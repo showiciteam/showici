@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy: #14213D;
+  --color-navy-deep: #0B1426;
+  --color-navy-soft: #2B3A5C;
+  --color-navy-line: #5B6787;
+  --color-brass: #D9A441;
+  --color-brass-dark: #8A6417;
+  --color-brass-tint: #F3E7CC;
+  --color-ivory: #FAF8F4;
+  --color-parchment: #F4F1EA;
+  --color-line: #E6E1D6;
+  --color-line-strong: #D3CCBD;
+  --color-ink-2: #2F3A52;
+  --color-slate: #4A5263;
+  --color-muted: #5F6677;
+  --color-on-navy: #C9CFDC;
+  --color-ph-1: #DCE1EA;
+  --color-ph-2: #EADFC8;
+  --color-ph-3: #CCD6E6;
+  --color-ph-4: #DDE3D6;
+  --color-ph-5: #E3DDE6;
+  --color-success: #DDE3D6;
+  --color-success-ink: #1F6B3A;
+  --font-display: "Fraunces", Georgia, serif;
+  --font-sans: "DM Sans", system-ui, sans-serif;
+}
+
+@layer base {
+  html { background: var(--color-ivory); }
+  body {
+    background: var(--color-ivory);
+    color: var(--color-navy);
+    font-family: var(--font-sans);
+  }
+  a { color: var(--color-brass-dark); }
+  a:hover { color: var(--color-navy-deep); }
+}
+
+@layer components {
+  .h-display { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em; color: var(--color-navy); }
+  .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-brass-dark); }
+  .card { background: #fff; border: 1px solid var(--color-line); border-radius: 16px; }
+  .input { background: #fff; color: var(--color-navy); border: 1px solid var(--color-line-strong); border-radius: 10px; padding: 12px; font: 500 16px var(--font-sans); width: 100%; }
+  .label { display: flex; flex-direction: column; gap: 6px; font-weight: 700; font-size: 14px; color: var(--color-navy); }
+  .hint { font-weight: 400; font-size: 13px; color: var(--color-muted); }
+  .wrap { max-width: 1240px; margin: 0 auto; padding-left: 24px; padding-right: 24px; }
+}
