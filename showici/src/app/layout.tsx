@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { DemoBanner } from "@/components/DemoBanner";
 import { LanguageProvider } from "@/lib/i18n";
 
 export const metadata: Metadata = {
@@ -21,6 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="min-h-screen antialiased">
+        <DemoBanner />
         <LanguageProvider>{children}</LanguageProvider>
       </body>
     </html>
