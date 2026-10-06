@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { Notice } from "@/components/form";
@@ -15,6 +15,10 @@ export default function LoginPage() {
   const [resetSent, setResetSent] = useState(false);
   const [busy, setBusy] = useState(false);
 
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("error") === "link") setError("That link has expired or was already used. Log in, or ask for a new link below.");
+  }, []);
+
   async function login(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
@@ -22,7 +26,11 @@ export default function LoginPage() {
     const res = await signIn(String(f.get("email")), String(f.get("password")));
     setBusy(false);
     if (!res.ok) return setError(res.error);
-    router.push(home[res.role ?? "performer"] ?? "/");
+    // Go back to the page that asked for a login, if any (only same-site paths).
+    const next = new URLSearchParams(window.location.search).get("next");
+    const safeNext = next && next.startsWith("/") && !next.startsWith("//") ? next : null;
+    router.push(safeNext ?? home[res.role ?? "performer"] ?? "/");
+    router.refresh();
   }
 
   async function reset(e: React.FormEvent<HTMLFormElement>) {
