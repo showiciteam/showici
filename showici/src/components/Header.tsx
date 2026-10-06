@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { signOutAction } from "@/lib/auth-actions";
 import { useLang, type DictKey } from "@/lib/i18n";
 import { Logo } from "./Logo";
 
@@ -35,7 +36,24 @@ export function LangToggle() {
   );
 }
 
-export function Header() {
+function Avatar({ name }: { name: string }) {
+  const letter = name.replace(/[\[\]]/g, "").trim()[0]?.toUpperCase() ?? "?";
+  return <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-ph-2 font-bold text-navy">{letter}</span>;
+}
+
+/** Log out button. Posts to a server action so the session cookie is cleared on the server too. */
+export function LogoutButton({ className = "" }: { className?: string }) {
+  const { lang } = useLang();
+  return (
+    <form action={signOutAction}>
+      <button type="submit" className={`min-h-10 rounded-[10px] border border-navy-line px-3.5 py-2 text-[15px] font-bold text-white hover:text-brass ${className}`}>
+        {lang === "fr" ? "Déconnexion" : "Log out"}
+      </button>
+    </form>
+  );
+}
+
+export function Header({ user }: { user?: { name: string; home: string } | null }) {
   const path = usePathname();
   const { t } = useLang();
   const [open, setOpen] = useState(false);
@@ -66,12 +84,24 @@ export function Header() {
           </div>
           <div className="flex items-center gap-2.5">
             <LangToggle />
-            <Link href="/login" className="rounded-[10px] px-3 py-2.5 text-[15px] text-white no-underline hover:text-brass">
-              {t("nav.login")}
-            </Link>
-            <Link href="/signup" className="rounded-[10px] bg-brass px-4 py-2.5 text-[15px] font-bold text-navy no-underline hover:text-navy">
-              {t("nav.signup")}
-            </Link>
+            {user ? (
+              <>
+                <Link href={user.home} className="flex items-center gap-2 rounded-[10px] px-2 py-1.5 text-[15px] text-white no-underline hover:text-brass">
+                  <Avatar name={user.name} />
+                  <span className="max-w-[160px] truncate font-bold">{user.name}</span>
+                </Link>
+                <LogoutButton />
+              </>
+            ) : (
+              <>
+                <Link href="/login" className="rounded-[10px] px-3 py-2.5 text-[15px] text-white no-underline hover:text-brass">
+                  {t("nav.login")}
+                </Link>
+                <Link href="/signup" className="rounded-[10px] bg-brass px-4 py-2.5 text-[15px] font-bold text-navy no-underline hover:text-navy">
+                  {t("nav.signup")}
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </nav>
@@ -79,8 +109,8 @@ export function Header() {
   );
 }
 
-type Role = "venue" | "performer" | "planner";
-const appLinks: Record<Role, { href: string; label: string }[]> = {
+type AppRole = "venue" | "performer" | "planner" | "admin";
+const appLinks: Record<AppRole, { href: string; label: string }[]> = {
   venue: [
     { href: "/dashboard/venue", label: "My shows" },
     { href: "/performers", label: "Find performers" },
@@ -97,9 +127,16 @@ const appLinks: Record<Role, { href: string; label: string }[]> = {
     { href: "/performers", label: "Find performers" },
     { href: "/messages", label: "Messages" },
   ],
+  admin: [
+    { href: "/admin", label: "Admin" },
+    { href: "/dashboard/venue", label: "Venue view" },
+    { href: "/dashboard/performer", label: "Performer view" },
+    { href: "/messages", label: "Messages" },
+  ],
 };
 
-export function AppHeader({ role, name }: { role: Role; name: string }) {
+/** Header for signed-in pages. `live` is false in demo mode, where there is no session to log out of. */
+export function AppHeader({ role, name, live = false }: { role: AppRole; name: string; live?: boolean }) {
   const path = usePathname();
   return (
     <header className="bg-navy text-white">
@@ -113,9 +150,10 @@ export function AppHeader({ role, name }: { role: Role; name: string }) {
           ))}
         </div>
         <span className="flex items-center gap-2.5 text-[15px]">
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-ph-2 font-bold text-navy">{name.replace(/[\[\]]/g, "")[0]}</span>
-          {name}
+          <Avatar name={name} />
+          <span className="max-w-[180px] truncate">{name}</span>
         </span>
+        {live && <LogoutButton />}
       </nav>
     </header>
   );
