@@ -22,16 +22,37 @@ export default function SignupPage() {
   const [role, setRole] = useState<Role>("venue");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [confirmEmail, setConfirmEmail] = useState("");
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
     setBusy(true);
     setError("");
-    const res = await signUp(String(f.get("email")), String(f.get("password")), role, String(f.get("name")));
+    const email = String(f.get("email"));
+    const res = await signUp(email, String(f.get("password")), role, String(f.get("name")), next[role]);
     setBusy(false);
     if (!res.ok) return setError(res.error);
+    // Email confirmation is on: the link in the email logs them in and continues to the next step.
+    if (res.needsConfirm) return setConfirmEmail(email);
     router.push(next[role]);
+    router.refresh();
+  }
+
+  if (confirmEmail) {
+    return (
+      <div className="flex min-h-screen flex-col items-center gap-7 bg-parchment px-4 pb-16 pt-10">
+        <div className="rounded-full bg-navy px-5 py-2.5"><Logo /></div>
+        <div className="card flex w-full max-w-[580px] flex-col gap-4 px-8 py-9">
+          <h1 className="h-display text-[32px]">Check your inbox</h1>
+          <p className="text-slate">
+            We sent a confirmation link to <strong>{confirmEmail}</strong>. Click it to activate your account and continue setting up your profile.
+          </p>
+          <p className="hint text-sm">Nothing there after a few minutes? Check your spam folder.</p>
+          <Link href="/login" className="font-bold">Back to log in</Link>
+        </div>
+      </div>
+    );
   }
 
   return (
