@@ -3,7 +3,7 @@
 import { getBrowserSupabase } from "./supabase/client";
 import { pointFor } from "./geo";
 
-export type Result = { ok: true; demo?: boolean; id?: string } | { ok: false; error: string };
+export type Result = { ok: true; demo?: boolean; id?: string; needsConfirm?: boolean } | { ok: false; error: string };
 
 async function currentUserId() {
   const sb = getBrowserSupabase();
@@ -12,11 +12,21 @@ async function currentUserId() {
   return data.user?.id ?? null;
 }
 
-export async function signUp(email: string, password: string, role: "venue" | "performer" | "planner", displayName: string): Promise<Result> {
+/** Creates the account. `nextPath` is where the email confirmation link should land. */
+export async function signUp(email: string, password: string, role: "venue" | "performer" | "planner", displayName: string, nextPath = "/"): Promise<Result> {
   const sb = getBrowserSupabase();
   if (!sb) return { ok: true, demo: true };
-  const { error } = await sb.auth.signUp({ email, password, options: { data: { role, display_name: displayName } } });
-  return error ? { ok: false, error: error.message } : { ok: true };
+  const { data, error } = await sb.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { role, display_name: displayName },
+      emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,
+    },
+  });
+  if (error) return { ok: false, error: error.message };
+  // When email confirmation is on, Supabase returns no session until the link is clicked.
+  return { ok: true, needsConfirm: !data.session };
 }
 
 export async function signIn(email: string, password: string): Promise<Result & { role?: string }> {
@@ -31,7 +41,7 @@ export async function signIn(email: string, password: string): Promise<Result & 
 export async function resetPassword(email: string): Promise<Result> {
   const sb = getBrowserSupabase();
   if (!sb) return { ok: true, demo: true };
-  const { error } = await sb.auth.resetPasswordForEmail(email);
+  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/auth/callback?next=/login` });
   return error ? { ok: false, error: error.message } : { ok: true };
 }
 
@@ -106,12 +116,34 @@ export async function startConversation(recipientProfileId: string, firstMessage
   return error ? { ok: false, error: error.message } : { ok: true, id: data as string };
 }
 
+/** Sends a message and returns the saved message's id (the database masks phone numbers and emails). */
 export async function sendMessage(conversationId: string, body: string, kind: "text" | "proposal" = "text"): Promise<Result> {
   const sb = getBrowserSupabase();
   const uid = await currentUserId();
   if (!sb) return { ok: true, demo: true };
   if (!uid) return { ok: false, error: "Please log in." };
-  const { error } = await sb.from("messages").insert({ conversation_id: conversationId, sender_id: uid, body, kind });
+  const { data, error } = await sb.from("messages").insert({ conversation_id: conversationId, sender_id: uid, body, kind }).select("id").single();
+  return error ? { ok: false, error: error.message } : { ok: true, id: data.id };
+}
+
+/** Updates one row by id. Row-level security decides who may change what. */
+async function updateById(table: "performers" | "reports", id: string, values: Record<string, unknown>): Promise<Result> {
+  const sb = getBrowserSupabase();
+  if (!sb) return { ok: true, demo: true };
+  const { error } = await sb.from(table).update(values).eq("id", id);
+  return error ? { ok: false, error: error.message } : { ok: true };
+}
+
+export const setPerformerAvailable = (performerId: string, available: boolean) => updateById("performers", performerId, { available });
+export const setPerformerVerified = (performerId: string, verified: boolean) => updateById("performers", performerId, { verified });
+export const unpublishPerformer = (performerId: string) => updateById("performers", performerId, { published: false });
+export const setReportStatus = (reportId: string, status: "dismissed" | "resolved") => updateById("reports", reportId, { status });
+
+/** Admin only: turns the free-plan contact cap on or off. */
+export async function setPlanLimits(enabled: boolean): Promise<Result> {
+  const sb = getBrowserSupabase();
+  if (!sb) return { ok: true, demo: true };
+  const { error } = await sb.from("app_settings").update({ value: enabled }).eq("key", "plan_limits_enabled");
   return error ? { ok: false, error: error.message } : { ok: true };
 }
 

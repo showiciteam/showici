@@ -89,6 +89,8 @@ export interface EventRequest {
   postedAgo: string;
   replies: string;
   tone: Tone;
+  /** Profile id of the planner who posted it (live data only). */
+  plannerId?: string;
 }
 
 export interface Story {
@@ -120,6 +122,9 @@ export interface Thread {
   when: string;
   last: string;
   tone: Tone;
+  /** Live data only: the other person's profile id and a short description (role, event). */
+  otherId?: string;
+  subtitle?: string;
 }
 
 export interface Message {

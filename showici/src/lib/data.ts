@@ -1,10 +1,10 @@
 // Data access. Reads from Supabase when it is configured, otherwise falls back to the sample data in mock.ts.
 import * as mock from "./mock";
 import { getServerSupabase } from "./supabase/server";
-import type { Performer, Show, Tone, Venue } from "./types";
+import type { EventRequest, Performer, Show, Tone, Venue } from "./types";
 
 const TONES: Tone[] = ["ph-1", "ph-2", "ph-3", "ph-4", "ph-5"];
-const toneFor = (id: string) => TONES[[...id].reduce((a, c) => a + c.charCodeAt(0), 0) % TONES.length];
+export const toneFor = (id: string) => TONES[[...id].reduce((a, c) => a + c.charCodeAt(0), 0) % TONES.length];
 
 // Greater Montréal bounding box used to place pins on the illustrated map.
 const BOUNDS = { north: 45.75, south: 45.35, west: -74.05, east: -73.35 };
@@ -14,6 +14,17 @@ export function mapPosition(lat?: number | null, lng?: number | null) {
   const y = ((BOUNDS.north - lat) / (BOUNDS.north - BOUNDS.south)) * 100;
   const clamp = (n: number) => Math.min(95, Math.max(5, n));
   return { x: `${clamp(x).toFixed(1)}%`, y: `${clamp(y).toFixed(1)}%` };
+}
+
+/** "3 h ago", "yesterday", "4 days ago"… */
+export function timeAgo(iso: string) {
+  const mins = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins} min ago`;
+  const hours = Math.round(mins / 60);
+  if (hours < 24) return `${hours} h ago`;
+  const days = Math.round(hours / 24);
+  return days === 1 ? "yesterday" : `${days} days ago`;
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -65,6 +76,27 @@ function toVenue(r: any): Venue {
     description: r.description ?? "",
     tone: toneFor(r.id),
     map: mapPosition(r.lat, r.lng),
+  };
+}
+
+function toEventRequest(r: any): EventRequest {
+  const date = r.event_date
+    ? new Date(`${r.event_date}T12:00:00`).toLocaleDateString("en-CA", { weekday: "short", month: "short", day: "numeric" })
+    : "Date TBD";
+  return {
+    id: r.id,
+    type: r.event_type,
+    date,
+    city: r.city ?? "",
+    guests: r.guests ? (/guest/i.test(r.guests) ? r.guests : `${r.guests} guests`) : "Guests TBD",
+    wants: (r.wants ?? []).join(", ") || "Any act",
+    budget: r.budget || "Budget TBD",
+    language: r.language || "Any language",
+    note: r.note ?? "",
+    postedAgo: timeAgo(r.created_at),
+    replies: "",
+    tone: toneFor(r.id),
+    plannerId: r.planner_id,
   };
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
@@ -151,8 +183,30 @@ export async function getShow(id: string): Promise<Show | undefined> {
   return all.find((s) => s.id === id) ?? all[0];
 }
 
+/** Open private-event requests, soonest first. Only signed-in performers (and the planner) can read them. */
+export async function getEventRequests(): Promise<EventRequest[]> {
+  const sb = await getServerSupabase();
+  if (!sb) return mock.eventRequests;
+  const today = new Date().toISOString().slice(0, 10);
+  const { data, error } = await sb
+    .from("event_requests")
+    .select("*")
+    .eq("status", "open")
+    .gte("event_date", today)
+    .order("event_date")
+    .limit(50);
+  if (error || !data) return [];
+  return data.map(toEventRequest);
+}
+
+export async function getEventRequest(id: string): Promise<EventRequest | undefined> {
+  const sb = await getServerSupabase();
+  if (!sb) return mock.eventRequests.find((r) => r.id === id);
+  const { data } = await sb.from("event_requests").select("*").eq("id", id).maybeSingle();
+  return data ? toEventRequest(data) : undefined;
+}
+
 export const getBigEvents = async () => mock.bigEvents; // Replace with the Ticketmaster Discovery API (see /api/big-events).
-export const getEventRequests = async () => mock.eventRequests;
 export const getStories = async () => mock.stories;
 export const getNews = async () => mock.news;
-export const getThreads = async () => mock.threads;
+export const getThreads = async () => mock.threads; // Sample threads for demo mode. Live inboxes use getInbox() in dashboard.ts.
