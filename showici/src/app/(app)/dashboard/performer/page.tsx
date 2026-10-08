@@ -44,7 +44,7 @@ export default async function PerformerDashboard() {
               </p>
             </div>
             <div className="flex flex-wrap gap-2.5">
-              {(me || !user) && <Button href={`/performers/${me?.id ?? "p1"}`} variant="secondary">View my profile</Button>}
+              {(me?.published || !user) && <Button href={`/performers/${me?.id ?? "p1"}`} variant="secondary">View my profile</Button>}
               <Button href="/register/performer">{me || !user ? "Edit profile" : "Create my profile"}</Button>
             </div>
           </div>
@@ -87,7 +87,7 @@ export default async function PerformerDashboard() {
                   <div key={g.id} className="flex items-center gap-3"><DateBadge day={g.day} date={g.date} /><span><strong>{g.title}</strong><br /><span className="text-sm text-muted">{g.sub}</span></span></div>
                 ))}
               </section>
-              <AvailabilityToggle performerId={me?.id} initial={me?.available ?? true} />
+              <AvailabilityToggle performerId={me?.id} initial={me?.available ?? true} blocked={me?.blockedDates ?? []} />
             </div>
           </div>
         </div>

@@ -123,7 +123,8 @@ const appLinks: Record<AppRole, { href: string; label: string }[]> = {
     { href: "/messages", label: "Messages" },
   ],
   planner: [
-    { href: "/request", label: "My event" },
+    { href: "/dashboard/planner", label: "My events" },
+    { href: "/request", label: "New request" },
     { href: "/performers", label: "Find performers" },
     { href: "/messages", label: "Messages" },
   ],

@@ -1,7 +1,8 @@
 // Data access. Reads from Supabase when it is configured, otherwise falls back to the sample data in mock.ts.
 import * as mock from "./mock";
 import { getServerSupabase } from "./supabase/server";
-import type { EventRequest, Performer, Show, Tone, Venue } from "./types";
+import { mediaUrl } from "./media";
+import type { EventRequest, Performer, Review, Show, Tone, Venue } from "./types";
 
 const TONES: Tone[] = ["ph-1", "ph-2", "ph-3", "ph-4", "ph-5"];
 export const toneFor = (id: string) => TONES[[...id].reduce((a, c) => a + c.charCodeAt(0), 0) % TONES.length];
@@ -28,6 +29,12 @@ export function timeAgo(iso: string) {
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+const photoUrls = (rows: any[] | undefined) =>
+  (rows ?? []).slice().sort((a: any, b: any) => (a.position ?? 0) - (b.position ?? 0)).map((p: any) => mediaUrl(p.storage_path)).filter(Boolean);
+
+const linkList = (pairs: [string, string | null | undefined][]) =>
+  pairs.filter(([, url]) => url && /^https?:\/\//.test(url)).map(([label, url]) => ({ label, url: url as string }));
+
 function toPerformer(r: any): Performer {
   const videos = (r.performer_videos ?? []).sort((a: any, b: any) => (a.position ?? 0) - (b.position ?? 0));
   return {
@@ -53,6 +60,9 @@ function toPerformer(r: any): Performer {
     videos: videos.map((v: any) => ({ title: v.title, length: v.length ?? "", featured: v.featured, url: v.youtube_url })),
     tone: toneFor(r.id),
     map: mapPosition(r.lat, r.lng),
+    ownerId: r.owner,
+    photos: photoUrls(r.performer_photos),
+    links: linkList([["Instagram", r.instagram], ["Facebook", r.facebook], ["TikTok", r.tiktok], ["Music", r.music_url], ["Website", r.website]]),
   };
 }
 
@@ -76,6 +86,10 @@ function toVenue(r: any): Venue {
     description: r.description ?? "",
     tone: toneFor(r.id),
     map: mapPosition(r.lat, r.lng),
+    ownerId: r.owner,
+    street: r.street ?? "",
+    photos: photoUrls(r.venue_photos),
+    links: linkList([["Website", r.website], ["Instagram", r.instagram], ["Facebook", r.facebook], ["YouTube", r.youtube_url]]),
   };
 }
 
@@ -123,7 +137,7 @@ export async function getPerformers(opts: NearOpts = {}): Promise<Performer[]> {
 export async function getPerformer(id: string): Promise<Performer | undefined> {
   const sb = await getServerSupabase();
   if (!sb) return mock.performers.find((p) => p.id === id) ?? mock.performers[0];
-  const { data } = await sb.from("performers_view").select("*, performer_videos(*)").eq("id", id).maybeSingle();
+  const { data } = await sb.from("performers_view").select("*, performer_videos(*), performer_photos(*)").eq("id", id).maybeSingle();
   return data ? toPerformer(data) : mock.performers.find((p) => p.id === id);
 }
 
@@ -142,9 +156,37 @@ export async function getVenues(opts: NearOpts = {}): Promise<Venue[]> {
 export async function getVenue(id: string): Promise<Venue | undefined> {
   const sb = await getServerSupabase();
   if (!sb) return mock.venues.find((v) => v.id === id) ?? mock.venues[0];
-  const { data } = await sb.from("venues_view").select("*").eq("id", id).maybeSingle();
+  const { data } = await sb.from("venues_view").select("*, venue_photos(*)").eq("id", id).maybeSingle();
   return data ? toVenue(data) : mock.venues.find((v) => v.id === id);
 }
+
+const SHOW_TZ = "America/Toronto"; // show times are always displayed in Montréal time
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+function toShow(r: any): Show {
+  const d = new Date(r.starts_at);
+  const long = d.toLocaleDateString("en-CA", { weekday: "long", month: "long", day: "numeric", timeZone: SHOW_TZ });
+  const clock = (x: Date) => x.toLocaleTimeString("en-CA", { hour: "numeric", minute: "2-digit", timeZone: SHOW_TZ });
+  return {
+    id: r.id,
+    performerId: r.performer_id ?? "",
+    venueId: r.venue_id,
+    title: r.title || r.performer_name,
+    genre: r.genre ?? "",
+    dayLabel: long,
+    day: d.toLocaleDateString("en-CA", { weekday: "short", timeZone: SHOW_TZ }).replace(".", "").toUpperCase(),
+    date: d.toLocaleDateString("en-CA", { day: "numeric", timeZone: SHOW_TZ }),
+    longDate: long,
+    doors: r.doors_at ? clock(new Date(r.doors_at)) : "",
+    time: clock(d),
+    entry: r.entry ?? "Free entry",
+    tone: toneFor(r.id),
+    ticketUrl: r.ticket_url ?? undefined,
+    description: r.description_en || r.description_fr || "",
+    startsAt: r.starts_at,
+  };
+}
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 export async function getShows(): Promise<Show[]> {
   const sb = await getServerSupabase();
@@ -157,30 +199,14 @@ export async function getShows(): Promise<Show[]> {
     .order("starts_at")
     .limit(50);
   if (error || !data?.length) return mock.shows;
-  return data.map((r) => {
-    const d = new Date(r.starts_at);
-    return {
-      id: r.id,
-      performerId: r.performer_id ?? "",
-      venueId: r.venue_id,
-      title: r.title || r.performer_name,
-      genre: r.genre ?? "",
-      dayLabel: d.toLocaleDateString("en-CA", { weekday: "long", month: "long", day: "numeric" }),
-      day: d.toLocaleDateString("en-CA", { weekday: "short" }).toUpperCase(),
-      date: String(d.getDate()),
-      longDate: d.toLocaleDateString("en-CA", { weekday: "long", month: "long", day: "numeric" }),
-      doors: r.doors_at ? new Date(r.doors_at).toLocaleTimeString("en-CA", { hour: "numeric", minute: "2-digit" }) : "",
-      time: d.toLocaleTimeString("en-CA", { hour: "numeric", minute: "2-digit" }),
-      entry: r.entry ?? "Free entry",
-      tone: toneFor(r.id),
-      ticketUrl: r.ticket_url ?? undefined,
-    } satisfies Show;
-  });
+  return data.map(toShow);
 }
 
 export async function getShow(id: string): Promise<Show | undefined> {
-  const all = await getShows();
-  return all.find((s) => s.id === id) ?? all[0];
+  const sb = await getServerSupabase();
+  if (!sb) return mock.shows.find((s) => s.id === id) ?? mock.shows[0];
+  const { data } = await sb.from("shows").select("*").eq("id", id).eq("status", "live").maybeSingle();
+  return data ? toShow(data) : mock.shows.find((s) => s.id === id);
 }
 
 /** Open private-event requests, soonest first. Only signed-in performers (and the planner) can read them. */
@@ -205,6 +231,34 @@ export async function getEventRequest(id: string): Promise<EventRequest | undefi
   const { data } = await sb.from("event_requests").select("*").eq("id", id).maybeSingle();
   return data ? toEventRequest(data) : undefined;
 }
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/** Reviews written about a profile (performer or venue owner), newest first. */
+export async function getReviewsFor(profileId?: string): Promise<Review[]> {
+  const sb = await getServerSupabase();
+  if (!sb || !profileId) return [];
+  const { data } = await sb
+    .from("reviews")
+    .select("id, rating, tags, body, created_at, reviewer:profiles!reviews_reviewer_id_fkey(display_name, role)")
+    .eq("subject_id", profileId)
+    .order("created_at", { ascending: false })
+    .limit(20);
+  const roleLabel: Record<string, string> = { venue: "Venue", performer: "Performer", planner: "Private event", admin: "ShowIci" };
+  return (data ?? []).map((r: any) => {
+    const who = Array.isArray(r.reviewer) ? r.reviewer[0] : r.reviewer;
+    return {
+      id: r.id,
+      author: who?.display_name || "ShowIci member",
+      context: roleLabel[who?.role] ?? "",
+      rating: r.rating,
+      body: r.body ?? "",
+      tags: r.tags ?? [],
+      date: new Date(r.created_at).toLocaleDateString("en-CA", { month: "short", year: "numeric" }),
+    };
+  });
+}
+
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 export const getBigEvents = async () => mock.bigEvents; // Replace with the Ticketmaster Discovery API (see /api/big-events).
 export const getStories = async () => mock.stories;

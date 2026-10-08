@@ -53,6 +53,62 @@ export async function getProfileName(profileId: string) {
   return data ? { name: data.display_name || "ShowIci member", role: roleLabel[data.role] ?? "" } : null;
 }
 
+/**
+ * Who a "Send message" link points to. Profile pages link with the performer or venue id,
+ * so this finds the owner's profile behind it.
+ */
+export async function resolveRecipient(id: string): Promise<{ id: string; name: string; role: string } | null> {
+  const sb = await getServerSupabase();
+  if (!sb) return null;
+  const direct = await getProfileName(id);
+  if (direct) return { id, ...direct };
+  const { data: perf } = await sb.from("performers_view").select("owner, name, act_type").eq("id", id).maybeSingle();
+  if (perf) return { id: perf.owner, name: perf.name, role: `Performer · ${perf.act_type}` };
+  const { data: venue } = await sb.from("venues_view").select("owner, name, type").eq("id", id).maybeSingle();
+  if (venue) return { id: venue.owner, name: venue.name, role: `Venue · ${venue.type}` };
+  return null;
+}
+
+/** Whether the signed-in user saved this performer or follows this venue. */
+export async function isSaved(userId: string | undefined, kind: "performer" | "venue", targetId: string) {
+  const sb = await getServerSupabase();
+  if (!sb || !userId) return false;
+  const { data } = await sb.from("saved").select("target_id").eq("profile_id", userId).eq("kind", kind).eq("target_id", targetId).maybeSingle();
+  return Boolean(data);
+}
+
+export async function getSavedPerformers(userId: string) {
+  const sb = await getServerSupabase();
+  if (!sb) return [];
+  const { data: saved } = await sb.from("saved").select("target_id").eq("profile_id", userId).eq("kind", "performer").order("created_at", { ascending: false }).limit(6);
+  const ids = (saved ?? []).map((s: any) => s.target_id);
+  if (!ids.length) return [];
+  const { data } = await sb.from("performers_view").select("id, name, act_type, genres").in("id", ids);
+  return (data ?? []).map((p: any) => ({ id: p.id as string, name: p.name as string, actType: p.act_type as string, genre: (p.genres ?? [])[0] ?? "", initials: initialsOf(p.name), tone: toneFor(p.id) }));
+}
+
+// ───────────── Planner ─────────────
+
+export async function getMyRequests(userId: string) {
+  const sb = await getServerSupabase();
+  if (!sb) return [];
+  const [{ data: reqs }, { data: convs }] = await Promise.all([
+    sb.from("event_requests").select("*").eq("planner_id", userId).order("event_date", { ascending: true }),
+    sb.from("conversations").select("id, event_request_id").not("event_request_id", "is", null),
+  ]);
+  return (reqs ?? []).map((r: any) => ({
+    id: r.id as string,
+    type: r.event_type as string,
+    date: r.event_date ? new Date(`${r.event_date}T12:00:00`).toLocaleDateString("en-CA", { weekday: "short", month: "short", day: "numeric", year: "numeric" }) : "",
+    city: (r.city ?? "") as string,
+    wants: ((r.wants ?? []) as string[]).join(", "),
+    budget: (r.budget ?? "") as string,
+    status: r.status as "open" | "booked" | "closed",
+    replies: (convs ?? []).filter((c: any) => c.event_request_id === r.id).length,
+    past: r.event_date ? new Date(`${r.event_date}T23:59:59`) < new Date() : false,
+  }));
+}
+
 // ───────────── Inbox ─────────────
 
 export interface Inbox {
@@ -119,7 +175,7 @@ export async function getMyPerformer(userId: string) {
   if (!sb) return null;
   const { data: p } = await sb
     .from("performers")
-    .select("id, name, bio, genres, available, published, verified, travel_km, performer_videos(id), performer_photos(id)")
+    .select("id, name, bio, genres, available, published, verified, travel_km, blocked_dates, performer_videos(id), performer_photos(id)")
     .eq("owner", userId)
     .order("created_at")
     .limit(1)
@@ -150,6 +206,7 @@ export async function getMyPerformer(userId: string) {
     available: p.available as boolean,
     published: p.published as boolean,
     travelKm: (p.travel_km as number) ?? 50,
+    blockedDates: ((p.blocked_dates ?? []) as string[]).filter((d) => d >= new Date().toISOString().slice(0, 10)).sort(),
     strength: Math.round((done / checks.length) * 100),
     tip: checks.find(([ok]) => !ok)?.[1] ?? "Your profile is complete.",
     gigs: (gigs ?? []).map((g: any) => {
@@ -198,6 +255,120 @@ export function nextNights(weeks = 3) {
 }
 
 // ───────────── Admin ─────────────
+
+export interface AdminUser {
+  id: string;
+  email: string;
+  role: "venue" | "performer" | "planner" | "admin";
+  name: string;
+  plan: string;
+  joined: string;
+  confirmed: boolean;
+  lastSeen: string;
+}
+
+export async function getAdminUsers(): Promise<{ users: AdminUser[]; error: string | null }> {
+  const sb = await getServerSupabase();
+  if (!sb) return { users: [], error: null };
+  const { data, error } = await sb.rpc("admin_users");
+  return {
+    error: error?.message ?? null,
+    users: (data ?? []).map((u: any) => ({
+      id: u.id as string,
+      email: u.email as string,
+      role: (u.role ?? "planner") as "venue" | "performer" | "planner" | "admin",
+      name: (u.display_name ?? "") as string,
+      plan: (u.plan ?? "free") as string,
+      joined: new Date(u.created_at).toLocaleDateString("en-CA", { year: "numeric", month: "short", day: "numeric" }),
+      confirmed: !!u.confirmed,
+      lastSeen: u.last_sign_in_at ? timeAgo(u.last_sign_in_at) : "never",
+    })),
+  };
+}
+
+export async function getAdminShows() {
+  const sb = await getServerSupabase();
+  if (!sb) return [];
+  const { data } = await sb
+    .from("shows")
+    .select("id, title, performer_name, starts_at, status, entry, venues(name, city)")
+    .order("starts_at", { ascending: false })
+    .limit(200);
+  return (data ?? []).map((s: any) => {
+    const v = one<any>(s.venues);
+    const d = dayParts(s.starts_at);
+    return { id: s.id as string, title: (s.title || s.performer_name || "Untitled") as string, venue: v?.name ?? "", city: v?.city ?? "", when: `${d.day} ${d.key} · ${d.time}`, status: s.status as "draft" | "live" | "cancelled", entry: (s.entry ?? "") as string, past: new Date(s.starts_at) < new Date() };
+  });
+}
+
+export async function getAdminRequests() {
+  const sb = await getServerSupabase();
+  if (!sb) return [];
+  const { data } = await sb
+    .from("event_requests")
+    .select("id, event_type, event_date, city, budget, status, created_at, planner:profiles!event_requests_planner_id_fkey(display_name)")
+    .order("created_at", { ascending: false })
+    .limit(200);
+  return (data ?? []).map((r: any) => ({
+    id: r.id as string,
+    type: r.event_type as string,
+    date: r.event_date as string,
+    city: (r.city ?? "") as string,
+    budget: (r.budget ?? "") as string,
+    status: r.status as "open" | "booked" | "closed",
+    planner: one<any>(r.planner)?.display_name ?? "",
+    posted: timeAgo(r.created_at),
+  }));
+}
+
+export async function getAdminReports(status: "open" | "dismissed" | "resolved" | "all") {
+  const sb = await getServerSupabase();
+  if (!sb) return [];
+  let q = sb
+    .from("reports")
+    .select("id, kind, reason, status, created_at, conversation_id, reporter:profiles!reports_reporter_id_fkey(display_name), subject:profiles!reports_subject_id_fkey(display_name)")
+    .order("created_at", { ascending: false })
+    .limit(200);
+  if (status !== "all") q = q.eq("status", status);
+  const { data } = await q;
+  return (data ?? []).map((r: any) => ({
+    id: r.id as string,
+    kind: String(r.kind).replace("_", "-"),
+    status: r.status as string,
+    who: one<any>(r.subject)?.display_name ?? "Unknown",
+    by: one<any>(r.reporter)?.display_name ?? "Unknown",
+    when: timeAgo(r.created_at),
+    why: (r.reason ?? "") as string,
+  }));
+}
+
+export async function getAdminPerformersAndVenues() {
+  const sb = await getServerSupabase();
+  if (!sb) return { performers: [], venues: [] };
+  const [{ data: perfs }, { data: vens }] = await Promise.all([
+    sb.from("performers").select("id, name, act_type, base_city, published, verified, created_at, performer_videos(id), performer_photos(id)").order("created_at", { ascending: false }).limit(200),
+    sb.from("venues").select("id, name, type, city, published, created_at").order("created_at", { ascending: false }).limit(200),
+  ]);
+  return {
+    performers: (perfs ?? []).map((p: any) => ({
+      id: p.id as string,
+      name: p.name as string,
+      detail: [p.act_type, p.base_city, `${(p.performer_videos ?? []).length} videos`, `${(p.performer_photos ?? []).length} photos`].filter(Boolean).join(" · "),
+      published: !!p.published,
+      verified: !!p.verified,
+      joined: timeAgo(p.created_at),
+    })),
+    venues: (vens ?? []).map((v: any) => ({ id: v.id as string, name: v.name as string, detail: [v.type, v.city].filter(Boolean).join(" · "), published: !!v.published, joined: timeAgo(v.created_at) })),
+  };
+}
+
+export async function getAppSettings() {
+  const sb = await getServerSupabase();
+  if (!sb) return { limitsOn: false, dailyContacts: 2 };
+  const { data } = await sb.from("app_settings").select("key, value");
+  const get = (k: string) => (data ?? []).find((s: any) => s.key === k)?.value;
+  return { limitsOn: get("plan_limits_enabled") === true, dailyContacts: Number(get("free_daily_contacts") ?? 2) };
+}
 
 export interface AdminStats {
   venues: number;

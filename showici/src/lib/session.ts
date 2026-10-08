@@ -15,7 +15,7 @@ export interface SessionUser {
 export const homeFor: Record<Role, string> = {
   venue: "/dashboard/venue",
   performer: "/dashboard/performer",
-  planner: "/request",
+  planner: "/dashboard/planner",
   admin: "/admin",
 };
 

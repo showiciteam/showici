@@ -2,7 +2,7 @@ import Link from "next/link";
 import { AppHeader } from "@/components/Header";
 import { Button, Placeholder } from "@/components/ui";
 import { getPerformers, getShows } from "@/lib/data";
-import { getMyVenue, nextNights } from "@/lib/dashboard";
+import { getMyVenue, getSavedPerformers, nextNights } from "@/lib/dashboard";
 import { requireUser } from "@/lib/session";
 
 export const metadata = { title: "My shows · ShowIci" };
@@ -12,7 +12,11 @@ const statusStyle = { live: "bg-success text-success-ink", draft: "bg-line", can
 
 export default async function VenueDashboard() {
   const user = await requireUser(["venue"]);
-  const [performers, venue] = await Promise.all([getPerformers(), user ? getMyVenue(user.id) : null]);
+  const [nearby, venue, saved] = await Promise.all([getPerformers(), user ? getMyVenue(user.id) : null, user ? getSavedPerformers(user.id) : []]);
+  // Saved performers first; until the venue saves some, suggest performers nearby.
+  const sideList = saved.length
+    ? saved.map((p) => ({ id: p.id, name: p.name, sub: [p.actType, p.genre].filter(Boolean).join(" · "), initials: p.initials, tone: p.tone }))
+    : nearby.slice(0, 3).map((p) => ({ id: p.id, name: p.name, sub: `${p.actType} · ${p.genres[0] ?? ""}`, initials: p.initials, tone: p.tone }));
 
   // Live mode: this venue's own shows. Demo mode: the sample shows and calendar.
   let name = "[Your pub]";
@@ -36,7 +40,7 @@ export default async function VenueDashboard() {
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div><h1 className="h-display text-[38px]">{name}</h1><p className="mt-1.5 text-slate">Plan your next nights and keep your listings fresh.</p></div>
             <div className="flex flex-wrap gap-2.5">
-              {(venue || !user) && <Button href={`/venues/${venue?.id ?? "v1"}`} variant="secondary">View venue page</Button>}
+              {(venue?.published || !user) && <Button href={`/venues/${venue?.id ?? "v1"}`} variant="secondary">View venue page</Button>}
               <Button href="/dashboard/venue/post-show">+ Post a show</Button>
             </div>
           </div>
@@ -77,7 +81,7 @@ export default async function VenueDashboard() {
                           <td className="px-2 py-3">{s.title}</td>
                           <td className="px-2 py-3">{s.entry}</td>
                           <td className="px-2 py-3"><span className={`rounded-full px-2.5 py-0.5 text-[13px] font-bold capitalize ${statusStyle[s.status]}`}>{s.status}</span></td>
-                          <td className="px-2 py-3 text-right"><Link href="/dashboard/venue/post-show" className="font-bold">Edit</Link></td>
+                          <td className="px-2 py-3 text-right"><Link href={user ? `/dashboard/venue/post-show?id=${s.id}` : "/dashboard/venue/post-show"} className="font-bold">Edit</Link></td>
                         </tr>
                       ))}
                     </tbody>
@@ -86,11 +90,12 @@ export default async function VenueDashboard() {
               )}
             </section>
             <section className="card flex max-w-[400px] flex-[1_1_300px] flex-col gap-3 p-[22px]">
-              <h2 className="h-display text-[22px]">Performers near you</h2>
-              {performers.slice(0, 3).map((p) => (
+              <h2 className="h-display text-[22px]">{saved.length ? "Saved performers" : "Performers near you"}</h2>
+              {!saved.length && user && <p className="hint text-sm">Tap ♡ Save on a performer&apos;s page to keep them here.</p>}
+              {sideList.map((p) => (
                 <Link key={p.id} href={`/performers/${p.id}`} className="flex items-center gap-3 text-navy no-underline">
                   <Placeholder tone={p.tone} label={p.initials} className="h-[42px] w-[42px] flex-none rounded-full text-navy" />
-                  <span><strong>{p.name}</strong><br /><span className="text-sm text-muted">{p.actType} · {p.genres[0]}</span></span>
+                  <span><strong>{p.name}</strong><br /><span className="text-sm text-muted">{p.sub}</span></span>
                 </Link>
               ))}
               <Button href="/performers" variant="secondary">Find more performers</Button>

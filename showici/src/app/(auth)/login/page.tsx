@@ -7,7 +7,7 @@ import { Logo } from "@/components/Logo";
 import { Notice } from "@/components/form";
 import { resetPassword, signIn } from "@/lib/actions";
 
-const home: Record<string, string> = { venue: "/dashboard/venue", performer: "/dashboard/performer", planner: "/request", admin: "/admin" };
+const home: Record<string, string> = { venue: "/dashboard/venue", performer: "/dashboard/performer", planner: "/dashboard/planner", admin: "/admin" };
 
 export default function LoginPage() {
   const router = useRouter();

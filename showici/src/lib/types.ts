@@ -23,6 +23,10 @@ export interface Performer {
   videos: { title: string; length: string; featured?: boolean; url?: string }[];
   tone: Tone;
   map: { x: string; y: string };
+  /** Live data only. */
+  ownerId?: string;
+  photos?: string[];
+  links?: { label: string; url: string }[];
 }
 
 export interface Venue {
@@ -44,6 +48,11 @@ export interface Venue {
   description: string;
   tone: Tone;
   map: { x: string; y: string };
+  /** Live data only. */
+  ownerId?: string;
+  street?: string;
+  photos?: string[];
+  links?: { label: string; url: string }[];
 }
 
 export interface Show {
@@ -61,6 +70,20 @@ export interface Show {
   entry: string;
   tone: Tone;
   ticketUrl?: string;
+  /** Live data only. */
+  description?: string;
+  startsAt?: string;
+  durationMin?: number;
+}
+
+export interface Review {
+  id: string;
+  author: string;
+  context: string;
+  rating: number;
+  body: string;
+  tags: string[];
+  date: string;
 }
 
 export interface BigEvent {

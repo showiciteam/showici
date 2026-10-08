@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button, PlayIcon, toneClass } from "@/components/ui";
-import { maskContactInfo, sendMessage, startConversation } from "@/lib/actions";
+import { maskContactInfo, reportConversation, sendMessage, startConversation } from "@/lib/actions";
 import { getBrowserSupabase } from "@/lib/supabase/client";
 import type { Message, Thread } from "@/lib/types";
 
@@ -32,7 +32,7 @@ interface Props {
   startedAt: string | null;
   contactsLeft: number | null;
   /** Set when starting a new conversation (e.g. replying to an event request). */
-  newTo: { id: string; name: string; context: string } | null;
+  newTo: { id: string; name: string; context: string; requestId?: string } | null;
 }
 
 export function Inbox({ live, meId, threads, activeId, messages: initial, startedAt, contactsLeft, newTo }: Props) {
@@ -43,6 +43,8 @@ export function Inbox({ live, meId, threads, activeId, messages: initial, starte
   const [proposing, setProposing] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [reporting, setReporting] = useState(false);
+  const [reported, setReported] = useState(false);
 
   const thread = live ? threads.find((t) => t.id === activeId) : demoActive;
   const header = newTo
@@ -81,7 +83,7 @@ export function Inbox({ live, meId, threads, activeId, messages: initial, starte
 
     setBusy(true);
     if (newTo) {
-      const res = await startConversation(newTo.id, body);
+      const res = await startConversation(newTo.id, body, newTo.requestId);
       setBusy(false);
       if (!res.ok) return setError(res.error);
       setDraft("");
@@ -101,6 +103,20 @@ export function Inbox({ live, meId, threads, activeId, messages: initial, starte
   function openThread(t: Thread) {
     if (live) router.push(`/messages?c=${t.id}`);
     else setDemoActive(t);
+  }
+
+  async function submitReport(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const f = new FormData(e.currentTarget);
+    const res = await reportConversation({
+      subject_id: thread?.otherId ?? null,
+      conversation_id: activeId,
+      kind: String(f.get("kind")) as "message" | "profile" | "no_show" | "other",
+      reason: String(f.get("reason") ?? ""),
+    });
+    if (!res.ok) return setError(res.error);
+    setReporting(false);
+    setReported(true);
   }
 
   const started = startedAt ? new Date(startedAt).toLocaleDateString("en-CA", { month: "short", day: "numeric" }) : null;
@@ -201,8 +217,30 @@ export function Inbox({ live, meId, threads, activeId, messages: initial, starte
             <span className="hint">Their featured video</span>
           </>
         )}
-        <Button href="/review" variant="secondary" className="text-sm">Leave a review after the gig</Button>
-        <Link href="#" className="text-sm text-muted">Report this conversation</Link>
+        {(!live || (activeId && !newTo)) && (
+          <Button href={live ? `/review?c=${activeId}` : "/review"} variant="secondary" className="text-sm">Leave a review after the gig</Button>
+        )}
+        {live && activeId && !newTo && (
+          reported ? (
+            <span className="text-sm text-success-ink">Thanks, the ShowIci team will look at it.</span>
+          ) : reporting ? (
+            <form onSubmit={submitReport} className="flex flex-col gap-2 rounded-xl border border-line p-3">
+              <label className="label text-sm">What happened?
+                <select name="kind" className="input min-h-9 py-1 text-sm" defaultValue="message">
+                  <option value="message">Inappropriate or spam messages</option>
+                  <option value="profile">Fake or misleading profile</option>
+                  <option value="no_show">Didn&apos;t show up</option>
+                  <option value="other">Something else</option>
+                </select>
+              </label>
+              <textarea name="reason" rows={3} className="input text-sm" placeholder="Tell us briefly what happened." />
+              <div className="flex gap-2"><button type="submit" className="min-h-9 rounded-lg bg-navy px-3 text-sm font-bold text-white">Send report</button><button type="button" onClick={() => setReporting(false)} className="text-sm text-muted">Cancel</button></div>
+            </form>
+          ) : (
+            <button type="button" onClick={() => setReporting(true)} className="self-start text-sm text-muted underline">Report this conversation</button>
+          )
+        )}
+        {!live && <Link href="#" className="text-sm text-muted">Report this conversation</Link>}
       </aside>
     </div>
   );
