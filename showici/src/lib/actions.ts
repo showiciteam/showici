@@ -255,6 +255,22 @@ export async function sendMessage(conversationId: string, body: string, kind: "t
   return error ? { ok: false, error: error.message } : { ok: true, id: data.id };
 }
 
+/** Marks a conversation as read for the signed-in person (stops "new message" emails while it is open). */
+export async function markConversationRead(conversationId: string): Promise<Result> {
+  const sb = getBrowserSupabase();
+  if (!sb) return { ok: true, demo: true };
+  const { error } = await sb.rpc("mark_conversation_read", { p_conversation: conversationId });
+  return error ? { ok: false, error: error.message } : { ok: true };
+}
+
+/** Turns the "you have a new message" emails on or off for the signed-in person. */
+export async function setEmailOnMessage(on: boolean): Promise<Result> {
+  const sb = getBrowserSupabase();
+  if (!sb) return { ok: true, demo: true };
+  const { error } = await sb.rpc("set_email_on_message", { p_on: on });
+  return error ? { ok: false, error: error.message } : { ok: true };
+}
+
 /** Updates one row by id. Row-level security decides who may change what. */
 async function updateById(table: "performers" | "reports" | "shows" | "event_requests" | "profiles" | "venues", id: string, values: Record<string, unknown>): Promise<Result> {
   const sb = getBrowserSupabase();

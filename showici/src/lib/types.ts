@@ -148,6 +148,8 @@ export interface Thread {
   /** Live data only: the other person's profile id and a short description (role, event). */
   otherId?: string;
   subtitle?: string;
+  /** Live data only: the newest message is from the other person and arrived after you last opened the thread. */
+  unread?: boolean;
 }
 
 export interface Message {

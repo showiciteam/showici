@@ -123,7 +123,7 @@ export async function getInbox(userId: string, wantedId?: string): Promise<Inbox
   const sb = await getServerSupabase();
   if (!sb) return empty;
 
-  const { data: mine } = await sb.from("conversation_members").select("conversation_id").eq("profile_id", userId);
+  const { data: mine } = await sb.from("conversation_members").select("conversation_id, last_read_at").eq("profile_id", userId);
   const ids = (mine ?? []).map((m: any) => m.conversation_id as string);
   if (!ids.length) return empty;
 
@@ -137,6 +137,8 @@ export async function getInbox(userId: string, wantedId?: string): Promise<Inbox
     const prof = one<any>(other?.profiles);
     const last = (msgs ?? []).find((m: any) => m.conversation_id === id);
     const name = prof?.display_name || "ShowIci member";
+    const readAt = (mine ?? []).find((m: any) => m.conversation_id === id)?.last_read_at as string | null | undefined;
+    const unread = !!last && last.sender_id !== userId && (!readAt || new Date(last.created_at) > new Date(readAt));
     return {
       id,
       name,
@@ -147,6 +149,7 @@ export async function getInbox(userId: string, wantedId?: string): Promise<Inbox
       otherId: other?.profile_id,
       subtitle: roleLabel[prof?.role] ?? "",
       at: last?.created_at ?? "",
+      unread,
     };
   });
   threads.sort((a, b) => b.at.localeCompare(a.at));
@@ -159,6 +162,14 @@ export async function getInbox(userId: string, wantedId?: string): Promise<Inbox
     messages: convMsgs.map((m: any) => ({ id: m.id, fromMe: m.sender_id === userId, text: m.body, kind: m.kind })),
     startedAt: convMsgs[0]?.created_at ?? null,
   };
+}
+
+/** Whether this person wants an email when someone messages them (defaults to yes). */
+export async function getEmailOnMessage(userId: string): Promise<boolean> {
+  const sb = await getServerSupabase();
+  if (!sb) return true;
+  const { data } = await sb.from("profiles").select("email_on_message").eq("id", userId).maybeSingle();
+  return (data as any)?.email_on_message ?? true;
 }
 
 export async function countConversations(userId: string) {

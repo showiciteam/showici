@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button, PlayIcon, toneClass } from "@/components/ui";
-import { maskContactInfo, reportConversation, sendMessage, startConversation } from "@/lib/actions";
+import { markConversationRead, maskContactInfo, reportConversation, sendMessage, setEmailOnMessage, startConversation } from "@/lib/actions";
 import { getBrowserSupabase } from "@/lib/supabase/client";
 import type { Message, Thread } from "@/lib/types";
 
@@ -31,11 +31,13 @@ interface Props {
   messages: Message[];
   startedAt: string | null;
   contactsLeft: number | null;
+  /** Whether this person gets an email when someone messages them. */
+  emailOnMessage?: boolean;
   /** Set when starting a new conversation (e.g. replying to an event request). */
   newTo: { id: string; name: string; context: string; requestId?: string } | null;
 }
 
-export function Inbox({ live, meId, threads, activeId, messages: initial, startedAt, contactsLeft, newTo }: Props) {
+export function Inbox({ live, meId, threads, activeId, messages: initial, startedAt, contactsLeft, emailOnMessage = true, newTo }: Props) {
   const router = useRouter();
   const [demoActive, setDemoActive] = useState(threads[0]);
   const [messages, setMessages] = useState<Message[]>(live ? initial : demoMessages);
@@ -45,6 +47,7 @@ export function Inbox({ live, meId, threads, activeId, messages: initial, starte
   const [error, setError] = useState("");
   const [reporting, setReporting] = useState(false);
   const [reported, setReported] = useState(false);
+  const [emailOn, setEmailOn] = useState(emailOnMessage);
 
   const thread = live ? threads.find((t) => t.id === activeId) : demoActive;
   const header = newTo
@@ -53,19 +56,26 @@ export function Inbox({ live, meId, threads, activeId, messages: initial, starte
       ? { name: thread.name, initials: thread.initials, tone: thread.tone, subtitle: thread.subtitle ?? "Band · Rock covers · Montréal" }
       : null;
 
-  // New messages from the other person appear without a reload.
+  // New messages from the other person appear without a reload. While a conversation is
+  // on screen it counts as read, so no "new message" email goes out for it.
   useEffect(() => {
     if (!live || !activeId) return;
     const sb = getBrowserSupabase();
     if (!sb) return;
+    markConversationRead(activeId);
+    const keepRead = setInterval(() => {
+      if (document.visibilityState === "visible") markConversationRead(activeId);
+    }, 120_000);
     const channel = sb
       .channel(`conversation-${activeId}`)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter: `conversation_id=eq.${activeId}` }, (payload) => {
         const m = payload.new as { id: string; sender_id: string; body: string; kind: Message["kind"] };
         setMessages((prev) => (prev.some((x) => x.id === m.id) ? prev : [...prev, { id: m.id, fromMe: m.sender_id === meId, text: m.body, kind: m.kind }]));
+        if (m.sender_id !== meId && document.visibilityState === "visible") markConversationRead(activeId);
       })
       .subscribe();
     return () => {
+      clearInterval(keepRead);
       sb.removeChannel(channel);
     };
   }, [live, activeId, meId]);
@@ -129,6 +139,25 @@ export function Inbox({ live, meId, threads, activeId, messages: initial, starte
           <span className="rounded-[10px] bg-brass-tint px-3 py-2 text-[13px] font-bold text-navy-deep">
             {contactsLeft == null ? "Unlimited new contacts during launch" : `${contactsLeft} of 2 new contacts left today`}
           </span>
+          {live && (
+            <label className="flex items-center gap-2 text-[13px] text-slate">
+              <input
+                type="checkbox"
+                checked={emailOn}
+                onChange={async (e) => {
+                  const on = e.target.checked;
+                  setEmailOn(on);
+                  const res = await setEmailOnMessage(on);
+                  if (!res.ok) {
+                    setEmailOn(!on);
+                    setError(res.error);
+                  }
+                }}
+                className="h-4 w-4 accent-navy"
+              />
+              Email me when I get a new message
+            </label>
+          )}
         </div>
         {threads.length === 0 && !newTo && <p className="p-[18px] text-sm text-slate">No conversations yet. Contact a performer, venue or event request to start one.</p>}
         {threads.map((t) => {
@@ -137,8 +166,14 @@ export function Inbox({ live, meId, threads, activeId, messages: initial, starte
             <button key={t.id} type="button" onClick={() => openThread(t)} className={`flex gap-3 border-b border-line px-[18px] py-3.5 text-left ${isActive ? "bg-brass-tint" : "bg-white hover:bg-parchment"}`}>
               <span className={`flex h-11 w-11 flex-none items-center justify-center rounded-full font-extrabold ${toneClass[t.tone]}`}>{t.initials}</span>
               <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <span className="flex justify-between gap-2"><strong>{t.name}</strong><span className="hint">{t.when}</span></span>
-                <span className="truncate text-sm text-slate">{t.last}</span>
+                <span className="flex justify-between gap-2">
+                  <strong className="flex items-center gap-1.5">
+                    {t.unread && !isActive && <span className="h-2.5 w-2.5 flex-none rounded-full bg-brass" aria-label="New message" />}
+                    {t.name}
+                  </strong>
+                  <span className="hint">{t.when}</span>
+                </span>
+                <span className={`truncate text-sm ${t.unread && !isActive ? "font-bold text-navy" : "text-slate"}`}>{t.last}</span>
               </span>
             </button>
           );

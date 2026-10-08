@@ -1,6 +1,6 @@
 import { AppHeader } from "@/components/Header";
 import { getEventRequest, getThreads } from "@/lib/data";
-import { getContactAllowance, getInbox, getProfileName, resolveRecipient } from "@/lib/dashboard";
+import { getContactAllowance, getEmailOnMessage, getInbox, getProfileName, resolveRecipient } from "@/lib/dashboard";
 import { requireUser } from "@/lib/session";
 import { Inbox } from "./Inbox";
 
@@ -25,7 +25,7 @@ export default async function MessagesPage({ searchParams }: { searchParams: Pro
     );
   }
 
-  const [inbox, contactsLeft] = await Promise.all([getInbox(user.id, sp.c), getContactAllowance(user.id)]);
+  const [inbox, contactsLeft, emailOnMessage] = await Promise.all([getInbox(user.id, sp.c), getContactAllowance(user.id), getEmailOnMessage(user.id)]);
 
   // Starting a new conversation: replying to an event request, or contacting a profile directly.
   let newTo: { id: string; name: string; context: string; requestId?: string } | null = null;
@@ -56,6 +56,7 @@ export default async function MessagesPage({ searchParams }: { searchParams: Pro
           messages={newTo ? [] : inbox.messages}
           startedAt={newTo ? null : inbox.startedAt}
           contactsLeft={contactsLeft}
+          emailOnMessage={emailOnMessage}
           newTo={newTo}
         />
       </main>
