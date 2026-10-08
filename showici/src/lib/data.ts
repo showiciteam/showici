@@ -1,4 +1,4 @@
-// Data access. Reads from Supabase when it is configured, otherwise falls back to the sample data in mock.ts.
+// Data access. Reads from Supabase when it is configured. The sample data in mock.ts is only used in demo mode (no Supabase env vars).
 import * as mock from "./mock";
 import { getServerSupabase } from "./supabase/server";
 import { mediaUrl } from "./media";
@@ -130,15 +130,15 @@ export async function getPerformers(opts: NearOpts = {}): Promise<Performer[]> {
     p_lng: opts.lng ?? MONTREAL.lng,
     p_radius_km: opts.radiusKm ?? 50,
   });
-  if (error || !data?.length) return mock.performers;
-  return data.map(toPerformer);
+  if (error) console.error("getPerformers", error.message);
+  return (data ?? []).map(toPerformer);
 }
 
 export async function getPerformer(id: string): Promise<Performer | undefined> {
   const sb = await getServerSupabase();
   if (!sb) return mock.performers.find((p) => p.id === id) ?? mock.performers[0];
   const { data } = await sb.from("performers_view").select("*, performer_videos(*), performer_photos(*)").eq("id", id).maybeSingle();
-  return data ? toPerformer(data) : mock.performers.find((p) => p.id === id);
+  return data ? toPerformer(data) : undefined;
 }
 
 export async function getVenues(opts: NearOpts = {}): Promise<Venue[]> {
@@ -149,15 +149,15 @@ export async function getVenues(opts: NearOpts = {}): Promise<Venue[]> {
     p_lng: opts.lng ?? MONTREAL.lng,
     p_radius_km: opts.radiusKm ?? 50,
   });
-  if (error || !data?.length) return mock.venues;
-  return data.map(toVenue);
+  if (error) console.error("getVenues", error.message);
+  return (data ?? []).map(toVenue);
 }
 
 export async function getVenue(id: string): Promise<Venue | undefined> {
   const sb = await getServerSupabase();
   if (!sb) return mock.venues.find((v) => v.id === id) ?? mock.venues[0];
   const { data } = await sb.from("venues_view").select("*, venue_photos(*)").eq("id", id).maybeSingle();
-  return data ? toVenue(data) : mock.venues.find((v) => v.id === id);
+  return data ? toVenue(data) : undefined;
 }
 
 const SHOW_TZ = "America/Toronto"; // show times are always displayed in Montréal time
@@ -198,15 +198,15 @@ export async function getShows(): Promise<Show[]> {
     .gte("starts_at", new Date().toISOString())
     .order("starts_at")
     .limit(50);
-  if (error || !data?.length) return mock.shows;
-  return data.map(toShow);
+  if (error) console.error("getShows", error.message);
+  return (data ?? []).map(toShow);
 }
 
 export async function getShow(id: string): Promise<Show | undefined> {
   const sb = await getServerSupabase();
   if (!sb) return mock.shows.find((s) => s.id === id) ?? mock.shows[0];
   const { data } = await sb.from("shows").select("*").eq("id", id).eq("status", "live").maybeSingle();
-  return data ? toShow(data) : mock.shows.find((s) => s.id === id);
+  return data ? toShow(data) : undefined;
 }
 
 /** Open private-event requests, soonest first. Only signed-in performers (and the planner) can read them. */

@@ -41,7 +41,15 @@ export async function signIn(email: string, password: string): Promise<Result & 
 export async function resetPassword(email: string): Promise<Result> {
   const sb = getBrowserSupabase();
   if (!sb) return { ok: true, demo: true };
-  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/auth/callback?next=/login` });
+  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/auth/callback?next=/reset-password` });
+  return error ? { ok: false, error: error.message } : { ok: true };
+}
+
+/** Sets a new password for the signed-in user (after following a reset link). */
+export async function updatePassword(password: string): Promise<Result> {
+  const sb = getBrowserSupabase();
+  if (!sb) return { ok: true, demo: true };
+  const { error } = await sb.auth.updateUser({ password });
   return error ? { ok: false, error: error.message } : { ok: true };
 }
 

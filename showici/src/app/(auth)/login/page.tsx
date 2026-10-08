@@ -13,10 +13,16 @@ export default function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState("");
   const [resetSent, setResetSent] = useState(false);
+  const [showReset, setShowReset] = useState(false);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get("error") === "link") setError("That link has expired or was already used. Log in, or ask for a new link below.");
+    const q = new URLSearchParams(window.location.search);
+    if (q.get("error") === "link") {
+      setError("That link has expired or was already used. Log in, or ask for a new link.");
+      setShowReset(true);
+    }
+    if (window.location.hash === "#reset") setShowReset(true);
   }, []);
 
   async function login(e: React.FormEvent<HTMLFormElement>) {
@@ -49,12 +55,13 @@ export default function LoginPage() {
           <label className="label">Password<input name="password" type="password" required className="input" autoComplete="current-password" /></label>
           <div className="flex flex-wrap items-center justify-between gap-2.5 text-sm">
             <label className="flex items-center gap-2"><input type="checkbox" defaultChecked className="h-[18px] w-[18px] accent-navy" />Keep me logged in</label>
-            <a href="#reset" className="font-bold">Forgot password?</a>
+            <button type="button" onClick={() => setShowReset((v) => !v)} className="font-bold text-brass-dark underline">Forgot password?</button>
           </div>
           {error && <Notice kind="error">{error}</Notice>}
           <button type="submit" disabled={busy} className="min-h-[50px] rounded-xl bg-navy text-base font-bold text-white hover:bg-navy-deep">{busy ? "Logging in…" : "Log in"}</button>
           <p className="text-center text-muted">New to ShowIci? <Link href="/signup" className="font-bold">Create a free account</Link></p>
         </form>
+        {showReset && (
         <form id="reset" onSubmit={reset} className="card flex max-w-[460px] flex-[1_1_340px] flex-col gap-[18px] self-start px-[30px] py-[34px]">
           <h2 className="h-display text-[30px]">Reset your password</h2>
           <p className="text-slate">Enter your email and we&apos;ll send you a link to choose a new password.</p>
@@ -62,6 +69,7 @@ export default function LoginPage() {
           <button type="submit" className="min-h-[50px] rounded-xl bg-navy text-base font-bold text-white">Send reset link</button>
           {resetSent && <Notice kind="ok">Check your inbox: if an account exists for this email, a reset link is on its way.</Notice>}
         </form>
+        )}
       </div>
     </div>
   );
