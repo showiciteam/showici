@@ -33,7 +33,7 @@ export default function ResetPasswordPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center gap-7 bg-parchment px-4 pb-16 pt-10">
-      <div className="rounded-full bg-navy px-5 py-2.5"><Logo /></div>
+      <Logo variant="color" height={64} />
       <form onSubmit={save} className="card flex w-full max-w-[460px] flex-col gap-[18px] px-[30px] py-[34px]">
         <h1 className="h-display text-[30px]">Choose a new password</h1>
         <label className="label">New password<input name="password" type="password" required minLength={8} className="input" autoComplete="new-password" /></label>

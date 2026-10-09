@@ -47,7 +47,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center gap-7 bg-parchment px-4 pb-16 pt-10">
-      <div className="rounded-full bg-navy px-5 py-2.5"><Logo /></div>
+      <Logo variant="color" height={64} />
       <div className="flex w-full flex-wrap justify-center gap-6">
         <form onSubmit={login} className="card flex max-w-[460px] flex-[1_1_340px] flex-col gap-[18px] px-[30px] py-[34px]">
           <h1 className="h-display text-[30px]">Welcome back</h1>

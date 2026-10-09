@@ -42,7 +42,7 @@ export default function SignupPage() {
   if (confirmEmail) {
     return (
       <div className="flex min-h-screen flex-col items-center gap-7 bg-parchment px-4 pb-16 pt-10">
-        <div className="rounded-full bg-navy px-5 py-2.5"><Logo /></div>
+        <Logo variant="color" height={64} />
         <div className="card flex w-full max-w-[580px] flex-col gap-4 px-8 py-9">
           <h1 className="h-display text-[32px]">Check your inbox</h1>
           <p className="text-slate">
@@ -57,7 +57,7 @@ export default function SignupPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center gap-7 bg-parchment px-4 pb-16 pt-10">
-      <div className="rounded-full bg-navy px-5 py-2.5"><Logo /></div>
+      <Logo variant="color" height={64} />
       <form onSubmit={submit} className="card flex w-full max-w-[580px] flex-col gap-[22px] px-8 py-9">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>

@@ -1,17 +1,30 @@
+import Image from "next/image";
 import Link from "next/link";
 
-export function Logo({ dark = true }: { dark?: boolean }) {
+/**
+ * ShowIci wordmark with the spotlight over the Montréal skyline.
+ * "light" is for navy backgrounds (header, admin sidebar); "color" is the
+ * original artwork for light backgrounds (auth pages, emails, print).
+ */
+export function Logo({ variant, dark = true, height = 40, href = "/", className = "" }: { variant?: "light" | "color"; dark?: boolean; height?: number; href?: string | null; className?: string } & Record<string, unknown>) {
+  // `dark` is the older prop: true = sitting on a navy background.
+  variant ??= dark ? "light" : "color";
+  const width = Math.round((height * 640) / 210);
+  const img = (
+    <Image
+      src={variant === "light" ? "/logo-light.png" : "/logo.png"}
+      alt="ShowIci"
+      width={width}
+      height={height}
+      priority
+      className="block h-auto max-w-full"
+      style={{ width, height: "auto" }}
+    />
+  );
+  if (!href) return <span className={`inline-flex ${className}`}>{img}</span>;
   return (
-    <Link href="/" className={`flex items-center gap-2.5 no-underline ${dark ? "text-white hover:text-white" : "text-navy hover:text-navy"}`}>
-      <span className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-brass">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#14213D" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" />
-          <circle cx="12" cy="9.5" r="2.5" />
-        </svg>
-      </span>
-      <span className="font-display text-2xl font-extrabold tracking-tight">
-        Show<span className="text-brass">Ici</span>
-      </span>
+    <Link href={href} aria-label="ShowIci home" className={`inline-flex shrink-0 no-underline ${className}`}>
+      {img}
     </Link>
   );
 }

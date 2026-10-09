@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { ImageResponse } from "next/og";
 
 // The picture shown when a ShowIci link is shared (WhatsApp, Facebook, iMessage, LinkedIn, X…).
@@ -23,6 +25,7 @@ async function googleFont(family: string, weight: number, italic = false): Promi
 }
 
 export default async function OpengraphImage() {
+  const logo = `data:image/png;base64,${(await readFile(join(process.cwd(), "public/logo-light.png"))).toString("base64")}`;
   const [bold, boldItalic, sans] = await Promise.all([googleFont("Fraunces", 700), googleFont("Fraunces", 700, true), googleFont("DM+Sans", 500)]);
   const fonts = [
     bold && { name: "Fraunces", data: bold, weight: 700 as const, style: "normal" as const },
@@ -45,39 +48,7 @@ export default async function OpengraphImage() {
           fontFamily: "Fraunces, serif",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 22 }}>
-          {/* Spotlight pin */}
-          <div style={{ display: "flex", position: "relative", width: 72, height: 92 }}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: 72,
-                height: 72,
-                borderRadius: 36,
-                background: BRASS,
-              }}
-            >
-              <div style={{ width: 28, height: 28, borderRadius: 14, background: NAVY }} />
-            </div>
-            <div
-              style={{
-                position: "absolute",
-                left: 22,
-                top: 58,
-                width: 28,
-                height: 28,
-                background: BRASS,
-                transform: "rotate(45deg)",
-              }}
-            />
-          </div>
-          <div style={{ display: "flex", fontSize: 76, fontWeight: 700, letterSpacing: -1 }}>
-            <span>Show</span>
-            <span style={{ color: BRASS, fontStyle: "italic" }}>Ici</span>
-          </div>
-        </div>
+        <img src={logo} alt="ShowIci" width={420} height={138} style={{ marginLeft: -8 }} />
 
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
           <div style={{ fontSize: 64, fontWeight: 700, lineHeight: 1.1 }}>Book local talent for every stage.</div>
