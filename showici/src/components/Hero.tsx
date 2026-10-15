@@ -13,13 +13,6 @@ export function Hero() {
 
   return (
     <section className="wrap pb-14 pt-[72px]">
-      <p className="eyebrow mb-[18px] text-[13px]">{t("hero.eyebrow")}</p>
-      <h1 className="h-display max-w-[920px] text-[clamp(42px,7vw,88px)] leading-[0.98] tracking-[-0.03em]">
-        {t("hero.title1")}
-        <br />
-        {t("hero.title2")}
-      </h1>
-      <p className="mt-[22px] max-w-[640px] text-xl leading-normal text-slate">{t("hero.sub")}</p>
 
       <form
         onSubmit={(e) => {
@@ -27,7 +20,7 @@ export function Hero() {
           const q = new URLSearchParams({ radius, ...(type ? { type } : {}) });
           router.push(`${what}?${q}`);
         }}
-        className="mt-10 grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] items-end gap-3 rounded-[18px] border border-line bg-parchment p-3.5"
+        className="grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] items-end gap-3 rounded-[18px] border border-line bg-parchment p-3.5"
       >
         <label className="flex flex-col gap-1.5 px-2 py-1.5 text-xs font-bold uppercase tracking-[0.06em] text-muted">
           {t("search.lookingFor")}
