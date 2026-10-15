@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLang } from "@/lib/i18n";
 
 export function Hero() {
@@ -10,9 +10,33 @@ export function Hero() {
   const [what, setWhat] = useState("/performers");
   const [type, setType] = useState("");
   const [radius, setRadius] = useState("50");
+  const video = useRef<HTMLVideoElement>(null);
+
+  // Respect "reduce motion": show the still frame instead of the looping video.
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) video.current?.pause();
+  }, []);
 
   return (
-    <section className="wrap pb-14 pt-[72px]">
+    <section className="wrap pb-14 pt-8">
+      <h1 className="sr-only">Live performance across Canada. Connecting cities. Find your match. No commission.</h1>
+      <div className="overflow-hidden rounded-[18px] border border-line bg-navy">
+        <video
+          ref={video}
+          className="block aspect-[1600/840] w-full object-cover"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          poster="/hero/hero-poster.jpg"
+          aria-hidden="true"
+        >
+          <source src="/hero/hero-mobile.mp4" type="video/mp4" media="(max-width: 767px)" />
+          <source src="/hero/hero.webm" type="video/webm" />
+          <source src="/hero/hero.mp4" type="video/mp4" />
+        </video>
+      </div>
 
       <form
         onSubmit={(e) => {
@@ -20,7 +44,7 @@ export function Hero() {
           const q = new URLSearchParams({ radius, ...(type ? { type } : {}) });
           router.push(`${what}?${q}`);
         }}
-        className="grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] items-end gap-3 rounded-[18px] border border-line bg-parchment p-3.5"
+        className="mt-8 grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] items-end gap-3 rounded-[18px] border border-line bg-parchment p-3.5"
       >
         <label className="flex flex-col gap-1.5 px-2 py-1.5 text-xs font-bold uppercase tracking-[0.06em] text-muted">
           {t("search.lookingFor")}
