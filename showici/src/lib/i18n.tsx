@@ -19,7 +19,7 @@ const dict = {
     "hero.title1": "Book local talent",
     "hero.title2": "for every stage.",
     "hero.sub":
-      "Bands, DJs, comedians and magicians, connected with venues and private events in your city. No commission, French and English, verified profiles.",
+      "Bands, DJs, comedians and magicians for venues and private events. No commission.",
     "search.lookingFor": "I'm looking for",
     "search.type": "Type of act",
     "search.near": "Near",
@@ -44,7 +44,7 @@ const dict = {
     "hero.title1": "Réservez les talents d'ici",
     "hero.title2": "pour toutes les scènes.",
     "hero.sub":
-      "Groupes, DJ, humoristes et magiciens, en lien avec les salles et les événements privés de votre ville. Sans commission, en français et en anglais, profils vérifiés.",
+      "Groupes, DJ, humoristes et magiciens pour les salles et les événements privés. Sans commission.",
     "search.lookingFor": "Je cherche",
     "search.type": "Type de numéro",
     "search.near": "Près de",
