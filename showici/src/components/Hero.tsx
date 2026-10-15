@@ -19,10 +19,7 @@ export function Hero() {
 
   return (
     <section className="wrap pb-14 pt-8">
-      <h1 className="h-display max-w-[920px] text-[clamp(36px,5.5vw,64px)] leading-[1] tracking-[-0.02em]">
-        {t("hero.title1")} {t("hero.title2")}
-      </h1>
-      <p className="mb-7 mt-4 max-w-[640px] text-lg leading-normal text-slate">{t("hero.sub")}</p>
+      <h1 className="sr-only">{t("hero.title1")} {t("hero.title2")} {t("hero.sub")}</h1>
       <div className="overflow-hidden rounded-[18px] border border-line bg-navy">
         <video
           ref={video}
