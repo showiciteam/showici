@@ -27,6 +27,9 @@ export interface Performer {
   ownerId?: string;
   photos?: string[];
   links?: { label: string; url: string }[];
+  /** Header banner and logo uploaded separately from the gallery. */
+  cover?: string;
+  logo?: string;
 }
 
 export interface Venue {

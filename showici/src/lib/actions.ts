@@ -96,6 +96,16 @@ export interface PerformerInput {
   phone: string;
   publish: boolean;
   geo?: Geo | null;
+  /** Header banner and logo: keep `path`, or upload `file`; both empty removes it. */
+  cover?: { file: File | null; path: string | null };
+  logo?: { file: File | null; path: string | null };
+}
+
+/** Uploads a newly picked header/logo image, or keeps the saved one. */
+async function imageSlot(slot?: { file: File | null; path: string | null }) {
+  if (!slot) return undefined;
+  if (slot.file) return (await uploadPhotos([slot.file]))[0] ?? slot.path;
+  return slot.path;
 }
 
 /** Saves the private phone number (never shown publicly). */
@@ -125,8 +135,15 @@ export async function savePerformer(input: PerformerInput, existingId?: string):
   const uid = await currentUserId();
   if (!sb) return { ok: true, demo: true };
   if (!uid) return { ok: false, error: "Please create an account or log in first." };
-  const { videos, photos, removedPhotos = [], phone, publish, geo, ...fields } = input;
-  const row = { ...fields, published: publish, ...locationFor(fields.base_city, geo, !existingId) };
+  const { videos, photos, removedPhotos = [], phone, publish, geo, cover, logo, ...fields } = input;
+  const [cover_path, logo_path] = await Promise.all([imageSlot(cover), imageSlot(logo)]);
+  const row = {
+    ...fields,
+    published: publish,
+    ...locationFor(fields.base_city, geo, !existingId),
+    ...(cover ? { cover_path: cover_path ?? null } : {}),
+    ...(logo ? { logo_path: logo_path ?? null } : {}),
+  };
 
   let id = existingId;
   if (id) {

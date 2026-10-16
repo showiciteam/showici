@@ -7,13 +7,14 @@ import { getSessionUser } from "@/lib/session";
 import { supabaseEnabled } from "@/lib/supabase/client";
 import { Button, Placeholder, Stars, Tag } from "@/components/ui";
 import { PhotoGallery, VideoPreview } from "@/components/Media";
+import { actFamily } from "@/lib/acts";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const p = await getPerformer(id);
   if (!p) return {};
   const description = `${p.actType} · ${p.genres.join(", ")} · ${p.base}. ${p.bio}`.slice(0, 200);
-  return { title: `${p.name} · ShowIci`, description, openGraph: { title: `${p.name} on ShowIci`, description, ...(p.photos?.[0] ? { images: [p.photos[0]] } : {}) } };
+  return { title: `${p.name} · ShowIci`, description, openGraph: { title: `${p.name} on ShowIci`, description, ...((p.cover ?? p.photos?.[0]) ? { images: [(p.cover ?? p.photos?.[0]) as string] } : {}) } };
 }
 
 export default async function PerformerProfile({ params }: { params: Promise<{ id: string }> }) {
@@ -28,10 +29,12 @@ export default async function PerformerProfile({ params }: { params: Promise<{ i
   const others = p.videos.filter((v) => v !== featured);
   const photos = p.photos ?? [];
   const isMe = Boolean(user && p.ownerId && user.id === p.ownerId);
+  const header = p.cover ?? photos[0];
+  const family = actFamily(p.actType);
 
   const facts: [string, string][] = [
-    ["Type", `${p.actType}${p.members > 1 ? `, ${p.members} members` : ""}`],
-    ["Repertoire", p.repertoire],
+    ["Type", `${p.actType}${p.members > 1 ? `, ${p.members} ${actFamily(p.actType).ownSound ? "members" : "performers"}` : ""}`],
+    [family.repertoireLabel, p.repertoire],
     ["Languages", p.languages.join(", ")],
     ["Set length", p.setLength],
     ["Typical fee", p.feeRange],
@@ -41,15 +44,20 @@ export default async function PerformerProfile({ params }: { params: Promise<{ i
 
   return (
     <>
-      {photos[0] ? (
+      {header ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={photos[0]} alt={`${p.name} live`} className="h-[300px] w-full object-cover" />
+        <img src={header} alt={`${p.name} live`} className="h-[220px] w-full object-cover sm:h-[300px]" />
       ) : (
         <Placeholder tone={p.tone} label={supabaseEnabled ? "" : "[Cover photo: live on stage]"} className="h-[300px]" />
       )}
       <div className="wrap pb-[72px]">
         <div className="-mt-16 flex flex-wrap items-end gap-6">
-          <Placeholder tone="ph-2" label={p.initials} className="h-[148px] w-[148px] flex-none rounded-full border-[6px] border-ivory text-4xl text-navy" />
+          {p.logo ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={p.logo} alt={`${p.name} logo`} className="h-[148px] w-[148px] flex-none rounded-full border-[6px] border-ivory bg-white object-cover" />
+          ) : (
+            <Placeholder tone="ph-2" label={p.initials} className="h-[148px] w-[148px] flex-none rounded-full border-[6px] border-ivory text-4xl text-navy" />
+          )}
           <div className="flex flex-[1_1_320px] flex-col gap-2 pb-1.5">
             <div className="flex flex-wrap items-center gap-2.5">
               <h1 className="h-display text-[44px]">{p.name}</h1>
@@ -83,7 +91,7 @@ export default async function PerformerProfile({ params }: { params: Promise<{ i
                 <h2 className="h-display text-[28px]">Watch us live</h2>
                 <VideoPreview url={featured.url} title={featured.title} length={featured.length} big />
                 {others.length > 0 && (
-                  <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-3">
+                  <div className="mt-1 grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-x-3 gap-y-4">
                     {others.map((v) => <VideoPreview key={v.url ?? v.title} url={v.url} title={v.title} length={v.length} />)}
                   </div>
                 )}
@@ -93,10 +101,10 @@ export default async function PerformerProfile({ params }: { params: Promise<{ i
               <h2 className="h-display text-[28px]">About</h2>
               <p className="whitespace-pre-line text-[17px] leading-relaxed text-ink-2">{p.bio || "No bio yet."}</p>
             </section>
-            {(photos.length > 1 || !supabaseEnabled) && (
+            {(photos.length > (p.cover ? 0 : 1) || !supabaseEnabled) && (
               <section className="flex flex-col gap-3.5">
                 <h2 className="h-display text-[28px]">Photos</h2>
-                {photos.length > 1 ? (
+                {photos.length > 0 ? (
                   <PhotoGallery photos={photos} alt={p.name} />
                 ) : (
                   <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-2.5">

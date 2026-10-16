@@ -62,6 +62,8 @@ function toPerformer(r: any): Performer {
     map: mapPosition(r.lat, r.lng),
     ownerId: r.owner,
     photos: photoUrls(r.performer_photos),
+    cover: r.cover_path ? mediaUrl(r.cover_path) : undefined,
+    logo: r.logo_path ? mediaUrl(r.logo_path) : undefined,
     links: linkList([["Instagram", r.instagram], ["Facebook", r.facebook], ["TikTok", r.tiktok], ["Music", r.music_url], ["Website", r.website]]),
   };
 }

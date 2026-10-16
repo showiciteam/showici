@@ -1,16 +1,18 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { ChipGroup, Dropzone, FormCard, Notice } from "@/components/form";
-import { Button, PlayIcon, VideoBox } from "@/components/ui";
+import { useEffect, useMemo, useState } from "react";
+import { ChipGroup, Dropzone, FormCard, Notice, SingleImage } from "@/components/form";
+import { Button, PlayIcon } from "@/components/ui";
+import { ACT_TYPES, LANGUAGES, actFamily, joinOther, splitOther } from "@/lib/acts";
 import { savePerformer, type Geo } from "@/lib/actions";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
+import { VideoPreview } from "@/components/Media";
 import { mediaUrl } from "@/lib/media";
 import { getBrowserSupabase } from "@/lib/supabase/client";
 
 const steps = [
-  ["basics", "The basics"], ["style", "Your style"], ["photos", "Photos"], ["videos", "Videos and links"],
+  ["basics", "About your act"], ["style", "Your style"], ["photos", "Photos"], ["videos", "Videos and links"],
   ["where", "Where you play"], ["events", "Events and availability"], ["publish", "Review and publish"],
 ];
 
@@ -45,6 +47,16 @@ export default function RegisterPerformer() {
   const [status, setStatus] = useState<{ kind: "ok" | "error"; msg: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const [geo, setGeo] = useState<Geo | null | undefined>(undefined);
+  const [languageOther, setLanguageOther] = useState("");
+  const [styleOther, setStyleOther] = useState("");
+  // Header photo and logo: a saved storage path, or a newly picked file (shown as a local preview).
+  const [coverPath, setCoverPath] = useState<string | null>(null);
+  const [logoPath, setLogoPath] = useState<string | null>(null);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const coverUrl = useMemo(() => (coverFile ? URL.createObjectURL(coverFile) : coverPath ? mediaUrl(coverPath) : undefined), [coverFile, coverPath]);
+  const logoUrl = useMemo(() => (logoFile ? URL.createObjectURL(logoFile) : logoPath ? mediaUrl(logoPath) : undefined), [logoFile, logoPath]);
+  const family = actFamily(actType[0]);
 
   // Editing: load the signed-in performer's existing profile so saving updates it instead of creating a copy.
   useEffect(() => {
@@ -65,8 +77,14 @@ export default function RegisterPerformer() {
           tiktok: p.tiktok ?? "", music: p.music_url ?? "", website: p.website ?? "",
         });
         setActType([p.act_type]);
-        setLanguages(p.languages ?? []);
-        setGenres(p.genres ?? []);
+        const langs = splitOther(p.languages ?? [], LANGUAGES);
+        setLanguages(langs.known);
+        setLanguageOther(langs.other);
+        const styles = splitOther(p.genres ?? [], actFamily(p.act_type).styles);
+        setGenres(styles.known);
+        setStyleOther(styles.other);
+        setCoverPath(p.cover_path ?? null);
+        setLogoPath(p.logo_path ?? null);
         setEventTypes(p.event_types ?? []);
         setDays(p.available_days ?? []);
         setRadius(p.travel_km ?? 50);
@@ -89,11 +107,29 @@ export default function RegisterPerformer() {
   const strength = Math.min(100, 30 + (photoCount ? 20 : 0) + Math.min(videos.length, 3) * 10 + (f.bio.length > 40 ? 20 : 0));
   const circle = 40 + radius * 1.6;
 
-  function addVideo() {
+  // Switching act type swaps the style list and the repertoire question.
+  function changeActType(next: string[]) {
+    const fam = actFamily(next[0]);
+    setActType(next);
+    setGenres((g) => g.filter((x) => x === "Other" || fam.styles.includes(x)));
+    if (!fam.repertoire.includes(f.rep)) set("rep", fam.repertoire[fam.repertoire.length - 1]);
+    if (!fam.ownSound) set("ownSound", false);
+  }
+
+  async function addVideo() {
     if (!ytId(videoUrl)) return setVideoError("That doesn't look like a YouTube link.");
     setVideoError("");
-    setVideos((v) => [...v, { youtube_url: videoUrl, title: `Video ${v.length + 1}`, featured: v.length === 0 }]);
+    const url = videoUrl;
+    setVideos((v) => [...v, { youtube_url: url, title: "", featured: v.length === 0 }]);
     setVideoUrl("");
+    // Fill in the real YouTube title so the profile doesn't say "Video 2".
+    try {
+      const r = await fetch(`https://noembed.com/embed?url=${encodeURIComponent(url)}`);
+      const d = await r.json();
+      if (d?.title) setVideos((v) => v.map((x) => (x.youtube_url === url && !x.title ? { ...x, title: String(d.title).slice(0, 80) } : x)));
+    } catch {
+      // keep it empty; the person can type a title
+    }
   }
 
   async function save(publish: boolean) {
@@ -101,12 +137,14 @@ export default function RegisterPerformer() {
     setStatus(null);
     const res = await savePerformer(
       {
-        name: f.name, act_type: actType[0], members: Number(f.members || 1), languages, genres,
+        name: f.name, act_type: actType[0], members: Number(f.members || 1),
+        languages: joinOther(languages, languageOther), genres: joinOther(genres, styleOther),
         repertoire: f.rep, bio: f.bio, set_length: f.setLength, fee_range: f.fee,
         own_sound: f.ownSound, base_city: f.base || "Montréal", travel_km: radius,
         event_types: eventTypes, available_days: days, available, contact_name: f.contact,
         instagram: f.instagram, facebook: f.facebook, tiktok: f.tiktok, music_url: f.music, website: f.website,
-        videos, photos, removedPhotos, phone: f.phone, publish, geo,
+        videos: videos.map((v, i) => ({ ...v, title: v.title.trim() || `Video ${i + 1}` })), photos, removedPhotos, phone: f.phone, publish, geo,
+        cover: { file: coverFile, path: coverPath }, logo: { file: logoFile, path: logoPath },
       },
       existingId,
     );
@@ -142,52 +180,63 @@ export default function RegisterPerformer() {
         </aside>
 
         <form onSubmit={(e) => { e.preventDefault(); save(true); }} className="flex min-w-0 flex-[999_1_600px] flex-col gap-5">
-          <FormCard id="basics" title="1. The basics">
+          <FormCard id="basics" title="1. About your act">
             <label className="label">Act or stage name<input required value={f.name} onChange={(e) => set("name", e.target.value)} className="input" placeholder="e.g. The Night Owls" /></label>
-            <ChipGroup legend="What kind of act are you?" single options={["Band", "Solo musician", "Duo", "DJ", "Stand-up comedy", "Magician", "Dancer", "Mariachi", "Other"]} value={actType} onChange={setActType} />
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] items-end gap-3.5">
-              <label className="label">Number of members<select value={f.members} onChange={(e) => set("members", e.target.value)} className="input"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option value="6">6+</option></select></label>
+            <ChipGroup legend="What kind of act are you?" single options={[...ACT_TYPES]} value={actType} onChange={changeActType} />
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] items-start gap-3.5">
+              <label className="label">Number of performers<select value={f.members} onChange={(e) => set("members", e.target.value)} className="input"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option value="6">6+</option></select></label>
               <label className="label">Contact person<input value={f.contact} onChange={(e) => set("contact", e.target.value)} className="input" /></label>
-              <label className="label">Phone <span className="hint">Private. Never shown on your profile.</span><input type="tel" value={f.phone} onChange={(e) => set("phone", e.target.value)} className="input" placeholder="514-555-0123" /></label>
+              <label className="label">Phone<input type="tel" value={f.phone} onChange={(e) => set("phone", e.target.value)} className="input" placeholder="514-555-0123" /><span className="hint">Private. Never shown on your profile.</span></label>
             </div>
-            <ChipGroup legend="Languages you perform in" options={["Français", "English", "Español", "Other"]} value={languages} onChange={setLanguages} />
+            <ChipGroup legend="Languages you perform in" options={[...LANGUAGES, "Other"]} value={languages} onChange={setLanguages} />
+            {languages.includes("Other") && (
+              <label className="label -mt-2">Other languages<input value={languageOther} onChange={(e) => setLanguageOther(e.target.value)} className="input" placeholder="e.g. Português, Italiano" /><span className="hint">Separate several with commas.</span></label>
+            )}
           </FormCard>
 
           <FormCard id="style" title="2. Your style">
-            <ChipGroup legend="Genres" hint="Pick up to 5" options={["Rock", "Pop", "Jazz", "Blues", "Country", "80s / 90s", "Latin", "Hip-hop", "Electronic", "Folk / trad québécois", "Metal", "R&B / soul"]} value={genres} onChange={(g) => setGenres(g.slice(0, 5))} />
+            <ChipGroup legend="Style" hint="Pick up to 5" options={[...family.styles, "Other"]} value={genres} onChange={(g) => setGenres(g.slice(0, 5))} />
+            {genres.includes("Other") && (
+              <label className="label -mt-2">Your style<input value={styleOther} onChange={(e) => setStyleOther(e.target.value)} className="input" placeholder={actType[0] === "Other" ? "Describe your act, e.g. Fire juggling" : "Type your style"} /><span className="hint">Separate several with commas.</span></label>
+            )}
             <fieldset>
-              <legend className="mb-2.5 text-sm font-bold">Repertoire</legend>
+              <legend className="mb-2.5 text-sm font-bold">{family.repertoireLabel}</legend>
               <div className="flex flex-wrap gap-[18px]">
-                {["Covers", "Originals", "Both"].map((r) => (
+                {family.repertoire.map((r) => (
                   <label key={r} className="flex items-center gap-2"><input type="radio" name="rep" value={r} checked={f.rep === r} onChange={() => set("rep", r)} className="h-[18px] w-[18px] accent-navy" />{r}</label>
                 ))}
               </div>
             </fieldset>
             <label className="label">Short bio <span className="hint">What makes your show great? 500 characters max.</span>
-              <textarea rows={4} maxLength={500} value={f.bio} onChange={(e) => set("bio", e.target.value)} className="input" placeholder="Tell bookers about your act: who you are, the vibe of your show, the crowds you love playing for." />
+              <textarea rows={4} maxLength={500} value={f.bio} onChange={(e) => set("bio", e.target.value)} className="input" placeholder="Tell bookers about your act: who you are, the vibe of your show, the crowds you love performing for." />
               <span className="hint text-right">{f.bio.length} / 500</span>
             </label>
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] items-end gap-3.5">
-              <label className="label">Typical set length<select value={f.setLength} onChange={(e) => set("setLength", e.target.value)} className="input"><option>45 min</option><option>1 hour</option><option>2 × 45 min</option><option>3 hours +</option></select></label>
-              <label className="label">Typical fee <span className="hint">Optional. Only shown as a range.</span><select value={f.fee} onChange={(e) => set("fee", e.target.value)} className="input"><option>Prefer not to say</option><option>Under $300</option><option>$300 – $600</option><option>$600 – $1,000</option><option>$1,000+</option></select></label>
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] items-start gap-3.5">
+              <label className="label">Typical set length<select value={f.setLength} onChange={(e) => set("setLength", e.target.value)} className="input"><option>15 min</option><option>30 min</option><option>45 min</option><option>1 hour</option><option>2 × 45 min</option><option>3 hours +</option></select></label>
+              <label className="label">Typical fee<select value={f.fee} onChange={(e) => set("fee", e.target.value)} className="input"><option>Prefer not to say</option><option>Under $300</option><option>$300 – $600</option><option>$600 – $1,000</option><option>$1,000+</option></select><span className="hint">Optional. Only shown as a range.</span></label>
             </div>
-            <label className="flex items-center gap-2.5 font-medium"><input type="checkbox" checked={f.ownSound} onChange={(e) => set("ownSound", e.target.checked)} className="h-[18px] w-[18px] accent-navy" />We bring our own sound system</label>
+            {family.ownSound && <label className="flex items-center gap-2.5 font-medium"><input type="checkbox" checked={f.ownSound} onChange={(e) => set("ownSound", e.target.checked)} className="h-[18px] w-[18px] accent-navy" />We bring our own sound system</label>}
           </FormCard>
 
           <FormCard id="photos" title="3. Photos">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] items-start gap-5">
+              <SingleImage label="Header image" hint="The wide banner at the top of your profile. Landscape, at least 1600 px wide." url={coverUrl} onFile={setCoverFile} onRemove={() => { setCoverFile(null); setCoverPath(null); }} />
+              <SingleImage label="Logo" shape="round" hint="Shown in the circle next to your name. Square works best." url={logoUrl} onFile={setLogoFile} onRemove={() => { setLogoFile(null); setLogoPath(null); }} />
+            </div>
+            <h3 className="mt-1 text-[17px] font-bold">Gallery</h3>
             {savedPhotos.length > 0 && (
               <div className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-3">
                 {savedPhotos.map((path, i) => (
                   <div key={path} className="relative aspect-[4/3] overflow-hidden rounded-xl bg-ph-1">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={mediaUrl(path)} alt="" className="h-full w-full object-cover" />
-                    {i === 0 && <span className="absolute left-2 top-2 rounded-md bg-navy px-2 py-1 text-[11px] font-bold text-white">COVER</span>}
+                    {i === 0 && !coverUrl && <span className="absolute left-2 top-2 rounded-md bg-navy px-2 py-1 text-[11px] font-bold text-white">HEADER</span>}
                     <button type="button" aria-label="Remove photo" onClick={() => { setSavedPhotos(savedPhotos.filter((p) => p !== path)); setRemovedPhotos([...removedPhotos, path]); }} className="absolute right-1.5 top-1.5 flex h-[30px] w-[30px] items-center justify-center rounded-full bg-white text-navy">✕</button>
                   </div>
                 ))}
               </div>
             )}
-            <Dropzone files={photos} onFiles={(fs) => setPhotos(fs.slice(0, Math.max(0, 12 - savedPhotos.length)))} hint="JPG or PNG, up to 10 MB each. Up to 12 photos. Live shots work best. The first photo is your cover." />
+            <Dropzone files={photos} onFiles={(fs) => setPhotos(fs.slice(0, Math.max(0, 12 - savedPhotos.length)))} hint="JPG or PNG, up to 10 MB each. Up to 12 photos. Live shots work best. These appear in the Photos section of your profile." />
           </FormCard>
 
           <FormCard id="videos" title="4. Videos and links">
@@ -199,25 +248,46 @@ export default function RegisterPerformer() {
               <Button onClick={addVideo}>Add video</Button>
             </div>
             {videoError && <Notice kind="error">{videoError}</Notice>}
-            {videos.map((v, i) => (
-              <div key={v.youtube_url + i} className="flex flex-wrap items-center gap-3.5 rounded-xl border border-line p-2.5">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={`https://i.ytimg.com/vi/${ytId(v.youtube_url)}/mqdefault.jpg`} alt="" className="aspect-video w-[140px] flex-none rounded-lg bg-navy object-cover" />
-                <input aria-label="Video title" value={v.title} onChange={(e) => setVideos(videos.map((x, j) => (j === i ? { ...x, title: e.target.value } : x)))} className="input flex-[1_1_200px]" />
-                <button type="button" onClick={() => setVideos(videos.map((x, j) => ({ ...x, featured: j === i })))} className={`min-h-10 rounded-full px-3.5 text-sm ${v.featured ? "border border-navy bg-brass-tint font-bold" : "border border-line-strong"}`}>{v.featured ? "★ Featured" : "☆ Make featured"}</button>
-                <button type="button" aria-label="Remove video" onClick={() => setVideos(videos.filter((_, j) => j !== i))} className="min-h-10 rounded-[10px] border border-line-strong px-3">✕</button>
-              </div>
-            ))}
+            {videos.length > 0 && (
+              <ul className="flex flex-col gap-2.5">
+                {videos.map((v, i) => (
+                  <li key={v.youtube_url + i} className={`flex flex-wrap items-center gap-3.5 rounded-xl border p-2.5 ${v.featured ? "border-brass bg-brass-tint/40" : "border-line bg-white"}`}>
+                    <span className="relative flex-none">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={`https://i.ytimg.com/vi/${ytId(v.youtube_url)}/mqdefault.jpg`} alt="" className="aspect-video w-[132px] rounded-lg bg-navy object-cover" />
+                      {v.featured && <span className="absolute left-1.5 top-1.5 rounded bg-navy px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-white">FEATURED</span>}
+                    </span>
+                    <label className="flex min-w-0 flex-[1_1_200px] flex-col gap-1 text-xs font-bold text-muted">Title
+                      <input value={v.title} placeholder="e.g. Live at Bar Le Ritz" onChange={(e) => setVideos(videos.map((x, j) => (j === i ? { ...x, title: e.target.value } : x)))} className="input py-2.5 text-[15px]" />
+                    </label>
+                    <span className="flex gap-2">
+                      {!v.featured && <button type="button" onClick={() => setVideos(videos.map((x, j) => ({ ...x, featured: j === i })))} className="min-h-10 rounded-full border border-line-strong px-3.5 text-sm font-bold text-navy hover:border-navy">☆ Make featured</button>}
+                      <button type="button" aria-label="Remove video" onClick={() => setVideos(videos.filter((_, j) => j !== i).map((x, j, arr) => ({ ...x, featured: arr.some((y) => y.featured) ? x.featured : j === 0 })))} className="min-h-10 rounded-[10px] border border-line-strong px-3">✕</button>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
             <div className="flex flex-col gap-3 rounded-2xl bg-parchment p-5">
-              <span className="text-sm font-bold text-brass-dark">PREVIEW: how your showcase appears on your profile</span>
-              {videos.find((v) => v.featured) ? (
-                <VideoBox url={videos.find((v) => v.featured)!.youtube_url} title="Featured video" />
+              <span className="text-sm font-bold text-brass-dark">PREVIEW: how your videos appear on your profile</span>
+              {videos.length ? (
+                <>
+                  {(() => {
+                    const feat = videos.find((v) => v.featured) ?? videos[0];
+                    return <VideoPreview url={feat.youtube_url} title={feat.title || "Featured video"} big />;
+                  })()}
+                  {videos.length > 1 && (
+                    <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-3">
+                      {videos.filter((v) => v !== (videos.find((x) => x.featured) ?? videos[0])).map((v, i) => <VideoPreview key={v.youtube_url + i} url={v.youtube_url} title={v.title || `Video ${i + 2}`} />)}
+                    </div>
+                  )}
+                </>
               ) : (
                 <div className="flex aspect-[16/7] items-center justify-center gap-3 rounded-xl bg-navy text-white"><PlayIcon color="#D9A441" /> Add a video to see your showcase</div>
               )}
             </div>
             <h3 className="mt-2 text-[17px] font-bold">Other links</h3>
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] items-end gap-3.5">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] items-start gap-3.5">
               <label className="label">Instagram<input type="url" value={f.instagram} onChange={(e) => set("instagram", e.target.value)} className="input" placeholder="https://instagram.com/…" /></label>
               <label className="label">Facebook<input type="url" value={f.facebook} onChange={(e) => set("facebook", e.target.value)} className="input" placeholder="https://facebook.com/…" /></label>
               <label className="label">TikTok<input type="url" value={f.tiktok} onChange={(e) => set("tiktok", e.target.value)} className="input" placeholder="https://tiktok.com/@…" /></label>
@@ -227,7 +297,7 @@ export default function RegisterPerformer() {
           </FormCard>
 
           <FormCard id="where" title="5. Where you play">
-            <label className="label">Home base <span className="hint">Start typing your city and pick it from the list. Only your city is shown publicly.</span>
+            <label className="label">Home base
               <AddressAutocomplete
                 mode="city"
                 value={f.base}
@@ -235,6 +305,7 @@ export default function RegisterPerformer() {
                 onChange={(v) => { set("base", v); setGeo(null); }}
                 onPick={(p) => { set("base", [p.city, p.province].filter(Boolean).join(", ")); setGeo({ lat: p.lat, lng: p.lng }); }}
               />
+              <span className="hint">Start typing your city and pick it from the list. Only your city is shown publicly.</span>
             </label>
             <label className="label">How far will you travel? <span className="font-display text-[28px] text-navy">{radius} km</span>
               <input type="range" min={5} max={150} step={5} value={radius} onChange={(e) => setRadius(Number(e.target.value))} className="w-full accent-navy" />
@@ -260,8 +331,11 @@ export default function RegisterPerformer() {
 
           <FormCard id="publish" title="7. Review and publish">
             <div className="flex flex-wrap items-center gap-4 rounded-[14px] border border-line p-4">
-              <div className="flex h-16 w-16 flex-none items-center justify-center rounded-full bg-ph-1 font-extrabold">{f.name ? f.name[0] : "?"}</div>
-              <div className="flex flex-[1_1_200px] flex-col gap-1"><span className="h-display text-xl">{f.name || "Your act name"}</span><span className="hint">{actType[0]} · {genres.join(", ")} · travels {radius} km · {videos.length} videos · {photoCount} photos</span></div>
+              <div className="flex h-16 w-16 flex-none items-center justify-center overflow-hidden rounded-full bg-ph-1 font-extrabold">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                {logoUrl ? <img src={logoUrl} alt="" className="h-full w-full object-cover" /> : f.name ? f.name[0] : "?"}
+              </div>
+              <div className="flex flex-[1_1_200px] flex-col gap-1"><span className="h-display text-xl">{f.name || "Your act name"}</span><span className="hint">{actType[0]} · {joinOther(genres, styleOther).join(", ")} · travels {radius} km · {videos.length} videos · {photoCount} photos</span></div>
               {existingId && <span className={`rounded-full px-3 py-1 text-sm font-bold ${published ? "bg-success text-success-ink" : "bg-line"}`}>{published ? "Published" : "Draft"}</span>}
             </div>
             <label className="flex items-start gap-2.5 text-sm text-slate"><input type="checkbox" required className="mt-0.5 h-[18px] w-[18px] flex-none accent-navy" />I confirm I have the rights to the photos and videos, and I agree to the <a href="#">Terms</a>.</label>

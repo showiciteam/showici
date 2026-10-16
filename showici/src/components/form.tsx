@@ -74,3 +74,40 @@ export function Dropzone({ files, onFiles, hint }: { files: File[]; onFiles: (f:
     </div>
   );
 }
+
+/** One image slot (header photo or logo): shows the current image, lets you pick a new one or remove it. */
+export function SingleImage({ label, hint, url, onFile, onRemove, shape = "wide" }: {
+  label: string;
+  hint: string;
+  url?: string;
+  onFile: (f: File) => void;
+  onRemove: () => void;
+  shape?: "wide" | "round";
+}) {
+  const box = shape === "round" ? "h-[120px] w-[120px] rounded-full" : "aspect-[3/1] w-full rounded-xl";
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="text-sm font-bold text-navy">{label}</span>
+      <div className={`flex flex-wrap items-center gap-4 ${shape === "wide" ? "flex-col items-stretch" : ""}`}>
+        <label className={`relative flex flex-none cursor-pointer items-center justify-center overflow-hidden border-2 border-dashed border-line-strong bg-ivory text-center ${box}`}>
+          {url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={url} alt="" className="absolute inset-0 h-full w-full object-cover" />
+          ) : (
+            <span className="px-3 text-sm font-bold text-brass-dark underline">Choose image</span>
+          )}
+          <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); e.target.value = ""; }} />
+        </label>
+        <div className="flex flex-col gap-1.5">
+          <span className="hint">{hint}</span>
+          {url && (
+            <span className="flex gap-3 text-sm font-bold">
+              <label className="cursor-pointer text-brass-dark underline">Replace<input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); e.target.value = ""; }} /></label>
+              <button type="button" onClick={onRemove} className="text-red-700 underline">Remove</button>
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
