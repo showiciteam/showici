@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ChipGroup, Dropzone, FormCard, Notice } from "@/components/form";
 import { Button } from "@/components/ui";
-import { saveVenue } from "@/lib/actions";
+import { saveVenue, type Geo } from "@/lib/actions";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { mediaUrl } from "@/lib/media";
 import { getBrowserSupabase } from "@/lib/supabase/client";
 
@@ -34,6 +35,8 @@ export default function RegisterVenue() {
   const [removedPhotos, setRemovedPhotos] = useState<string[]>([]);
   const [status, setStatus] = useState<{ kind: "ok" | "error"; msg: string } | null>(null);
   const [busy, setBusy] = useState(false);
+  // undefined: address untouched; null: typed by hand; set: picked from the suggestions (exact map pin)
+  const [geo, setGeo] = useState<Geo | null | undefined>(undefined);
 
   // Editing: load the signed-in venue's existing listing so saving updates it.
   useEffect(() => {
@@ -77,7 +80,7 @@ export default function RegisterVenue() {
         capacity: f.capacity, stage: f.stage, setting: f.setting, equipment, books, genres, nights: nights.join(", "),
         fee_range: f.fee, lead_time: f.lead, open_to_new_acts: f.open, website: f.website, instagram: f.instagram,
         facebook: f.facebook, youtube_url: f.youtube, contact_name: f.contact, contact_role: f.role, phone: f.phone,
-        photos, removedPhotos, publish,
+        photos, removedPhotos, publish, geo,
       },
       existingId,
     );
@@ -108,16 +111,23 @@ export default function RegisterVenue() {
           <FormCard id="v1" title="1. Venue basics">
             <label className="label">Venue name<input required value={f.name} onChange={(e) => set("name", e.target.value)} className="input" /></label>
             <ChipGroup legend="Type of venue" single options={["Pub", "Bar", "Restaurant", "Brewery", "Café", "Club", "Event hall", "Other"]} value={type} onChange={setType} />
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3.5">
-              <label className="label">Street address<input value={f.street} onChange={(e) => set("street", e.target.value)} className="input" placeholder="123 rue Saint-Denis" /></label>
-              <label className="label">City<input required value={f.city} onChange={(e) => set("city", e.target.value)} className="input" /></label>
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] items-end gap-3.5">
+              <label className="label">Street address <span className="hint">Start typing, then pick your address</span>
+                <AddressAutocomplete
+                  value={f.street}
+                  placeholder="123 rue Saint-Denis"
+                  onChange={(v) => { set("street", v); setGeo(null); }}
+                  onPick={(p) => { setF((x) => ({ ...x, street: p.street || x.street, city: p.city || x.city, postal: p.postal || x.postal })); setGeo({ lat: p.lat, lng: p.lng }); }}
+                />
+              </label>
+              <label className="label">City<input required value={f.city} onChange={(e) => { set("city", e.target.value); setGeo(null); }} className="input" /></label>
               <label className="label">Postal code<input value={f.postal} onChange={(e) => set("postal", e.target.value)} className="input" placeholder="H2X 1K1" /></label>
             </div>
             <label className="label">Short description <span className="hint">The vibe, the crowd, what nights are like.</span><textarea rows={3} value={f.description} onChange={(e) => set("description", e.target.value)} className="input" /></label>
           </FormCard>
 
           <FormCard id="v2" title="2. Space and equipment">
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3.5">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] items-end gap-3.5">
               <label className="label">Capacity<select value={f.capacity} onChange={(e) => set("capacity", e.target.value)} className="input"><option>Under 50</option><option>50 – 150</option><option>150 – 300</option><option>300+</option></select></label>
               <label className="label">Stage<select value={f.stage} onChange={(e) => set("stage", e.target.value)} className="input"><option>No stage (floor area)</option><option>Small stage</option><option>Large stage</option></select></label>
               <label className="label">Setting<select value={f.setting} onChange={(e) => set("setting", e.target.value)} className="input"><option>Indoor</option><option>Outdoor terrace</option><option>Both</option></select></label>
@@ -145,7 +155,7 @@ export default function RegisterVenue() {
             <ChipGroup legend="Types of acts" options={["Bands", "Solo / duo", "DJs", "Stand-up comedy", "Magicians", "Trivia / karaoke hosts"]} value={books} onChange={setBooks} />
             <ChipGroup legend="Genres your crowd likes" options={["Rock", "Pop", "Blues", "Jazz", "Folk / trad québécois", "Country", "Latin", "Electronic"]} value={genres} onChange={setGenres} />
             <ChipGroup legend="Nights with live entertainment" options={["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]} value={nights} onChange={setNights} />
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-3.5">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] items-end gap-3.5">
               <label className="label">Typical fee you pay <span className="hint">Optional. Shown as a range.</span><select value={f.fee} onChange={(e) => set("fee", e.target.value)} className="input"><option>Prefer not to say</option><option>Door split / tips</option><option>$200 – $500</option><option>$500 – $1,000</option><option>$1,000+</option></select></label>
               <label className="label">How far ahead you book<select value={f.lead} onChange={(e) => set("lead", e.target.value)} className="input"><option>Last minute is fine</option><option>2 – 4 weeks</option><option>1 – 3 months</option></select></label>
             </div>
@@ -153,7 +163,7 @@ export default function RegisterVenue() {
           </FormCard>
 
           <FormCard id="v5" title="5. Links">
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-3.5">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] items-end gap-3.5">
               <label className="label">Website<input type="url" value={f.website} onChange={(e) => set("website", e.target.value)} className="input" placeholder="https://" /></label>
               <label className="label">Instagram<input type="url" value={f.instagram} onChange={(e) => set("instagram", e.target.value)} className="input" placeholder="https://instagram.com/…" /></label>
               <label className="label">Facebook<input type="url" value={f.facebook} onChange={(e) => set("facebook", e.target.value)} className="input" placeholder="https://facebook.com/…" /></label>
@@ -162,7 +172,7 @@ export default function RegisterVenue() {
           </FormCard>
 
           <FormCard id="v6" title="6. Booking contact and publish">
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-3.5">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] items-end gap-3.5">
               <label className="label">Booking contact name<input value={f.contact} onChange={(e) => set("contact", e.target.value)} className="input" /></label>
               <label className="label">Role<select value={f.role} onChange={(e) => set("role", e.target.value)} className="input"><option>Owner</option><option>Manager</option><option>Booker</option></select></label>
               <label className="label">Phone <span className="hint">Private</span><input type="tel" value={f.phone} onChange={(e) => set("phone", e.target.value)} className="input" placeholder="514-555-0123" /></label>

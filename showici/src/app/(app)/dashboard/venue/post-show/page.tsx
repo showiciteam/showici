@@ -126,10 +126,16 @@ export default function PostShow() {
           )}
           <div className="flex flex-wrap items-start gap-7">
             <form onSubmit={(e) => { e.preventDefault(); save("live"); }} className="card flex min-w-0 flex-[999_1_560px] flex-col gap-5 p-7">
-              <label className="label">Performer <span className="hint">Start typing to pick an act on ShowIci, or type a name if they&apos;re not on ShowIci yet.</span>
-                <input required value={performer} onChange={(e) => setPerformer(e.target.value)} className="input" placeholder="e.g. [Band name]" list="performers" />
+              <label className="label">Performer <span className="hint">Type the act&apos;s name. If they&apos;re on ShowIci, pick them from the list: they get a booking request, and the show is listed as &ldquo;Artist TBA&rdquo; until they accept.</span>
+                <input required value={performer} onChange={(e) => setPerformer(e.target.value)} className="input" placeholder="Act or band name" list="performers" />
                 <datalist id="performers">{performers.map((p) => <option key={p.id} value={p.name} />)}</datalist>
               </label>
+              {(() => {
+                const picked = performers.find((p) => p.name.toLowerCase() === performer.trim().toLowerCase());
+                if (picked) return <Notice kind="info"><strong>{picked.name}</strong> is on ShowIci. Saving sends them a booking request in their inbox. Their name appears publicly once they accept.</Notice>;
+                if (performer.trim().length > 1) return <p className="hint -mt-2.5 text-sm">Not on ShowIci (or not picked from the list): the name is shown as you typed it, with no link to a profile.</p>;
+                return null;
+              })()}
               <label className="label">Show title <span className="hint">Optional</span><input value={title} onChange={(e) => setTitle(e.target.value)} className="input" placeholder="e.g. 90s Night" /></label>
               <div className="grid grid-cols-[repeat(auto-fit,minmax(160px,1fr))] gap-3.5">
                 <label className="label">Date<input type="date" required value={date} onChange={(e) => setDate(e.target.value)} className="input" /></label>
@@ -158,7 +164,7 @@ export default function PostShow() {
                 <div className="relative"><Placeholder tone="ph-1" className="h-[170px]" /><span className="absolute bottom-3.5 left-3.5"><DateBadge day={d ? d.toLocaleDateString("en-CA", { weekday: "short" }).replace(".", "").toUpperCase() : "FRI"} date={d ? String(d.getDate()) : "16"} dark /></span></div>
                 <div className="flex flex-col gap-1.5 p-[18px]">
                   <span className="eyebrow">{genre}</span>
-                  <span className="h-display text-[21px]">{title || performer || "[Performer]"}</span>
+                  <span className="h-display text-[21px]">{title || (performers.some((p) => p.name.toLowerCase() === performer.trim().toLowerCase()) ? "Artist TBA" : performer) || "[Performer]"}</span>
                   <span className="text-slate">{me.venueName || "[Your venue]"}{me.area ? ` · ${me.area}` : ""}</span>
                   <span className="text-sm text-muted">{time} · {entry[0] === "Free" ? "Free entry" : price || entry[0]}</span>
                 </div>

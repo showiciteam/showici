@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ChipGroup, Dropzone, FormCard, Notice } from "@/components/form";
 import { Button, PlayIcon, VideoBox } from "@/components/ui";
-import { savePerformer } from "@/lib/actions";
+import { savePerformer, type Geo } from "@/lib/actions";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { mediaUrl } from "@/lib/media";
 import { getBrowserSupabase } from "@/lib/supabase/client";
 
@@ -43,6 +44,7 @@ export default function RegisterPerformer() {
   const [published, setPublished] = useState(false);
   const [status, setStatus] = useState<{ kind: "ok" | "error"; msg: string } | null>(null);
   const [busy, setBusy] = useState(false);
+  const [geo, setGeo] = useState<Geo | null | undefined>(undefined);
 
   // Editing: load the signed-in performer's existing profile so saving updates it instead of creating a copy.
   useEffect(() => {
@@ -104,7 +106,7 @@ export default function RegisterPerformer() {
         own_sound: f.ownSound, base_city: f.base || "Montréal", travel_km: radius,
         event_types: eventTypes, available_days: days, available, contact_name: f.contact,
         instagram: f.instagram, facebook: f.facebook, tiktok: f.tiktok, music_url: f.music, website: f.website,
-        videos, photos, removedPhotos, phone: f.phone, publish,
+        videos, photos, removedPhotos, phone: f.phone, publish, geo,
       },
       existingId,
     );
@@ -143,7 +145,7 @@ export default function RegisterPerformer() {
           <FormCard id="basics" title="1. The basics">
             <label className="label">Act or stage name<input required value={f.name} onChange={(e) => set("name", e.target.value)} className="input" placeholder="e.g. The Night Owls" /></label>
             <ChipGroup legend="What kind of act are you?" single options={["Band", "Solo musician", "Duo", "DJ", "Stand-up comedy", "Magician", "Dancer", "Mariachi", "Other"]} value={actType} onChange={setActType} />
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3.5">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] items-end gap-3.5">
               <label className="label">Number of members<select value={f.members} onChange={(e) => set("members", e.target.value)} className="input"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option value="6">6+</option></select></label>
               <label className="label">Contact person<input value={f.contact} onChange={(e) => set("contact", e.target.value)} className="input" /></label>
               <label className="label">Phone <span className="hint">Private. Never shown on your profile.</span><input type="tel" value={f.phone} onChange={(e) => set("phone", e.target.value)} className="input" placeholder="514-555-0123" /></label>
@@ -165,7 +167,7 @@ export default function RegisterPerformer() {
               <textarea rows={4} maxLength={500} value={f.bio} onChange={(e) => set("bio", e.target.value)} className="input" placeholder="Tell bookers about your act: who you are, the vibe of your show, the crowds you love playing for." />
               <span className="hint text-right">{f.bio.length} / 500</span>
             </label>
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3.5">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] items-end gap-3.5">
               <label className="label">Typical set length<select value={f.setLength} onChange={(e) => set("setLength", e.target.value)} className="input"><option>45 min</option><option>1 hour</option><option>2 × 45 min</option><option>3 hours +</option></select></label>
               <label className="label">Typical fee <span className="hint">Optional. Only shown as a range.</span><select value={f.fee} onChange={(e) => set("fee", e.target.value)} className="input"><option>Prefer not to say</option><option>Under $300</option><option>$300 – $600</option><option>$600 – $1,000</option><option>$1,000+</option></select></label>
             </div>
@@ -215,7 +217,7 @@ export default function RegisterPerformer() {
               )}
             </div>
             <h3 className="mt-2 text-[17px] font-bold">Other links</h3>
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-3.5">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] items-end gap-3.5">
               <label className="label">Instagram<input type="url" value={f.instagram} onChange={(e) => set("instagram", e.target.value)} className="input" placeholder="https://instagram.com/…" /></label>
               <label className="label">Facebook<input type="url" value={f.facebook} onChange={(e) => set("facebook", e.target.value)} className="input" placeholder="https://facebook.com/…" /></label>
               <label className="label">TikTok<input type="url" value={f.tiktok} onChange={(e) => set("tiktok", e.target.value)} className="input" placeholder="https://tiktok.com/@…" /></label>
@@ -225,7 +227,15 @@ export default function RegisterPerformer() {
           </FormCard>
 
           <FormCard id="where" title="5. Where you play">
-            <label className="label">Home base <span className="hint">City or postal code. Only your city is shown publicly.</span><input value={f.base} onChange={(e) => set("base", e.target.value)} className="input" /></label>
+            <label className="label">Home base <span className="hint">Start typing your city and pick it from the list. Only your city is shown publicly.</span>
+              <AddressAutocomplete
+                mode="city"
+                value={f.base}
+                placeholder="Montréal, QC"
+                onChange={(v) => { set("base", v); setGeo(null); }}
+                onPick={(p) => { set("base", [p.city, p.province].filter(Boolean).join(", ")); setGeo({ lat: p.lat, lng: p.lng }); }}
+              />
+            </label>
             <label className="label">How far will you travel? <span className="font-display text-[28px] text-navy">{radius} km</span>
               <input type="range" min={5} max={150} step={5} value={radius} onChange={(e) => setRadius(Number(e.target.value))} className="w-full accent-navy" />
             </label>

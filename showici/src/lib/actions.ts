@@ -95,6 +95,7 @@ export interface PerformerInput {
   removedPhotos?: string[];
   phone: string;
   publish: boolean;
+  geo?: Geo | null;
 }
 
 /** Saves the private phone number (never shown publicly). */
@@ -105,14 +106,27 @@ async function savePhone(phone: string) {
   await sb.from("private_contacts").upsert({ profile_id: uid, phone: phone || null });
 }
 
+/**
+ * Where to put the map pin. `geo` is set when someone picked an address suggestion (exact point);
+ * null means they typed the place by hand (approximate city centre); undefined means the place
+ * wasn't touched while editing, so the saved pin is kept.
+ */
+function locationFor(place: string, geo: Geo | null | undefined, isNew: boolean): { location?: string } {
+  if (geo && Number.isFinite(geo.lat) && Number.isFinite(geo.lng)) return { location: `SRID=4326;POINT(${geo.lng} ${geo.lat})` };
+  if (geo === null || isNew) return { location: pointFor(place) };
+  return {};
+}
+
+export type Geo = { lat: number; lng: number };
+
 /** Creates the performer profile, or updates it when `existingId` is given (no duplicates). */
 export async function savePerformer(input: PerformerInput, existingId?: string): Promise<Result> {
   const sb = getBrowserSupabase();
   const uid = await currentUserId();
   if (!sb) return { ok: true, demo: true };
   if (!uid) return { ok: false, error: "Please create an account or log in first." };
-  const { videos, photos, removedPhotos = [], phone, publish, ...fields } = input;
-  const row = { ...fields, published: publish, location: pointFor(fields.base_city) };
+  const { videos, photos, removedPhotos = [], phone, publish, geo, ...fields } = input;
+  const row = { ...fields, published: publish, ...locationFor(fields.base_city, geo, !existingId) };
 
   let id = existingId;
   if (id) {
@@ -166,6 +180,7 @@ export interface VenueInput {
   photos: File[];
   removedPhotos?: string[];
   publish: boolean;
+  geo?: Geo | null;
 }
 
 /** Creates the venue, or updates it when `existingId` is given. */
@@ -174,8 +189,8 @@ export async function saveVenue(input: VenueInput, existingId?: string): Promise
   const uid = await currentUserId();
   if (!sb) return { ok: true, demo: true };
   if (!uid) return { ok: false, error: "Please create an account or log in first." };
-  const { photos, removedPhotos = [], phone, publish, ...fields } = input;
-  const row = { ...fields, published: publish, location: pointFor(fields.city) };
+  const { photos, removedPhotos = [], phone, publish, geo, ...fields } = input;
+  const row = { ...fields, published: publish, ...locationFor(fields.city, geo, !existingId) };
 
   let id = existingId;
   if (id) {
@@ -343,4 +358,12 @@ export function maskContactInfo(text: string) {
   return text
     .replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, "[email hidden]")
     .replace(/(\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/g, "[phone hidden]");
+}
+
+/** A performer accepts or declines a show a venue added them to. */
+export async function respondBooking(showId: string, accept: boolean): Promise<Result> {
+  const sb = getBrowserSupabase();
+  if (!sb) return { ok: true, demo: true };
+  const { error } = await sb.rpc("respond_booking", { p_show: showId, p_accept: accept });
+  return error ? { ok: false, error: error.message } : { ok: true };
 }

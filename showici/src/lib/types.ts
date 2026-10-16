@@ -74,6 +74,8 @@ export interface Show {
   description?: string;
   startsAt?: string;
   durationMin?: number;
+  /** True while the act a venue picked hasn't accepted the booking yet (shown publicly as "Artist TBA"). */
+  artistTba?: boolean;
 }
 
 export interface Review {

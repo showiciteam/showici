@@ -1,9 +1,10 @@
 import { AppHeader } from "@/components/Header";
 import { Button, DateBadge, toneClass } from "@/components/ui";
 import { getEventRequests } from "@/lib/data";
-import { countConversations, getContactAllowance, getMyPerformer } from "@/lib/dashboard";
+import { countConversations, getBookingRequests, getContactAllowance, getMyPerformer } from "@/lib/dashboard";
 import { requireUser } from "@/lib/session";
 import { AvailabilityToggle } from "./AvailabilityToggle";
+import { BookingRequests } from "./BookingRequests";
 
 export const metadata = { title: "Dashboard · ShowIci" };
 
@@ -13,9 +14,9 @@ export default async function PerformerDashboard() {
   const requests = allRequests.slice(0, 3);
 
   // Demo mode keeps the sample layout. Live mode reads the signed-in performer's own data.
-  const [me, conversations, contactsLeft] = user
-    ? await Promise.all([getMyPerformer(user.id), countConversations(user.id), getContactAllowance(user.id)])
-    : [null, 3, 2];
+  const [me, conversations, contactsLeft, bookings] = user
+    ? await Promise.all([getMyPerformer(user.id), countConversations(user.id), getContactAllowance(user.id), getBookingRequests()])
+    : [null, 3, 2, []];
 
   const name = me?.name ?? user?.name ?? "[Band name]";
   const strength = me?.strength ?? (user ? 0 : 85);
@@ -55,6 +56,8 @@ export default async function PerformerDashboard() {
               <Button href="/register/performer">Create my profile</Button>
             </div>
           )}
+
+          <BookingRequests requests={bookings} />
 
           <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-3.5">
             {stats.map(([k, v]) => <div key={k} className="card flex flex-col gap-1.5 p-5"><span className="text-sm text-muted">{k}</span><span className="h-display text-[34px]">{v}</span></div>)}

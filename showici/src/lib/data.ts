@@ -165,13 +165,17 @@ const SHOW_TZ = "America/Toronto"; // show times are always displayed in Montré
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function toShow(r: any): Show {
   const d = new Date(r.starts_at);
+  // A ShowIci act only appears once they accept the booking; until then the show says "Artist TBA".
+  const tba = Boolean(r.performer_id) && (r.performer_status ?? "accepted") !== "accepted";
+  const ownTitle = r.title && r.title !== r.performer_name ? r.title : "";
   const long = d.toLocaleDateString("en-CA", { weekday: "long", month: "long", day: "numeric", timeZone: SHOW_TZ });
   const clock = (x: Date) => x.toLocaleTimeString("en-CA", { hour: "numeric", minute: "2-digit", timeZone: SHOW_TZ });
   return {
     id: r.id,
-    performerId: r.performer_id ?? "",
+    performerId: tba ? "" : r.performer_id ?? "",
     venueId: r.venue_id,
-    title: r.title || r.performer_name,
+    title: tba ? ownTitle || "Artist TBA" : r.title || r.performer_name,
+    artistTba: tba,
     genre: r.genre ?? "",
     dayLabel: long,
     day: d.toLocaleDateString("en-CA", { weekday: "short", timeZone: SHOW_TZ }).replace(".", "").toUpperCase(),

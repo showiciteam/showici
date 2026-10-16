@@ -207,6 +207,7 @@ export async function getMyPerformer(userId: string) {
     .from("shows")
     .select("id, starts_at, title, venues(name, area, city)")
     .eq("performer_id", p.id)
+    .eq("performer_status", "accepted")
     .gte("starts_at", new Date().toISOString())
     .order("starts_at")
     .limit(5);
@@ -237,7 +238,7 @@ export async function getMyVenue(userId: string) {
   if (!v) return null;
   const { data: shows } = await sb
     .from("shows")
-    .select("id, title, performer_name, entry, status, starts_at")
+    .select("id, title, performer_name, performer_id, performer_status, entry, status, starts_at")
     .eq("venue_id", v.id)
     .gte("starts_at", new Date(Date.now() - 7 * 864e5).toISOString())
     .order("starts_at")
@@ -248,9 +249,24 @@ export async function getMyVenue(userId: string) {
     published: v.published as boolean,
     shows: (shows ?? []).map((s: any) => {
       const d = dayParts(s.starts_at);
-      return { id: s.id as string, key: d.key, day: d.day, date: d.date, title: (s.title || s.performer_name || "Untitled show") as string, entry: (s.entry ?? "") as string, status: s.status as "draft" | "live" | "cancelled" };
+      return { id: s.id as string, key: d.key, day: d.day, date: d.date, title: (s.title || s.performer_name || "Untitled show") as string, entry: (s.entry ?? "") as string, status: s.status as "draft" | "live" | "cancelled", booking: (s.performer_id ? s.performer_status ?? "pending" : "none") as BookingStatus };
     }),
   };
+}
+
+export type BookingStatus = "none" | "pending" | "accepted" | "declined";
+export type BookingRequest = { id: string; venueId: string; venueName: string; area: string; title: string; day: string; date: string; time: string; status: BookingStatus; showStatus: string };
+
+/** Shows a venue added this performer to, waiting for (or already given) an answer. */
+export async function getBookingRequests(): Promise<BookingRequest[]> {
+  const sb = await getServerSupabase();
+  if (!sb) return [];
+  const { data, error } = await sb.rpc("my_booking_requests");
+  if (error) return [];
+  return (data ?? []).map((r: any) => {
+    const d = dayParts(r.starts_at);
+    return { id: r.show_id, venueId: r.venue_id, venueName: r.venue_name ?? "A venue", area: r.venue_area || r.venue_city || "", title: r.title ?? "", day: d.day, date: d.date, time: d.time, status: r.performer_status, showStatus: r.show_status };
+  });
 }
 
 /** Thursday, Friday and Saturday nights for the next three weeks, Montréal time. */

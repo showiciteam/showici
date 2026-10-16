@@ -6,6 +6,7 @@ import { isSaved } from "@/lib/dashboard";
 import { getSessionUser } from "@/lib/session";
 import { supabaseEnabled } from "@/lib/supabase/client";
 import { Button, Placeholder, Stars, Tag } from "@/components/ui";
+import { PhotoGallery, VideoPreview, youTubeId } from "@/components/Media";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -25,17 +26,14 @@ export default async function VenueProfile({ params }: { params: Promise<{ id: s
   const photos = v.photos ?? [];
   const isMe = Boolean(user && v.ownerId && user.id === v.ownerId);
   const address = [v.street, v.city].filter(Boolean).join(", ");
+  const video = v.links?.find((l) => youTubeId(l.url));
+  const otherLinks = (v.links ?? []).filter((l) => l !== video);
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${v.name}, ${address}`)}`;
 
   return (
     <div className="wrap pb-[72px] pt-6">
       {photos.length > 0 ? (
-        <div className="grid grid-cols-4 grid-rows-[170px_170px] gap-2.5 overflow-hidden rounded-[18px]">
-          {photos.slice(0, 5).map((src, i) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img key={src} src={src} alt="" className={`h-full w-full object-cover ${i === 0 ? "col-span-2 row-span-2" : ""}`} />
-          ))}
-        </div>
+        <PhotoGallery photos={photos} alt={v.name} layout="hero" />
       ) : supabaseEnabled ? (
         <Placeholder tone={v.tone} label={v.name} className="h-[220px] rounded-[18px] text-xl text-navy" />
       ) : (
@@ -48,9 +46,9 @@ export default async function VenueProfile({ params }: { params: Promise<{ id: s
         </div>
       )}
 
-      <div className="mb-7 mt-[26px] flex flex-wrap items-end justify-between gap-5">
-        <div className="flex flex-col gap-2">
-          <h1 className="h-display text-[44px]">{v.name}</h1>
+      <div className="mb-6 mt-5 flex flex-wrap items-end justify-between gap-4">
+        <div className="flex flex-col gap-1.5">
+          <h1 className="h-display text-[34px] leading-tight sm:text-[44px]">{v.name}</h1>
           <span className="text-[17px] text-slate">{[v.type, [v.area, v.city].filter(Boolean).join(", "), v.capacity].filter(Boolean).join(" · ")}</span>
           {v.rating > 0 ? (
             <span className="flex items-center gap-1.5"><Stars rating={v.rating} /><strong>{v.rating}</strong><span className="hint text-sm">from performers</span></span>
@@ -66,11 +64,17 @@ export default async function VenueProfile({ params }: { params: Promise<{ id: s
       </div>
 
       <div className="flex flex-wrap items-start gap-8">
-        <div className="flex min-w-0 flex-[999_1_560px] flex-col gap-9">
+        <div className="flex min-w-0 flex-[999_1_560px] flex-col gap-8">
           <section className="flex flex-col gap-2.5">
             <h2 className="h-display text-[26px]">About the venue</h2>
             <p className="whitespace-pre-line text-[17px] leading-relaxed text-ink-2">{v.description || "No description yet."}</p>
           </section>
+          {video && (
+            <section className="flex flex-col gap-3">
+              <h2 className="h-display text-[26px]">See the room</h2>
+              <VideoPreview url={video.url} big />
+            </section>
+          )}
           <section className="flex flex-col gap-3">
             <h2 className="h-display text-[26px]">Upcoming shows</h2>
             {shows.length === 0 && <p className="text-slate">No shows posted yet.</p>}
@@ -124,9 +128,9 @@ export default async function VenueProfile({ params }: { params: Promise<{ id: s
               <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="font-bold no-underline">Get directions →</a>
             </div>
           </div>
-          {(v.links?.length ?? 0) > 0 && (
+          {otherLinks.length > 0 && (
             <div className="card flex flex-wrap gap-2 p-[22px]">
-              {v.links!.map((l) => <a key={l.url} href={l.url} target="_blank" rel="noopener noreferrer" className="rounded-full border border-line-strong bg-white px-3 py-1 text-[13px] text-ink-2 no-underline">{l.label} ↗</a>)}
+              {otherLinks.map((l) => <a key={l.url} href={l.url} target="_blank" rel="noopener noreferrer" className="rounded-full border border-line-strong bg-white px-3 py-1 text-[13px] text-ink-2 no-underline">{l.label} ↗</a>)}
             </div>
           )}
         </aside>

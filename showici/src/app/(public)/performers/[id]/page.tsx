@@ -5,7 +5,8 @@ import { getPerformer, getReviewsFor, getShows, getVenues } from "@/lib/data";
 import { isSaved } from "@/lib/dashboard";
 import { getSessionUser } from "@/lib/session";
 import { supabaseEnabled } from "@/lib/supabase/client";
-import { Button, Placeholder, PlayIcon, Stars, Tag, VideoBox } from "@/components/ui";
+import { Button, Placeholder, Stars, Tag } from "@/components/ui";
+import { PhotoGallery, VideoPreview } from "@/components/Media";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -80,15 +81,10 @@ export default async function PerformerProfile({ params }: { params: Promise<{ i
             {featured && (
               <section className="flex flex-col gap-3.5">
                 <h2 className="h-display text-[28px]">Watch us live</h2>
-                <VideoBox url={featured.url} title={featured.title} big />
+                <VideoPreview url={featured.url} title={featured.title} length={featured.length} big />
                 {others.length > 0 && (
                   <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-3">
-                    {others.map((v) => (
-                      <a key={v.url ?? v.title} href={v.url ?? "#"} target="_blank" rel="noopener noreferrer" className="flex flex-col gap-2 text-navy no-underline">
-                        <span className="relative flex aspect-video items-center justify-center rounded-[10px] bg-ink-2"><PlayIcon size={26} />{v.length && <span className="absolute bottom-2 right-2 rounded bg-navy px-1.5 py-0.5 text-xs text-white">{v.length}</span>}</span>
-                        <span className="text-[15px] font-bold">{v.title}</span>
-                      </a>
-                    ))}
+                    {others.map((v) => <VideoPreview key={v.url ?? v.title} url={v.url} title={v.title} length={v.length} />)}
                   </div>
                 )}
               </section>
@@ -100,16 +96,13 @@ export default async function PerformerProfile({ params }: { params: Promise<{ i
             {(photos.length > 1 || !supabaseEnabled) && (
               <section className="flex flex-col gap-3.5">
                 <h2 className="h-display text-[28px]">Photos</h2>
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-2.5">
-                  {photos.length > 1
-                    ? photos.map((src) => (
-                        <a key={src} href={src} target="_blank" rel="noopener noreferrer">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={src} alt="" className="aspect-square w-full rounded-xl object-cover" />
-                        </a>
-                      ))
-                    : (["ph-1", "ph-2", "ph-3", "ph-4", "ph-5", "ph-1"] as const).map((t, i) => <Placeholder key={i} tone={t} label="[Photo]" className="aspect-square rounded-xl" />)}
-                </div>
+                {photos.length > 1 ? (
+                  <PhotoGallery photos={photos} alt={p.name} />
+                ) : (
+                  <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-2.5">
+                    {(["ph-1", "ph-2", "ph-3", "ph-4", "ph-5", "ph-1"] as const).map((t, i) => <Placeholder key={i} tone={t} label="[Photo]" className="aspect-square rounded-xl" />)}
+                  </div>
+                )}
               </section>
             )}
             <section className="flex flex-col gap-3.5">

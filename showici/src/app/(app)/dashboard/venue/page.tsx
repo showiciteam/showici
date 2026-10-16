@@ -7,7 +7,8 @@ import { requireUser } from "@/lib/session";
 
 export const metadata = { title: "My shows · ShowIci" };
 
-type Row = { id: string; day: string; date: string; title: string; entry: string; status: "draft" | "live" | "cancelled" };
+type Row = { id: string; day: string; date: string; title: string; entry: string; status: "draft" | "live" | "cancelled"; booking?: "none" | "pending" | "accepted" | "declined" };
+const bookingLabel = { pending: ["Waiting for the act to accept · public as Artist TBA", "text-brass-dark"], accepted: ["Act confirmed", "text-success-ink"], declined: ["Act declined · pick another act", "text-red-700"] } as const;
 const statusStyle = { live: "bg-success text-success-ink", draft: "bg-line", cancelled: "bg-line text-muted line-through" };
 
 export default async function VenueDashboard() {
@@ -78,7 +79,7 @@ export default async function VenueDashboard() {
                       {rows.map((s) => (
                         <tr key={s.id} className="border-t border-line">
                           <td className="px-2 py-3 font-bold">{s.day} {s.date}</td>
-                          <td className="px-2 py-3">{s.title}</td>
+                          <td className="px-2 py-3">{s.title}{s.booking && s.booking !== "none" && <span className={`block text-[13px] font-bold ${bookingLabel[s.booking][1]}`}>{bookingLabel[s.booking][0]}</span>}</td>
                           <td className="px-2 py-3">{s.entry}</td>
                           <td className="px-2 py-3"><span className={`rounded-full px-2.5 py-0.5 text-[13px] font-bold capitalize ${statusStyle[s.status]}`}>{s.status}</span></td>
                           <td className="px-2 py-3 text-right"><Link href={user ? `/dashboard/venue/post-show?id=${s.id}` : "/dashboard/venue/post-show"} className="font-bold">Edit</Link></td>
