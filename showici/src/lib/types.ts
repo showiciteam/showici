@@ -23,6 +23,9 @@ export interface Performer {
   videos: { title: string; length: string; featured?: boolean; url?: string }[];
   tone: Tone;
   map: { x: string; y: string };
+  /** Real coordinates (live data). Performers are placed at their home city, never an exact address. */
+  lat?: number;
+  lng?: number;
   /** Live data only. */
   ownerId?: string;
   photos?: string[];
@@ -51,6 +54,9 @@ export interface Venue {
   description: string;
   tone: Tone;
   map: { x: string; y: string };
+  /** Real coordinates (live data). Performers are placed at their home city, never an exact address. */
+  lat?: number;
+  lng?: number;
   /** Live data only. */
   ownerId?: string;
   street?: string;
