@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { setFreeDailyContacts, setPerformerVerified, setPlanLimits, setReportStatus, setRequestStatus, setShowStatus, setUserRole, setVenuePublished, unpublishPerformer, type Result } from "@/lib/actions";
+import { setContactStatus, setFreeDailyContacts, setPerformerVerified, setPlanLimits, setReportStatus, setRequestStatus, setShowStatus, setUserRole, setVenuePublished, unpublishPerformer, type Result } from "@/lib/actions";
 
 type Action = { label: string; done: string; run: () => Promise<Result> };
 
@@ -171,5 +171,17 @@ export function ContactsCap({ initial }: { initial: number }) {
       <button type="button" onClick={save} className="min-h-10 rounded-lg bg-navy px-4 text-sm font-bold text-white">Save</button>
       {msg && <span className="text-sm">{msg}</span>}
     </section>
+  );
+}
+
+export function ContactActions({ id, status }: { id: string; status: string }) {
+  if (status !== "new") return <ActionButtons actions={[{ label: "Reopen", done: "Reopened", run: () => setContactStatus(id, "new") }]} />;
+  return (
+    <ActionButtons
+      actions={[
+        { label: "Close", done: "Closed", run: () => setContactStatus(id, "closed") },
+        { label: "Mark answered", done: "Answered", run: () => setContactStatus(id, "answered") },
+      ]}
+    />
   );
 }

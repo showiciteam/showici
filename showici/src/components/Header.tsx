@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { signOutAction } from "@/lib/auth-actions";
 import { useLang, type DictKey } from "@/lib/i18n";
+import { ContactButton } from "./ContactDialog";
 import { Logo } from "./Logo";
 
 const links: { href: string; key: DictKey; match: string[] }[] = [
@@ -81,6 +82,7 @@ export function Header({ user }: { user?: { name: string; home: string } | null 
                 </Link>
               );
             })}
+            <ContactButton className="text-left text-on-navy hover:text-white" />
           </div>
           <div className="flex items-center gap-2.5">
             <LangToggle />
@@ -149,6 +151,7 @@ export function AppHeader({ role, name, live = false }: { role: AppRole; name: s
               {l.label}
             </Link>
           ))}
+          <ContactButton className="text-on-navy hover:text-white" />
         </div>
         <span className="flex items-center gap-2.5 text-[15px]">
           <Avatar name={name} />

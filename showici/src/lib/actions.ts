@@ -304,7 +304,7 @@ export async function setEmailOnMessage(on: boolean): Promise<Result> {
 }
 
 /** Updates one row by id. Row-level security decides who may change what. */
-async function updateById(table: "performers" | "reports" | "shows" | "event_requests" | "profiles" | "venues", id: string, values: Record<string, unknown>): Promise<Result> {
+async function updateById(table: "performers" | "reports" | "shows" | "event_requests" | "profiles" | "venues" | "contact_requests", id: string, values: Record<string, unknown>): Promise<Result> {
   const sb = getBrowserSupabase();
   if (!sb) return { ok: true, demo: true };
   const { error } = await sb.from(table).update(values).eq("id", id);
@@ -384,3 +384,28 @@ export async function respondBooking(showId: string, accept: boolean): Promise<R
   const { error } = await sb.rpc("respond_booking", { p_show: showId, p_accept: accept });
   return error ? { ok: false, error: error.message } : { ok: true };
 }
+
+export interface ContactInput {
+  role: string;
+  topic: string;
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  details: Record<string, string>;
+  page: string;
+  lang: string;
+}
+
+/** Saves a message for the ShowIci team (main menu → Contact). Works signed in or not. */
+export async function sendContactRequest(input: ContactInput): Promise<Result> {
+  const sb = getBrowserSupabase();
+  if (!sb) return { ok: true, demo: true };
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email)) return { ok: false, error: "Please check the email address." };
+  const { error } = await sb.from("contact_requests").insert(input);
+  if (!error) return { ok: true };
+  if (/too many/i.test(error.message)) return { ok: false, error: "You've sent several messages already. Please wait a little before sending another." };
+  return { ok: false, error: "Your message couldn't be sent. Please try again in a moment." };
+}
+
+export const setContactStatus = (id: string, status: "new" | "answered" | "closed") => updateById("contact_requests", id, { status });

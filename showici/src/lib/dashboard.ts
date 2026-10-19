@@ -440,3 +440,25 @@ export async function getAdminData() {
   };
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
+
+export async function getAdminContact(status: "new" | "answered" | "closed" | "all") {
+  const sb = await getServerSupabase();
+  if (!sb) return [];
+  let q = sb.from("contact_requests").select("*").order("created_at", { ascending: false }).limit(200);
+  if (status !== "all") q = q.eq("status", status);
+  const { data } = await q;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data ?? []).map((r: any) => ({
+    id: r.id as string,
+    role: r.role as string,
+    topic: r.topic as string,
+    name: r.name as string,
+    email: r.email as string,
+    phone: (r.phone ?? "") as string,
+    message: r.message as string,
+    details: (r.details ?? {}) as Record<string, string>,
+    status: r.status as string,
+    when: timeAgo(r.created_at),
+    page: (r.page ?? "") as string,
+  }));
+}
