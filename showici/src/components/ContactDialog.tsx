@@ -55,11 +55,11 @@ const T = {
   close: { en: "Close", fr: "Fermer" },
 } satisfies Record<string, Record<L, string>>;
 
-export function ContactButton({ className = "" }: { className?: string }) {
+export function ContactButton({ className = "", label = "Contact" }: { className?: string; label?: string }) {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} className={className}>Contact</button>
+      <button type="button" onClick={() => setOpen(true)} className={className}>{label}</button>
       {open && <ContactDialog onClose={() => setOpen(false)} />}
     </>
   );

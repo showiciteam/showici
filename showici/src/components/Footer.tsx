@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useLang } from "@/lib/i18n";
+import { ContactButton } from "./ContactDialog";
 
 export function Footer() {
   const { t } = useLang();
@@ -14,7 +15,7 @@ export function Footer() {
           <Link href="/news" className="text-muted">{t("nav.news")}</Link>
           <Link href="/pricing" className="text-muted">Pricing</Link>
           <a href="#" className="text-muted">{t("footer.about")}</a>
-          <a href="#" className="text-muted">{t("footer.contact")}</a>
+          <ContactButton label={t("footer.contact")} className="text-muted hover:text-navy hover:underline" />
           <a href="#" className="text-muted">{t("footer.terms")}</a>
           <a href="#" className="text-muted">{t("footer.privacy")}</a>
         </div>
