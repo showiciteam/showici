@@ -137,7 +137,7 @@ export default function PostShow() {
                 return null;
               })()}
               <label className="label">Show title <span className="hint">Optional</span><input value={title} onChange={(e) => setTitle(e.target.value)} className="input" placeholder="e.g. 90s Night" /></label>
-              <div className="grid grid-cols-[repeat(auto-fit,minmax(160px,1fr))] gap-3.5">
+              <div className="grid grid-cols-[repeat(auto-fit,minmax(160px,1fr))] items-start gap-3.5">
                 <label className="label">Date<input type="date" required value={date} onChange={(e) => setDate(e.target.value)} className="input" /></label>
                 <label className="label">Doors<input type="time" value={doors} onChange={(e) => setDoors(e.target.value)} className="input" /></label>
                 <label className="label">Show starts<input type="time" value={time} onChange={(e) => setTime(e.target.value)} className="input" /></label>

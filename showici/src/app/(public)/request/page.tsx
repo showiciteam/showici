@@ -66,21 +66,21 @@ export default function EventRequestPage() {
         <div className="flex flex-wrap items-start gap-7">
           <form onSubmit={submit} className="card flex min-w-0 flex-[999_1_600px] flex-col gap-[22px] p-7">
             <ChipGroup legend="Type of event" single options={["Quinceañera", "Birthday", "Wedding", "House party", "Anniversary", "Corporate", "Kids' party", "Other"]} value={type} onChange={setType} />
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3.5">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] items-start gap-3.5">
               <label className="label">Date<input name="date" type="date" required min={new Date().toISOString().slice(0, 10)} className="input" /></label>
               <label className="label">Start time<input name="time" type="time" defaultValue="19:00" className="input" /></label>
               <label className="label">Performance length<select name="length" className="input" defaultValue="2 hours"><option>1 hour</option><option>2 hours</option><option>3 hours</option><option>4 hours +</option></select></label>
             </div>
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3.5">
-              <label className="label">City or postal code <span className="hint">Your exact address stays private.</span><input name="city" required className="input" placeholder="e.g. Laval" /></label>
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] items-start gap-3.5">
+              <label className="label">City or postal code<input name="city" required className="input" placeholder="e.g. Laval" /><span className="hint">Your exact address stays private.</span></label>
               <label className="label">Number of guests<select name="guests" className="input" defaultValue="75 – 150"><option>Under 25</option><option>25 – 75</option><option>75 – 150</option><option>150+</option></select></label>
               <label className="label">Setting<select name="setting" className="input"><option>Home</option><option>Rented hall</option><option>Restaurant</option><option>Outdoor</option></select></label>
             </div>
             <ChipGroup legend="What are you looking for?" hint="Choose one or more" options={["Band", "DJ", "Mariachi", "Solo singer", "Magician", "Comedian", "Dancers"]} value={wants} onChange={setWants} />
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-3.5">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] items-start gap-3.5">
               <label className="label">Music style<input name="style" className="input" placeholder="e.g. Latin, pop" /></label>
               <label className="label">Language<select name="language" className="input"><option>Any</option><option>Français</option><option>English</option><option>Español</option></select></label>
-              <label className="label">Budget <span className="hint">Helps performers reply with fitting offers</span><select name="budget" className="input" defaultValue="$600 – $1,000"><option>Under $300</option><option>$300 – $600</option><option>$600 – $1,000</option><option>$1,000 – $2,000</option><option>$2,000+</option></select></label>
+              <label className="label">Budget<select name="budget" className="input" defaultValue="$600 – $1,000"><option>Under $300</option><option>$300 – $600</option><option>$600 – $1,000</option><option>$1,000 – $2,000</option><option>$2,000+</option></select><span className="hint">Helps performers reply with fitting offers</span></label>
             </div>
             <label className="label">Tell performers more<textarea name="note" rows={4} className="input" placeholder="e.g. Live band for the first hour, then a DJ for dancing. Sound system needed." /></label>
             <div className="flex items-start gap-2.5 rounded-xl bg-brass-tint px-4 py-3.5 text-sm text-ink-2">

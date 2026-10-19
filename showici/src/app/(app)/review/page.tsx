@@ -88,7 +88,7 @@ export default function ReviewPage() {
           </div>
         </fieldset>
         <ChipGroup legend="What stood out?" options={tagOptions} value={tags} onChange={setTags} />
-        <label className="label">Your review <span className="hint">Shown publicly on their profile</span><textarea name="body" rows={4} className="input" placeholder="Write what others should know." /></label>
+        <label className="label">Your review<textarea name="body" rows={4} className="input" placeholder="Write what others should know." /><span className="hint">Shown publicly on their profile</span></label>
         <fieldset>
           <legend className="mb-2.5 text-sm font-bold">Would you work with them again?</legend>
           <div className="flex gap-[18px]">
