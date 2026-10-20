@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { setContactStatus, setFreeDailyContacts, setPerformerVerified, setPlanLimits, setReportStatus, setRequestStatus, setShowStatus, setUserRole, setVenuePublished, unpublishPerformer, type Result } from "@/lib/actions";
+import { setContactStatus, setFreeDailyContacts, setPerformerVerified, setPlanLimits, setReportStatus, setRequestStatus, setShowStatus, setUserRole, setVenuePublished, unpublishPerformer, type Result, decideVenueClaim } from "@/lib/actions";
 
 type Action = { label: string; done: string; run: () => Promise<Result> };
 
@@ -181,6 +181,17 @@ export function ContactActions({ id, status }: { id: string; status: string }) {
       actions={[
         { label: "Close", done: "Closed", run: () => setContactStatus(id, "closed") },
         { label: "Mark answered", done: "Answered", run: () => setContactStatus(id, "answered") },
+      ]}
+    />
+  );
+}
+
+export function ClaimActions({ id }: { id: string }) {
+  return (
+    <ActionButtons
+      actions={[
+        { label: "Reject", done: "Rejected", run: () => decideVenueClaim(id, false) },
+        { label: "Approve: hand over the venue", done: "Approved", run: () => decideVenueClaim(id, true) },
       ]}
     />
   );

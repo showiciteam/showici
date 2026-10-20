@@ -409,3 +409,26 @@ export async function sendContactRequest(input: ContactInput): Promise<Result> {
 }
 
 export const setContactStatus = (id: string, status: "new" | "answered" | "closed") => updateById("contact_requests", id, { status });
+
+// ───────────── Venue claims ─────────────
+
+/** "Claim this venue": 'approved' when the email matches the venue's website, otherwise 'pending' for admin review. */
+export async function claimVenue(venueId: string, name: string, role: string, phone: string, message: string): Promise<{ ok: true; status: "approved" | "pending" } | { ok: false; error: string }> {
+  const sb = getBrowserSupabase();
+  if (!sb) return { ok: true, status: "pending" };
+  if (!name.trim() || !role.trim()) return { ok: false, error: "Please fill in your name and role." };
+  const { data, error } = await sb.rpc("claim_venue", { p_venue: venueId, p_name: name, p_role: role, p_phone: phone, p_message: message });
+  if (error) {
+    const known = /(sign in|already|not found|waiting)/i.test(error.message);
+    return { ok: false, error: known ? error.message : "Your claim couldn't be sent. Please try again in a moment." };
+  }
+  return { ok: true, status: data === "approved" ? "approved" : "pending" };
+}
+
+/** Admin only: approve (hand the venue over) or reject a claim. */
+export async function decideVenueClaim(claimId: string, approve: boolean): Promise<Result> {
+  const sb = getBrowserSupabase();
+  if (!sb) return { ok: true, demo: true };
+  const { error } = await sb.rpc("decide_venue_claim", { p_claim: claimId, p_approve: approve });
+  return error ? { ok: false, error: error.message } : { ok: true };
+}

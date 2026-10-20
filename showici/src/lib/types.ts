@@ -62,6 +62,11 @@ export interface Venue {
   street?: string;
   photos?: string[];
   links?: { label: string; url: string }[];
+  /** False for venues ShowIci listed from public sources that no owner has claimed yet. */
+  claimed?: boolean;
+  phone?: string;
+  /** "osm:n123" when the listing started from OpenStreetMap data (credited on the page). */
+  sourceRef?: string;
 }
 
 export interface Show {

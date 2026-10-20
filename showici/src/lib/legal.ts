@@ -6,8 +6,8 @@
 
 export type LegalDoc = { title: string; updated: string; intro: string; sections: { h: string; p: string[] }[] };
 
-const UPDATED_EN = "Last updated: October 19, 2026";
-const UPDATED_FR = "Dernière mise à jour : 19 octobre 2026";
+const UPDATED_EN = "Last updated: October 20, 2026";
+const UPDATED_FR = "Dernière mise à jour : 20 octobre 2026";
 const PRIVACY_EMAIL = "privacy@showici.com";
 
 export const terms: Record<"en" | "fr", LegalDoc> = {
@@ -33,6 +33,7 @@ export const terms: Record<"en" | "fr", LegalDoc> = {
         "- Shows you post must be real and up to date. Edit or cancel a show as soon as plans change.",
         "- When you add a performer who is on ShowIci to a show, they receive a booking request. Until they accept, the show is listed as “Artist TBA” and their name and profile are not shown. Never list an act publicly that has not agreed to perform.",
         "- Your venue's address, photos and description are public so people can find your shows.",
+        "- To help artists find places to play, ShowIci may list a venue before its owner joins, using public business information (name, address, public phone number, website) from OpenStreetMap and the venue's own pages. These pages are marked as not claimed. The owner can claim the page for free to manage it, or ask us to correct or remove it through Contact. A claim is approved only once we have confirmed that the person manages the venue.",
       ] },
       { h: "5. Performers", p: [
         "- Your profile must describe your own act. Only post photos, videos and music you have the right to share, and only answer requests you can really fulfil.",
@@ -92,6 +93,7 @@ export const terms: Record<"en" | "fr", LegalDoc> = {
         "- Les spectacles que vous publiez doivent être réels et à jour. Modifiez ou annulez un spectacle dès que les plans changent.",
         "- Lorsque vous ajoutez à un spectacle un artiste inscrit sur ShowIci, il reçoit une demande de réservation. Tant qu'il n'a pas accepté, le spectacle est affiché « Artist TBA » (artiste à confirmer) et son nom et son profil ne sont pas montrés. N'annoncez jamais publiquement un artiste qui n'a pas accepté de jouer.",
         "- L'adresse, les photos et la description de votre salle sont publiques pour qu'on puisse trouver vos spectacles.",
+        "- Pour aider les artistes à trouver où jouer, ShowIci peut afficher une salle avant que son propriétaire s'inscrive, à partir de renseignements d'entreprise publics (nom, adresse, numéro de téléphone public, site web) provenant d'OpenStreetMap et des pages de la salle. Ces pages sont indiquées comme non réclamées. Le propriétaire peut réclamer la page gratuitement pour la gérer, ou nous demander de la corriger ou de la retirer par le lien Contact. Une réclamation n'est approuvée qu'après avoir confirmé que la personne gère la salle.",
       ] },
       { h: "5. Artistes", p: [
         "- Votre profil doit présenter votre propre numéro. Ne publiez que des photos, vidéos et pièces musicales que vous avez le droit de partager, et ne répondez qu'aux demandes que vous pouvez réellement honorer.",
@@ -146,8 +148,10 @@ export const privacy: Record<"en" | "fr", LegalDoc> = {
         "- Activity: shows you post, booking requests and answers, event requests (event type, date, city, number of guests, budget, notes), saved profiles, reviews and reports.",
         "- Messages: conversations between members, which we store so they can be read in your inbox. Phone numbers and emails typed in messages may be hidden automatically.",
         "- Contact form: what you write to us and the details you choose to add (name, email, phone, company, etc.).",
+        "- Venue claims: when you claim a venue page, your name, role at the venue, email and phone number, used only to confirm the claim.",
+        "- Venues listed before their owner joins: public business information about the venue (name, address, public phone number, website), taken from OpenStreetMap and the venue's own pages. It is about the business, not about a person.",
         "- Technical: a login session cookie needed to keep you signed in, your language choice saved in your browser, and the basic connection logs (IP address, browser, time) that our hosting providers keep for security.",
-        "We collect this information directly from you when you fill in a form or use the site. We don't buy information about you, and we don't use advertising or third-party tracking cookies.",
+        "Apart from those public venue listings, we collect this information directly from you when you fill in a form or use the site. We don't buy information about you, and we don't use advertising or third-party tracking cookies.",
       ] },
       { h: "3. Why we use it", p: [
         "- To create and secure your account and let you sign in and reset your password.",
@@ -209,8 +213,10 @@ export const privacy: Record<"en" | "fr", LegalDoc> = {
         "- Activité : spectacles publiés, demandes de réservation et réponses, demandes d'événement (type, date, ville, nombre d'invités, budget, notes), profils sauvegardés, avis et signalements.",
         "- Messages : les conversations entre membres, que nous conservons pour qu'elles s'affichent dans votre boîte de réception. Les numéros et courriels écrits dans les messages peuvent être masqués automatiquement.",
         "- Formulaire de contact : ce que vous nous écrivez et les détails que vous choisissez d'ajouter (nom, courriel, téléphone, entreprise, etc.).",
+        "- Réclamation d'une salle : lorsque vous réclamez la page d'une salle, votre nom, votre rôle à la salle, votre courriel et votre numéro de téléphone, utilisés seulement pour confirmer la réclamation.",
+        "- Salles affichées avant l'inscription de leur propriétaire : des renseignements d'entreprise publics sur la salle (nom, adresse, numéro de téléphone public, site web), tirés d'OpenStreetMap et des pages de la salle. Ils concernent l'entreprise, pas une personne.",
         "- Données techniques : un témoin (cookie) de session nécessaire pour rester connecté, votre choix de langue enregistré dans votre navigateur, et les journaux de connexion de base (adresse IP, navigateur, heure) conservés par nos hébergeurs pour la sécurité.",
-        "Nous recueillons ces renseignements directement auprès de vous lorsque vous remplissez un formulaire ou utilisez le site. Nous n'achetons pas de renseignements sur vous et n'utilisons ni publicité ni témoins de suivi de tiers.",
+        "Sauf pour ces fiches de salles publiques, nous recueillons ces renseignements directement auprès de vous lorsque vous remplissez un formulaire ou utilisez le site. Nous n'achetons pas de renseignements sur vous et n'utilisons ni publicité ni témoins de suivi de tiers.",
       ] },
       { h: "3. Pourquoi nous les utilisons", p: [
         "- Créer et protéger votre compte, et vous permettre de vous connecter et de réinitialiser votre mot de passe.",

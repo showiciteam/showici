@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { LangToggle } from "@/components/Header";
@@ -23,6 +23,15 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [confirmEmail, setConfirmEmail] = useState("");
+  // ?role=venue&next=/venues/…/claim: preselect the account type and come back to that page after sign-up.
+  const [nextOverride, setNextOverride] = useState<string | null>(null);
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    const r = q.get("role");
+    if (r === "venue" || r === "planner" || r === "performer") setRole(r);
+    const n = q.get("next");
+    if (n && n.startsWith("/") && !n.startsWith("//")) setNextOverride(n);
+  }, []);
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -30,12 +39,13 @@ export default function SignupPage() {
     setBusy(true);
     setError("");
     const email = String(f.get("email"));
-    const res = await signUp(email, String(f.get("password")), role, String(f.get("name")), next[role]);
+    const goTo = nextOverride ?? next[role];
+    const res = await signUp(email, String(f.get("password")), role, String(f.get("name")), goTo);
     setBusy(false);
     if (!res.ok) return setError(res.error);
     // Email confirmation is on: the link in the email logs them in and continues to the next step.
     if (res.needsConfirm) return setConfirmEmail(email);
-    router.push(next[role]);
+    router.push(goTo);
     router.refresh();
   }
 

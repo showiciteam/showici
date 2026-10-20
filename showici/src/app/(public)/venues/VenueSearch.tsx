@@ -6,10 +6,10 @@ import type { Venue } from "@/lib/types";
 import { RegionFilter, regionLabel } from "@/components/RegionFilter";
 import { ALL_QUEBEC, kmFrom, regionFor } from "@/lib/regions";
 
-const TYPES = ["Pub", "Bar", "Restaurant", "Brewery", "Club"];
+const TYPES = ["Pub", "Bar", "Restaurant", "Brewery", "Café", "Club", "Event hall"];
 
 export function VenueSearch({ venues, initialRadius, initialRegion }: { venues: Venue[]; initialRadius?: number; initialRegion?: string }) {
-  const [types, setTypes] = useState<string[]>(["Pub", "Bar"]);
+  const [types, setTypes] = useState<string[]>([]); // none ticked = every type
   const [region, setRegion] = useState(() => regionFor(initialRegion));
   const [radius, setRadius] = useState(initialRadius ?? regionFor(initialRegion).radiusKm);
   const [openOnly, setOpenOnly] = useState(false);

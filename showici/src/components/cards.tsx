@@ -73,12 +73,16 @@ export function VenueRow({ v }: { v: Venue }) {
           <span className="h-display text-[21px]">{v.name}</span>
           {v.openToNewActs && <span className="rounded-full bg-success px-2 py-1 text-xs font-bold text-success-ink">Open to new acts</span>}
         </div>
-        <span className="text-slate">{v.type} · {v.area} · {v.distanceKm} km away · {v.capacity}</span>
-        <div className="flex flex-wrap gap-1.5">{[...v.genres.slice(0, 2), v.nights].map((g) => <Tag key={g}>{g}</Tag>)}</div>
+        <span className="text-slate">{[v.type, v.area || v.city, `${v.distanceKm} km away`, v.capacity].filter(Boolean).join(" · ")}</span>
+        <div className="flex flex-wrap gap-1.5">{[...v.genres.slice(0, 2), v.nights].filter(Boolean).map((g) => <Tag key={g}>{g}</Tag>)}</div>
       </div>
       <div className="flex flex-wrap gap-2.5">
         <Button href={`/venues/${v.id}`} variant="secondary" className="text-sm">View venue</Button>
-        <Button href={`/messages?to=${v.id}`} className="text-sm">Send message</Button>
+        {v.claimed === false ? (
+          <Button href={`/venues/${v.id}/claim`} variant="secondary" className="text-sm">Claim this venue</Button>
+        ) : (
+          <Button href={`/messages?to=${v.id}`} className="text-sm">Send message</Button>
+        )}
       </div>
     </article>
   );

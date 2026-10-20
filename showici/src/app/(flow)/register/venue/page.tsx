@@ -98,6 +98,11 @@ export default function RegisterVenue() {
       <p className="eyebrow mb-1.5 text-[13px]">{existingId ? "Edit your venue" : "Venue registration"}</p>
       <h1 className="h-display text-[44px]">{existingId ? "Update your venue" : "List your venue"}</h1>
       <p className="mb-8 mt-2.5 max-w-[720px] text-lg text-slate">Tell performers what your space is like and what you book. Your upcoming shows also appear on ShowIci&apos;s public listings.</p>
+      {!existingId && (
+        <p className="-mt-4 mb-8 max-w-[720px] rounded-xl border border-[#E2C98F] bg-brass-tint px-4 py-3 text-[15px] text-ink-2">
+          Is your venue already on ShowIci? Find it under <a href="/venues?region=all" className="font-bold">Venues</a> and click <strong>Claim this venue</strong> instead of creating a new page.
+        </p>
+      )}
       <div className="flex flex-wrap items-start gap-7">
         <nav aria-label="Registration steps" className="card flex max-w-[280px] flex-[1_1_240px] flex-col p-2.5 lg:sticky lg:top-6">
           {steps.map((s, i) => (

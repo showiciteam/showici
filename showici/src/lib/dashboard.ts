@@ -462,3 +462,32 @@ export async function getAdminContact(status: "new" | "answered" | "closed" | "a
     page: (r.page ?? "") as string,
   }));
 }
+
+// ───────────── Admin: venue claims ─────────────
+
+export async function getAdminClaims(status: "pending" | "approved" | "rejected" | "all") {
+  const sb = await getServerSupabase();
+  if (!sb) return [];
+  let q = sb.from("venue_claims").select("*, venue:venues(id, name, website, phone, street, city)").order("created_at", { ascending: false }).limit(200);
+  if (status !== "all") q = q.eq("status", status);
+  const { data } = await q;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data ?? []).map((c: any) => ({
+    id: c.id as string,
+    status: c.status as string,
+    auto: Boolean(c.auto_approved),
+    name: c.name as string,
+    role: c.role as string,
+    email: c.email as string,
+    phone: (c.phone ?? "") as string,
+    message: (c.message ?? "") as string,
+    when: timeAgo(c.created_at),
+    venue: {
+      id: (c.venue?.id ?? "") as string,
+      name: (c.venue?.name ?? "Deleted venue") as string,
+      website: (c.venue?.website ?? "") as string,
+      phone: (c.venue?.phone ?? "") as string,
+      address: [c.venue?.street, c.venue?.city].filter(Boolean).join(", "),
+    },
+  }));
+}

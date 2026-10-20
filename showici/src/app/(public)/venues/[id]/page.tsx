@@ -25,6 +25,7 @@ export default async function VenueProfile({ params }: { params: Promise<{ id: s
   const shows = allShows.filter((s) => s.venueId === v.id);
   const photos = v.photos ?? [];
   const isMe = Boolean(user && v.ownerId && user.id === v.ownerId);
+  const unclaimed = v.claimed === false;
   const address = [v.street, v.city].filter(Boolean).join(", ");
   const video = v.links?.find((l) => youTubeId(l.url));
   const otherLinks = (v.links ?? []).filter((l) => l !== video);
@@ -49,8 +50,9 @@ export default async function VenueProfile({ params }: { params: Promise<{ id: s
       <div className="mb-6 mt-5 flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-1.5">
           <h1 className="h-display text-[34px] leading-tight sm:text-[44px]">{v.name}</h1>
+          {unclaimed && <span className="w-fit rounded-full border border-line-strong bg-white px-3 py-1 text-[13px] font-bold text-slate">Listed by ShowIci · Not claimed yet</span>}
           <span className="text-[17px] text-slate">{[v.type, [v.area, v.city].filter(Boolean).join(", "), v.capacity].filter(Boolean).join(" · ")}</span>
-          {v.rating > 0 ? (
+          {unclaimed ? null : v.rating > 0 ? (
             <span className="flex items-center gap-1.5"><Stars rating={v.rating} /><strong>{v.rating}</strong><span className="hint text-sm">from performers</span></span>
           ) : (
             <span className="hint text-sm">No reviews yet</span>
@@ -59,9 +61,19 @@ export default async function VenueProfile({ params }: { params: Promise<{ id: s
         <div className="flex flex-wrap gap-2.5">
           {isMe ? <Button href="/register/venue" variant="secondary">Edit my venue</Button> : <SaveButton kind="venue" id={v.id} initial={following} signedIn={Boolean(user)} />}
           <ShareButton title={`${v.name} on ShowIci`} />
-          {!isMe && <Button href={`/messages?to=${v.id}`}>Message about a gig</Button>}
+          {unclaimed ? <Button href={`/venues/${v.id}/claim`}>Claim this venue</Button> : !isMe && <Button href={`/messages?to=${v.id}`}>Message about a gig</Button>}
         </div>
       </div>
+
+      {unclaimed && (
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-[18px] border border-[#E2C98F] bg-brass-tint px-5 py-4">
+          <div className="flex max-w-[680px] flex-col gap-1">
+            <strong className="text-[17px]">Is this your venue?</strong>
+            <span className="text-ink-2">We listed {v.name} from public information so local artists can find it. Claim it to add photos, post your shows, fix any details and get messages from artists. It&apos;s free.</span>
+          </div>
+          <Button href={`/venues/${v.id}/claim`}>Claim this venue</Button>
+        </div>
+      )}
 
       <div className="flex flex-wrap items-start gap-8">
         <div className="flex min-w-0 flex-[999_1_560px] flex-col gap-8">
@@ -86,7 +98,7 @@ export default async function VenueProfile({ params }: { params: Promise<{ id: s
               </Link>
             ))}
           </section>
-          <section className="flex flex-col gap-3">
+          {!unclaimed && <section className="flex flex-col gap-3">
             <h2 className="h-display text-[26px]">What performers say</h2>
             {supabaseEnabled ? (
               reviews.length === 0 ? (
@@ -104,17 +116,17 @@ export default async function VenueProfile({ params }: { params: Promise<{ id: s
             ) : (
               <article className="card flex flex-col gap-2 p-5"><div className="flex justify-between"><strong>[Band name]</strong><Stars rating={5} /></div><p className="text-ink-2">[Review from a performer who played here.]</p></article>
             )}
-          </section>
+          </section>}
         </div>
         <aside className="flex max-w-[380px] flex-[1_1_300px] flex-col gap-4">
-          <div className="card flex flex-col gap-3.5 p-[22px]">
+          {(v.books.length > 0 || v.genres.length > 0 || v.nights || v.leadTime || v.feeRange || !unclaimed) && <div className="card flex flex-col gap-3.5 p-[22px]">
             <h3 className="h-display text-xl">What they book</h3>
             <div className="flex flex-wrap gap-1.5">{v.books.map((b) => <Tag key={b}>{b}</Tag>)}</div>
             <div className="flex flex-wrap gap-1.5">{v.genres.map((g) => <Tag key={g}>{g}</Tag>)}</div>
-            {[["Live nights", v.nights], ["Books", v.leadTime], ["Fee range", v.feeRange], ["New acts", v.openToNewActs ? "Welcome" : "Established acts"]].filter(([, val]) => val).map(([k, val]) => (
+            {[["Live nights", v.nights], ["Books", v.leadTime], ["Fee range", v.feeRange], ["New acts", unclaimed ? "" : v.openToNewActs ? "Welcome" : "Established acts"]].filter(([, val]) => val).map(([k, val]) => (
               <div key={k} className="flex justify-between gap-3 border-t border-line pt-3"><span className="text-muted">{k}</span><strong className="text-right">{val}</strong></div>
             ))}
-          </div>
+          </div>}
           {v.equipment.length > 0 && (
             <div className="card flex flex-col gap-2.5 p-[22px]">
               <h3 className="h-display text-xl">Equipment</h3>
@@ -125,6 +137,7 @@ export default async function VenueProfile({ params }: { params: Promise<{ id: s
             <div className="relative h-[150px] bg-[#E9EDE6]"><span className="absolute left-1/2 top-1/2 -ml-[9px] -mt-[9px] h-[18px] w-[18px] rounded-full border-[3px] border-white bg-navy" /></div>
             <div className="flex flex-col gap-1.5 p-4">
               <span className="text-slate">{address || (supabaseEnabled ? v.city : `[Street address], ${v.city}`)}</span>
+              {v.phone && <a href={`tel:${v.phone.replace(/[^\d+]/g, "")}`} className="no-underline">{v.phone}</a>}
               <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="font-bold no-underline">Get directions →</a>
             </div>
           </div>
@@ -132,6 +145,11 @@ export default async function VenueProfile({ params }: { params: Promise<{ id: s
             <div className="card flex flex-wrap gap-2 p-[22px]">
               {otherLinks.map((l) => <a key={l.url} href={l.url} target="_blank" rel="noopener noreferrer" className="rounded-full border border-line-strong bg-white px-3 py-1 text-[13px] text-ink-2 no-underline">{l.label} ↗</a>)}
             </div>
+          )}
+          {unclaimed && (
+            <p className="text-[13px] leading-relaxed text-muted">
+              Details come from public sources{v.sourceRef?.startsWith("osm:") ? <> including <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a></> : null} and the venue&apos;s own website, and may be out of date. Something wrong, or want this page removed? Use Contact at the bottom of the page.
+            </p>
           )}
         </aside>
       </div>
