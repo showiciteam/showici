@@ -130,13 +130,13 @@ export function Section({ title, eyebrow, action, children, className = "" }: { 
   );
 }
 
-export function FreePlanBanner({ left = 2 }: { left?: number }) {
+export function FreePlanBanner() {
   return (
     <div className="mb-7 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#E2C98F] bg-brass-tint px-4 py-3.5">
       <span>
-        <strong className="text-brass-dark">Free plan:</strong> {left} contacts left today. Upgrade for unlimited contacts and every filter.
+        <strong className="text-brass-dark">Launch offer:</strong> everything on ShowIci is free. Unlimited contacts, every filter, zero commission.
       </span>
-      <Link href="/pricing" className="font-bold no-underline">See plans →</Link>
+      <Link href="/pricing" className="font-bold no-underline">Learn more →</Link>
     </div>
   );
 }
