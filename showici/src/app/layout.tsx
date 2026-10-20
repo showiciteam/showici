@@ -19,8 +19,9 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
-    locale: "fr_CA",
-    alternateLocale: ["en_CA"],
+    // Pages load in English first (the FR / EN switch changes them in the browser).
+    locale: "en_CA",
+    alternateLocale: ["fr_CA"],
   },
   twitter: {
     card: "summary_large_image",
