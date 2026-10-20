@@ -178,7 +178,7 @@ export default function RegisterVenue() {
               <label className="label">Role<select value={f.role} onChange={(e) => set("role", e.target.value)} className="input"><option>Owner</option><option>Manager</option><option>Booker</option></select></label>
               <label className="label">Phone<input type="tel" value={f.phone} onChange={(e) => set("phone", e.target.value)} className="input" placeholder="514-555-0123" /><span className="hint">Private. Never shown on your page.</span></label>
             </div>
-            <label className="flex items-start gap-2.5 text-sm text-slate"><input type="checkbox" required className="mt-0.5 h-[18px] w-[18px] flex-none accent-navy" />I&apos;m authorized to list this venue, and I agree to the <a href="#">Terms</a>.</label>
+            <label className="flex items-start gap-2.5 text-sm text-slate"><input type="checkbox" required className="mt-0.5 h-[18px] w-[18px] flex-none accent-navy" />I&apos;m authorized to list this venue, and I agree to the <a href="/terms" target="_blank" rel="noopener">Terms</a>.</label>
             {existingId && <p className="hint text-sm">Currently {published ? "published" : "a draft (hidden from the public)"}.</p>}
             {status && <Notice kind={status.kind}>{status.msg}</Notice>}
             <div className="flex flex-wrap justify-end gap-2.5">

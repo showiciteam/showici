@@ -16,8 +16,8 @@ export function Footer() {
           <Link href="/pricing" className="text-muted">Pricing</Link>
           <a href="#" className="text-muted">{t("footer.about")}</a>
           <ContactButton label={t("footer.contact")} className="text-muted hover:text-navy hover:underline" />
-          <a href="#" className="text-muted">{t("footer.terms")}</a>
-          <a href="#" className="text-muted">{t("footer.privacy")}</a>
+          <Link href="/terms" className="text-muted">{t("footer.terms")}</Link>
+          <Link href="/privacy" className="text-muted">{t("footer.privacy")}</Link>
         </div>
       </div>
     </footer>

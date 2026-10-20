@@ -338,7 +338,7 @@ export default function RegisterPerformer() {
               <div className="flex flex-[1_1_200px] flex-col gap-1"><span className="h-display text-xl">{f.name || "Your act name"}</span><span className="hint">{actType[0]} · {joinOther(genres, styleOther).join(", ")} · travels {radius} km · {videos.length} videos · {photoCount} photos</span></div>
               {existingId && <span className={`rounded-full px-3 py-1 text-sm font-bold ${published ? "bg-success text-success-ink" : "bg-line"}`}>{published ? "Published" : "Draft"}</span>}
             </div>
-            <label className="flex items-start gap-2.5 text-sm text-slate"><input type="checkbox" required className="mt-0.5 h-[18px] w-[18px] flex-none accent-navy" />I confirm I have the rights to the photos and videos, and I agree to the <a href="#">Terms</a>.</label>
+            <label className="flex items-start gap-2.5 text-sm text-slate"><input type="checkbox" required className="mt-0.5 h-[18px] w-[18px] flex-none accent-navy" />I confirm I have the rights to the photos and videos, and I agree to the <a href="/terms" target="_blank" rel="noopener">Terms</a>.</label>
             {status && <Notice kind={status.kind}>{status.msg}</Notice>}
             <div className="flex flex-wrap justify-end gap-2.5">
               <Button variant="secondary" disabled={busy || !f.name} onClick={() => save(false)}>Save as draft</Button>

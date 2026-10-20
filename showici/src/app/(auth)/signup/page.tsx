@@ -113,7 +113,7 @@ export default function SignupPage() {
         <label className="label">Password<input name="password" type="password" required minLength={8} className="input" placeholder="At least 8 characters" autoComplete="new-password" /></label>
         <label className="flex items-start gap-2.5 text-sm leading-snug text-slate">
           <input type="checkbox" required className="mt-0.5 h-[18px] w-[18px] flex-none accent-navy" />
-          <span>I agree to the <a href="#">Terms</a> and <a href="#">Privacy policy</a>. Contact details stay private: people reach me through ShowIci messages.</span>
+          <span>I agree to the <a href="/terms" target="_blank" rel="noopener">Terms</a> and <a href="/privacy" target="_blank" rel="noopener">Privacy policy</a>. Contact details stay private: people reach me through ShowIci messages.</span>
         </label>
         {error && <Notice kind="error">{error}</Notice>}
         <button type="submit" disabled={busy} className="min-h-[52px] rounded-xl bg-navy text-[17px] font-bold text-white hover:bg-navy-deep disabled:opacity-60">{busy ? "Creating…" : cta[role]}</button>
