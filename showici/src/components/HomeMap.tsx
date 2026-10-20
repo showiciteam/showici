@@ -3,13 +3,15 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Performer, Venue } from "@/lib/types";
+import { ALL_QUEBEC, REGIONS, distanceKm, regionFor, type Region } from "@/lib/regions";
 
 type Filter = "all" | "venues" | "artists";
 type Pick = { kind: "venue"; item: Venue } | { kind: "performer"; item: Performer };
 
 // Leaflet is loaded from cdnjs on demand, so the map adds nothing to the page bundle.
 const LEAFLET = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4";
-const MONTREAL: [number, number] = [45.5019, -73.5674];
+// Rough outline of Québec, used for the "All of Québec" view.
+const QUEBEC_BOX: [[number, number], [number, number]] = [[44.99, -79.76], [58.5, -57.1]];
 // Same box the old illustrated map used: turns demo-mode x/y percentages back into coordinates.
 const BOUNDS = { north: 45.75, south: 45.35, west: -74.05, east: -73.35 };
 
@@ -59,6 +61,7 @@ const PERFORMER_ICON = `<span style="display:flex;width:30px;height:30px;align-i
 export function HomeMap({ venues, performers }: { venues: Venue[]; performers: Performer[] }) {
   const [filter, setFilter] = useState<Filter>("all");
   const [selected, setSelected] = useState<Pick | null>(null);
+  const [region, setRegion] = useState<Region>(REGIONS[0]); // Greater Montréal is the landing view
   const [failed, setFailed] = useState(false);
   const box = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
@@ -66,6 +69,9 @@ export function HomeMap({ venues, performers }: { venues: Venue[]; performers: P
 
   const venuePts = useMemo(() => venues.map((v) => ({ v, at: coords(v) })), [venues]);
   const perfPts = useMemo(() => performers.map((p) => ({ p, at: spread(p.id, coords(p)) })), [performers]);
+  const inRegion = (at: [number, number]) => region.key === ALL_QUEBEC || distanceKm(region, { lat: at[0], lng: at[1] }) <= region.radiusKm;
+  const venueCount = venuePts.filter((x) => inRegion(x.at)).length;
+  const perfCount = perfPts.filter((x) => inRegion(x.at)).length;
 
   // Build the map once.
   useEffect(() => {
@@ -73,7 +79,8 @@ export function HomeMap({ venues, performers }: { venues: Venue[]; performers: P
     loadLeaflet()
       .then((L) => {
         if (cancelled || !box.current || mapRef.current) return;
-        const map = L.map(box.current, { center: MONTREAL, zoom: 10, scrollWheelZoom: false, zoomControl: true, attributionControl: true });
+        const start = regionFor("montreal");
+        const map = L.map(box.current, { center: [start.lat, start.lng], zoom: start.zoom, scrollWheelZoom: false, zoomControl: true, attributionControl: true });
         L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
           maxZoom: 18,
           attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -91,9 +98,6 @@ export function HomeMap({ venues, performers }: { venues: Venue[]; performers: P
           perfPts.map(({ p, at }) => L.marker(at, { icon: perfIcon, title: p.name, keyboard: true }).on("click", () => setSelected({ kind: "performer", item: p }))),
         ).addTo(map);
 
-        const all = [...venuePts.map((x) => x.at), ...perfPts.map((x) => x.at)];
-        if (all.length > 1) map.fitBounds(L.latLngBounds(all).pad(0.25), { maxZoom: 12 });
-        else if (all.length === 1) map.setView(all[0], 12);
         mapRef.current = map;
       })
       .catch(() => setFailed(true));
@@ -103,6 +107,14 @@ export function HomeMap({ venues, performers }: { venues: Venue[]; performers: P
       mapRef.current = null;
     };
   }, [venuePts, perfPts]);
+
+  // Region picker moves the map.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    if (region.key === ALL_QUEBEC) map.fitBounds(QUEBEC_BOX);
+    else map.flyTo([region.lat, region.lng], region.zoom, { duration: 0.8 });
+  }, [region]);
 
   // Venues / Performers filter.
   useEffect(() => {
@@ -121,7 +133,7 @@ export function HomeMap({ venues, performers }: { venues: Venue[]; performers: P
         <div className="flex flex-col gap-2">
           <span className="eyebrow">The ShowIci map</span>
           <h2 className="h-display text-[40px]">Who&apos;s on ShowIci near you</h2>
-          <p className="max-w-[620px] text-[17px] text-slate">Every registered venue and performer, on one map. Tap a pin to see their profile.</p>
+          <p className="max-w-[620px] text-[17px] text-slate">Every registered venue and performer across Québec, on one map. Pick a region or tap a pin to see a profile.</p>
         </div>
         <div role="group" aria-label="Show on map" className="flex gap-1.5 rounded-full border border-line bg-parchment p-1">
           {([["all", "All"], ["venues", "Venues"], ["artists", "Performers"]] as const).map(([id, label]) => (
@@ -184,17 +196,14 @@ export function HomeMap({ venues, performers }: { venues: Venue[]; performers: P
 
         <aside className="flex max-w-[360px] flex-[1_1_280px] flex-col gap-3.5">
           <label className="label">
-            City
-            <select className="input">
-              <option>Greater Montréal</option>
-              <option disabled>Toronto (coming soon)</option>
-              <option disabled>Ottawa (coming soon)</option>
-              <option disabled>Vancouver (coming soon)</option>
+            Region
+            <select className="input" value={region.key} onChange={(e) => setRegion(regionFor(e.target.value))}>
+              {REGIONS.map((r) => <option key={r.key} value={r.key}>{r.en}</option>)}
             </select>
           </label>
           <div className="grid grid-cols-2 gap-2.5">
-            <div className="card p-4"><span className="text-[13px] text-muted">Venues</span><div className="h-display text-[32px]">{venues.length}</div></div>
-            <div className="card p-4"><span className="text-[13px] text-muted">Performers</span><div className="h-display text-[32px]">{performers.length}</div></div>
+            <div className="card p-4"><span className="text-[13px] text-muted">Venues</span><div className="h-display text-[32px]">{venueCount}</div></div>
+            <div className="card p-4"><span className="text-[13px] text-muted">Performers</span><div className="h-display text-[32px]">{perfCount}</div></div>
           </div>
           <div className="card flex flex-col gap-2.5 p-4">
             <strong className="text-[15px]">Newest on the map</strong>

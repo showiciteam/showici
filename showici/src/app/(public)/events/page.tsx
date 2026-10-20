@@ -18,7 +18,7 @@ export default async function BigEventsPage() {
       </div>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-2">
-          <h1 className="h-display text-[46px]">Big events near Montréal</h1>
+          <h1 className="h-display text-[46px]">Big events in Québec</h1>
           <p className="max-w-[680px] text-lg text-slate">Concerts, festivals, comedy tours and sports in your area. Tickets are sold securely on Ticketmaster.</p>
         </div>
         <span className="max-w-[300px] text-right text-[13px] text-muted">ShowIci may earn a commission when you buy tickets through these links. It never changes your price.</span>

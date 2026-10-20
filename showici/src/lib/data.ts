@@ -7,7 +7,7 @@ import type { EventRequest, Performer, Review, Show, Tone, Venue } from "./types
 const TONES: Tone[] = ["ph-1", "ph-2", "ph-3", "ph-4", "ph-5"];
 export const toneFor = (id: string) => TONES[[...id].reduce((a, c) => a + c.charCodeAt(0), 0) % TONES.length];
 
-// Greater Montréal bounding box used to place pins on the illustrated map.
+// Greater Montréal bounding box used to place demo-mode pins on the map.
 const BOUNDS = { north: 45.75, south: 45.35, west: -74.05, east: -73.35 };
 export function mapPosition(lat?: number | null, lng?: number | null) {
   if (lat == null || lng == null) return { x: "50%", y: "50%" };
@@ -127,6 +127,8 @@ export interface NearOpts {
   radiusKm?: number;
 }
 const MONTREAL = { lat: 45.5019, lng: -73.5674 };
+/** Default reach: all of Québec (and nearby border towns). Distances are still measured from Montréal. */
+const QUEBEC_WIDE_KM = 2000;
 
 export async function getPerformers(opts: NearOpts = {}): Promise<Performer[]> {
   const sb = await getServerSupabase();
@@ -134,7 +136,7 @@ export async function getPerformers(opts: NearOpts = {}): Promise<Performer[]> {
   const { data, error } = await sb.rpc("performers_nearby", {
     p_lat: opts.lat ?? MONTREAL.lat,
     p_lng: opts.lng ?? MONTREAL.lng,
-    p_radius_km: opts.radiusKm ?? 50,
+    p_radius_km: opts.radiusKm ?? QUEBEC_WIDE_KM,
   });
   if (error) console.error("getPerformers", error.message);
   return (data ?? []).map(toPerformer);
@@ -153,7 +155,7 @@ export async function getVenues(opts: NearOpts = {}): Promise<Venue[]> {
   const { data, error } = await sb.rpc("venues_nearby", {
     p_lat: opts.lat ?? MONTREAL.lat,
     p_lng: opts.lng ?? MONTREAL.lng,
-    p_radius_km: opts.radiusKm ?? 50,
+    p_radius_km: opts.radiusKm ?? QUEBEC_WIDE_KM,
   });
   if (error) console.error("getVenues", error.message);
   return (data ?? []).map(toVenue);
@@ -166,7 +168,7 @@ export async function getVenue(id: string): Promise<Venue | undefined> {
   return data ? toVenue(data) : undefined;
 }
 
-const SHOW_TZ = "America/Toronto"; // show times are always displayed in Montréal time
+const SHOW_TZ = "America/Toronto"; // show times are displayed in Eastern time (Montréal, Québec City)
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function toShow(r: any): Show {

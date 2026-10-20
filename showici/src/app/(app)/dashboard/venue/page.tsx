@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { AppHeader } from "@/components/Header";
 import { Button, Placeholder } from "@/components/ui";
-import { getPerformers, getShows } from "@/lib/data";
+import { getPerformers, getShows, getVenue } from "@/lib/data";
 import { getMyVenue, getSavedPerformers, nextNights } from "@/lib/dashboard";
 import { requireUser } from "@/lib/session";
 
@@ -13,7 +13,10 @@ const statusStyle = { live: "bg-success text-success-ink", draft: "bg-line", can
 
 export default async function VenueDashboard() {
   const user = await requireUser(["venue"]);
-  const [nearby, venue, saved] = await Promise.all([getPerformers(), user ? getMyVenue(user.id) : null, user ? getSavedPerformers(user.id) : []]);
+  const [venue, saved] = await Promise.all([user ? getMyVenue(user.id) : null, user ? getSavedPerformers(user.id) : []]);
+  // Suggestions are sorted by distance from this venue (anywhere in Québec), or from Montréal until it has an address.
+  const here = venue ? await getVenue(venue.id) : undefined;
+  const nearby = await getPerformers(here?.lat != null && here?.lng != null ? { lat: here.lat, lng: here.lng } : {});
   // Saved performers first; until the venue saves some, suggest performers nearby.
   const sideList = saved.length
     ? saved.map((p) => ({ id: p.id, name: p.name, sub: [p.actType, p.genre].filter(Boolean).join(" · "), initials: p.initials, tone: p.tone }))

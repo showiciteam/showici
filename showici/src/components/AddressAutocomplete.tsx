@@ -69,6 +69,8 @@ export function AddressAutocomplete({ value, onChange, onPick, mode = "address",
           .filter((f) => f.properties.countrycode === "CA")
           .map(toPlace)
           .filter((p) => p.label && !seen.has(p.label) && seen.add(p.label))
+          // ShowIci is a Québec platform: Québec places first, nearby places elsewhere in Canada after.
+          .sort((a, b) => Number(b.province === "QC") - Number(a.province === "QC"))
           .slice(0, 6);
         setItems(list);
         setActive(-1);

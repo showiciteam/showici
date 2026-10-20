@@ -120,7 +120,7 @@ export default function PostShow() {
         <div className="wrap pb-[72px] pt-9">
           <Link href="/dashboard/venue" className="font-bold no-underline">← My shows</Link>
           <h1 className="h-display mt-2.5 text-[40px]">{showId ? "Edit show" : "Post an upcoming show"}</h1>
-          <p className="mb-7 mt-2 text-[17px] text-slate">It appears on ShowIci&apos;s public listings and on your venue page. Times are Montréal time.</p>
+          <p className="mb-7 mt-2 text-[17px] text-slate">It appears on ShowIci&apos;s public listings and on your venue page. Times are Québec time (Eastern).</p>
           {supabaseEnabled && !me.venueId && (
             <div className="mb-6"><Notice kind="info">You need to add your venue before posting shows. <Link href="/register/venue" className="font-bold">Add my venue →</Link></Notice></div>
           )}

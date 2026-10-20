@@ -3,12 +3,14 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useLang } from "@/lib/i18n";
+import { ALL_QUEBEC, REGIONS } from "@/lib/regions";
 
 export function Hero() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const router = useRouter();
   const [what, setWhat] = useState("/performers");
   const [type, setType] = useState("");
+  const [region, setRegion] = useState("montreal");
   const [radius, setRadius] = useState("50");
   const video = useRef<HTMLVideoElement>(null);
 
@@ -41,7 +43,7 @@ export function Hero() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          const q = new URLSearchParams({ radius, ...(type ? { type } : {}) });
+          const q = new URLSearchParams({ region, ...(region === ALL_QUEBEC ? {} : { radius }), ...(type ? { type } : {}) });
           router.push(`${what}?${q}`);
         }}
         className="mt-8 grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] items-end gap-3 rounded-[18px] border border-line bg-parchment p-3.5"
@@ -67,15 +69,18 @@ export function Hero() {
         </label>
         <label className="flex flex-col gap-1.5 px-2 py-1.5 text-xs font-bold uppercase tracking-[0.06em] text-muted">
           {t("search.near")}
-          <input className="input normal-case tracking-normal" defaultValue="Montréal, QC" />
+          <select className="input normal-case tracking-normal" value={region} onChange={(e) => setRegion(e.target.value)}>
+            {REGIONS.map((r) => <option key={r.key} value={r.key}>{lang === "fr" ? r.fr : r.en}</option>)}
+          </select>
         </label>
         <label className="flex flex-col gap-1.5 px-2 py-1.5 text-xs font-bold uppercase tracking-[0.06em] text-muted">
           {t("search.within")}
-          <select className="input normal-case tracking-normal" value={radius} onChange={(e) => setRadius(e.target.value)}>
+          <select className="input normal-case tracking-normal" value={radius} disabled={region === ALL_QUEBEC} onChange={(e) => setRadius(e.target.value)}>
             <option value="10">10 km</option>
             <option value="25">25 km</option>
             <option value="50">50 km</option>
             <option value="100">100 km</option>
+            <option value="200">200 km</option>
           </select>
         </label>
         <button type="submit" className="flex min-h-[52px] items-center justify-center gap-2 rounded-xl bg-navy px-5 text-[17px] font-bold text-white hover:bg-navy-deep">

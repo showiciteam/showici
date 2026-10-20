@@ -15,7 +15,7 @@ type Copy = {
 /** Everything is free during launch. Text lives here so it can be edited without touching the layout. */
 const COPY: Record<L, Copy> = {
   en: {
-    badge: "Launch offer in Greater Montréal",
+    badge: "Launch offer across Québec",
     title: "Everything is free. Zero commission.",
     lede: "Every feature, for every venue, performer and event planner, at no cost while we launch. You keep 100% of what you agree on.",
     free: "Free",
@@ -29,7 +29,7 @@ const COPY: Record<L, Copy> = {
     faqTitle: "Questions",
     groups: [
       { h: "Pricing", items: [
-        ["Is ShowIci really free?", "Yes. During our launch in Greater Montréal, every feature is free for everyone: no subscription, no credit card and no limit on how many people you can contact."],
+        ["Is ShowIci really free?", "Yes. During our launch in Québec, every feature is free for everyone: no subscription, no credit card and no limit on how many people you can contact."],
         ["Will it stay free?", "Event planners will always use ShowIci for free. We may add optional paid plans for venues and performers later. If we do, we'll post the prices and what's included at least 30 days in advance, and you'll never be charged unless you choose a paid plan yourself."],
         ["Does ShowIci take a commission on bookings?", "No. You agree on the fee and payment directly with each other. ShowIci only connects you, and we never take a cut."],
         ["Do I need a credit card to sign up?", "No. You only need an email address."],
@@ -41,7 +41,7 @@ const COPY: Record<L, Copy> = {
         ["Why are phone numbers hidden in messages?", "To protect everyone's privacy until both sides are ready. Phone numbers and email addresses typed into messages are hidden automatically, so keep the conversation in ShowIci until you've agreed to work together."],
       ] },
       { h: "Accounts", items: [
-        ["Who can join?", "Venues, performers and event planners in Greater Montréal, aged 18 or older. Other Canadian cities are coming soon."],
+        ["Who can join?", "Venues, performers and event planners anywhere in Québec, aged 18 or older. We're starting in Greater Montréal, and you can search Québec City, Gatineau, Sherbrooke and every other region too."],
         ["What kinds of acts are on ShowIci?", "Bands, DJs, solo musicians, mariachis, comedians, magicians, dancers and other live acts, for venues and private events."],
         ["I'm planning a quinceañera. Do I pay?", "No. Posting event requests and messaging performers is free for event planners."],
         ["Is ShowIci available in French?", "Yes. Use the FR / EN switch at the top of any page."],
@@ -53,7 +53,7 @@ const COPY: Record<L, Copy> = {
     contact: "Contact us",
   },
   fr: {
-    badge: "Offre de lancement dans le Grand Montréal",
+    badge: "Offre de lancement partout au Québec",
     title: "Tout est gratuit. Aucune commission.",
     lede: "Toutes les fonctions, pour toutes les salles, tous les artistes et tous les organisateurs, sans frais pendant notre lancement. Vous gardez 100 % de ce que vous convenez.",
     free: "Gratuit",
@@ -67,7 +67,7 @@ const COPY: Record<L, Copy> = {
     faqTitle: "Questions",
     groups: [
       { h: "Prix", items: [
-        ["ShowIci est-il vraiment gratuit?", "Oui. Pendant notre lancement dans le Grand Montréal, toutes les fonctions sont gratuites pour tout le monde : aucun abonnement, aucune carte de crédit et aucune limite de contacts."],
+        ["ShowIci est-il vraiment gratuit?", "Oui. Pendant notre lancement au Québec, toutes les fonctions sont gratuites pour tout le monde : aucun abonnement, aucune carte de crédit et aucune limite de contacts."],
         ["Est-ce que ça restera gratuit?", "Les organisateurs d'événements utiliseront toujours ShowIci gratuitement. Nous pourrions ajouter plus tard des forfaits payants facultatifs pour les salles et les artistes. Le cas échéant, nous publierons les prix et leur contenu au moins 30 jours à l'avance, et vous ne serez jamais facturé sans avoir choisi vous-même un forfait payant."],
         ["ShowIci prend-il une commission sur les réservations?", "Non. Vous convenez du cachet et du paiement directement entre vous. ShowIci ne fait que vous mettre en contact et ne prend jamais de pourcentage."],
         ["Faut-il une carte de crédit pour s'inscrire?", "Non. Une adresse courriel suffit."],
@@ -79,7 +79,7 @@ const COPY: Record<L, Copy> = {
         ["Pourquoi les numéros de téléphone sont-ils masqués?", "Pour protéger la vie privée de chacun jusqu'à ce que les deux parties soient prêtes. Les numéros et courriels écrits dans les messages sont masqués automatiquement : gardez la conversation dans ShowIci jusqu'à ce que vous soyez d'accord pour travailler ensemble."],
       ] },
       { h: "Comptes", items: [
-        ["Qui peut s'inscrire?", "Les salles, artistes et organisateurs d'événements du Grand Montréal, âgés de 18 ans ou plus. D'autres villes canadiennes arrivent bientôt."],
+        ["Qui peut s'inscrire?", "Les salles, artistes et organisateurs d'événements de partout au Québec, âgés de 18 ans ou plus. Nous commençons par le Grand Montréal, et vous pouvez aussi chercher à Québec, Gatineau, Sherbrooke et dans toutes les autres régions."],
         ["Quels types d'artistes trouve-t-on sur ShowIci?", "Groupes, DJ, musiciens solo, mariachis, humoristes, magiciens, danseurs et autres numéros sur scène, pour les salles et les événements privés."],
         ["J'organise une quinceañera. Est-ce que je paie?", "Non. Publier des demandes et écrire aux artistes est gratuit pour les organisateurs."],
         ["ShowIci est-il offert en anglais?", "Oui. Utilisez le bouton FR / EN en haut de chaque page."],

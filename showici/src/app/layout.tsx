@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
   keywords: [
-    "Montréal", "Montreal", "live music", "musique live", "bands", "DJ", "comedians", "humoristes", "magicians",
+    "Québec", "Quebec", "Montréal", "Montreal", "live music", "musique live", "bands", "DJ", "comedians", "humoristes", "magicians",
     "book a band", "réserver un groupe", "pubs", "bars", "venues", "salles", "weddings", "mariages", "quinceañera",
     "private events", "événements privés",
   ],

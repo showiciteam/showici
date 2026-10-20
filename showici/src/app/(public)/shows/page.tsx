@@ -17,7 +17,7 @@ export default async function ShowsPage() {
         <Link href="/shows" className="rounded-full bg-navy px-[18px] py-2.5 text-sm font-bold text-white no-underline hover:text-white">Local shows</Link>
         <Link href="/events" className="rounded-full px-[18px] py-2.5 text-sm text-ink-2 no-underline">Big events and tickets</Link>
       </div>
-      <h1 className="h-display text-[44px]">Shows near Montréal</h1>
+      <h1 className="h-display text-[44px]">Shows across Québec</h1>
       <p className="mb-[22px] mt-2 text-[17px] text-slate">Live music, comedy and more at local pubs and bars. Spectacles locaux, près de chez vous.</p>
       {shows.length > 0 && <ShowsFilters />}
 

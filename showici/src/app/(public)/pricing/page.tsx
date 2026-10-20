@@ -1,11 +1,11 @@
 import { PricingView } from "./PricingView";
 
 const TITLE = "Pricing · Prix · ShowIci";
-const DESCRIPTION = "ShowIci is free during its launch in Greater Montréal: every feature, unlimited contacts and zero commission for venues, performers and event planners.";
+const DESCRIPTION = "ShowIci is free during its launch across Québec: every feature, unlimited contacts and zero commission for venues, performers and event planners.";
 const SHARE_TITLE = "ShowIci is free: no fees, no commission";
 // Setting openGraph here replaces the site-wide one, so the share picture is listed again.
 const IMAGE = { url: "/opengraph-image", width: 1200, height: 630, alt: "ShowIci · Book local talent for every stage" };
-const SHARE_DESCRIPTION = "Venues, performers and event planners in Greater Montréal use every ShowIci feature for free during the launch. Unlimited contacts, zero commission.";
+const SHARE_DESCRIPTION = "Venues, performers and event planners across Québec use every ShowIci feature for free during the launch. Unlimited contacts, zero commission.";
 
 export const metadata = {
   title: TITLE,

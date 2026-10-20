@@ -18,7 +18,7 @@ export default async function NewsPage() {
         <Placeholder tone="ph-1" label="[Launch photo]" className="min-h-[340px] flex-[1_1_480px] self-stretch" />
         <div className="flex flex-[1_1_380px] flex-col gap-3 py-7 pl-1 pr-8">
           <span className="eyebrow">New cities · Featured</span>
-          <span className="h-display text-4xl leading-tight">ShowIci opens in Greater Montréal</span>
+          <span className="h-display text-4xl leading-tight">ShowIci opens across Québec, starting in Montréal</span>
           <span className="text-[17px] leading-relaxed text-slate">[Launch announcement: venues, performers and event planners can join free during the launch. What&apos;s live today and what&apos;s coming next.]</span>
           <span className="text-sm text-muted">[Launch date] · 3 min read</span>
         </div>

@@ -4,4 +4,4 @@ export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.showic
 export const SITE_NAME = "ShowIci";
 export const SITE_TITLE = "ShowIci · Book local talent for every stage";
 export const SITE_DESCRIPTION =
-  "ShowIci connects venues, event planners and local performers (bands, DJs, comedians, magicians). Free, no commission, in French and English. Starting in Montréal.";
+  "ShowIci connects venues, event planners and local performers (bands, DJs, comedians, magicians). Free, no commission, in French and English. Across Québec, starting in Montréal.";

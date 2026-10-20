@@ -65,7 +65,7 @@ export default async function OpengraphImage() {
               </div>
             ))}
           </div>
-          <div style={{ fontSize: 30, color: "#C9CEDA" }}>Montréal · Canada</div>
+          <div style={{ fontSize: 30, color: "#C9CEDA" }}>Québec · Montréal</div>
         </div>
       </div>
     ),

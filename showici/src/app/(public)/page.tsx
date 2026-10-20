@@ -57,7 +57,7 @@ export default async function Home() {
       </section>
 
       <div className="border-y border-line bg-parchment">
-        <Section title="This week near Montréal" action={<Link href="/shows" className="font-bold no-underline">See all shows →</Link>}>
+        <Section title="This week across Québec" action={<Link href="/shows" className="font-bold no-underline">See all shows →</Link>}>
           <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-4">
             {shows.slice(0, 4).map((s) => <ShowCard key={s.id} show={s} venue={venueById[s.venueId]} />)}
           </div>
@@ -117,7 +117,7 @@ export default async function Home() {
         <div className="flex flex-wrap items-center justify-between gap-6 rounded-3xl bg-navy px-10 py-12 text-white">
           <div className="max-w-[620px]">
             <h2 className="mb-2.5 font-display text-[40px] font-extrabold tracking-tight">Free during launch</h2>
-            <p className="text-lg leading-normal">Venues, performers and event planners join free while we launch in Greater Montréal. No commission on bookings, ever.</p>
+            <p className="text-lg leading-normal">Venues, performers and event planners across Québec join free while we launch, starting in Greater Montréal. No commission on bookings, ever.</p>
           </div>
           <Link href="/signup" className="rounded-xl bg-white px-6 py-4 text-[17px] font-bold text-navy no-underline hover:text-navy">Create your free profile</Link>
         </div>
