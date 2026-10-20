@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { DemoBanner } from "@/components/DemoBanner";
+import { FontPreview } from "@/components/FontPreview";
 import { LanguageProvider } from "@/lib/i18n";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "@/lib/site";
 
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen antialiased">
         <DemoBanner />
         <LanguageProvider>{children}</LanguageProvider>
+        <FontPreview />
       </body>
     </html>
   );
