@@ -112,16 +112,8 @@ export default async function Home() {
       </div>
 
       <HomeMap venues={venues} performers={performers} />
-
-      <section className="wrap py-[72px]">
-        <div className="flex flex-wrap items-center justify-between gap-6 rounded-3xl bg-navy px-10 py-12 text-white">
-          <div className="max-w-[620px]">
-            <h2 className="mb-2.5 font-display text-[40px] font-extrabold tracking-tight">Free during launch</h2>
-            <p className="text-lg leading-normal">Venues, performers and event planners across Québec join free while we launch, starting in Greater Montréal. No commission on bookings, ever.</p>
-          </div>
-          <Link href="/signup" className="rounded-xl bg-white px-6 py-4 text-[17px] font-bold text-navy no-underline hover:text-navy">Create your free profile</Link>
-        </div>
-      </section>
+      {/* "Free during launch" banner removed for now; it was a navy box linking to /signup. */}
+      <div className="pb-[72px]" />
     </>
   );
 }
