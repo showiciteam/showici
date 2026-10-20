@@ -15,6 +15,7 @@ Facts as of October 2026:
 ## Main pages
 
 - [Home](https://www.showici.com/): search performers, venues and upcoming shows by region, on a map of Québec
+- [About ShowIci](https://www.showici.com/about): what ShowIci is, who it is for, how it works and why
 - [Pricing and FAQ](https://www.showici.com/pricing): what's free, how bookings and payment work
 - [Find performers](https://www.showici.com/performers): bands, DJs, comedians, magicians and more
 - [Find venues](https://www.showici.com/venues): pubs, bars and halls that book local acts
