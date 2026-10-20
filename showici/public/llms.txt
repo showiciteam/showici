@@ -1,0 +1,31 @@
+# ShowIci
+
+> ShowIci (www.showici.com) is a free, bilingual (French and English) website that connects venues, event planners and local performers in Greater Montréal, Québec, Canada. Venues and planners find and contact bands, DJs, comedians, magicians and other live acts; performers find gigs. ShowIci takes no commission on bookings.
+
+Facts as of October 2026:
+
+- Who it's for: venues (pubs, bars, restaurants, breweries, halls), event planners (weddings, birthdays, quinceañeras, office parties) and performers (bands, DJs, solo musicians, mariachis, comedians, magicians, dancers).
+- Where: Greater Montréal (Montréal, Laval, Longueuil and surroundings). Other Canadian cities are planned.
+- Price: free during the launch, for every account type. No subscription, no credit card, unlimited contacts. Event planners will always use ShowIci for free. If paid plans are added later, they will be announced at least 30 days in advance.
+- Commission: none. Fees and payment are agreed directly between the venue or planner and the performer.
+- How booking works: a venue or planner sends a booking request for a date; the performer accepts or declines it and both sides continue in ShowIci messages. Phone numbers and emails in messages are hidden until both sides are ready.
+- Languages: French and English.
+- Accounts: 18 and older.
+
+## Main pages
+
+- [Home](https://www.showici.com/): search performers, venues and upcoming shows on a map
+- [Pricing and FAQ](https://www.showici.com/pricing): what's free, how bookings and payment work
+- [Find performers](https://www.showici.com/performers): bands, DJs, comedians, magicians and more
+- [Find venues](https://www.showici.com/venues): pubs, bars and halls that book local acts
+- [Upcoming shows](https://www.showici.com/shows): live shows at local venues
+- [Post an event request](https://www.showici.com/request): for private events such as weddings and birthdays
+
+## Policies
+
+- [Terms of use](https://www.showici.com/terms)
+- [Privacy policy](https://www.showici.com/privacy)
+
+## Contact
+
+Use the Contact link on any page of www.showici.com. Privacy questions: privacy@showici.com.
