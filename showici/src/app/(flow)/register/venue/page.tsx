@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ChipGroup, Dropzone, FormCard, Notice } from "@/components/form";
@@ -100,7 +101,7 @@ export default function RegisterVenue() {
       <p className="mb-8 mt-2.5 max-w-[720px] text-lg text-slate">Tell performers what your space is like and what you book. Your upcoming shows also appear on ShowIci&apos;s public listings.</p>
       {!existingId && (
         <p className="-mt-4 mb-8 max-w-[720px] rounded-xl border border-[#E2C98F] bg-brass-tint px-4 py-3 text-[15px] text-ink-2">
-          Is your venue already on ShowIci? Find it under <a href="/venues?region=all" className="font-bold">Venues</a> and click <strong>Claim this venue</strong> instead of creating a new page.
+          Is your venue already on ShowIci? Find it under <Link href="/venues?region=all" className="font-bold">Venues</Link> and click <strong>Claim this venue</strong> instead of creating a new page.
         </p>
       )}
       <div className="flex flex-wrap items-start gap-7">
