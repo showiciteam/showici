@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import { PerformerRow } from "@/components/cards";
-import { FreePlanBanner } from "@/components/ui";
 import type { Performer } from "@/lib/types";
 import { RegionFilter, regionLabel } from "@/components/RegionFilter";
 import { ALL_QUEBEC, kmFrom, regionFor } from "@/lib/regions";
@@ -35,7 +34,6 @@ export function PerformerSearch({ performers, initialType, initialRadius, initia
 
   return (
     <div className="wrap pb-16 pt-8">
-      <FreePlanBanner />
       <h1 className="h-display text-[40px]">Find performers</h1>
       <p className="mb-7 mt-1.5 text-slate">{regionLabel(region, radius)} · {results.length} shown</p>
 

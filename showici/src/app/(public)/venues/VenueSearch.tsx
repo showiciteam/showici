@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import { VenueRow } from "@/components/cards";
-import { FreePlanBanner } from "@/components/ui";
 import type { Venue } from "@/lib/types";
 import { RegionFilter, regionLabel } from "@/components/RegionFilter";
 import { ALL_QUEBEC, kmFrom, regionFor } from "@/lib/regions";
@@ -27,7 +26,6 @@ export function VenueSearch({ venues, initialRadius, initialRegion }: { venues: 
 
   return (
     <div className="wrap pb-16 pt-8">
-      <FreePlanBanner />
       <h1 className="h-display text-[40px]">Find venues</h1>
       <p className="mb-7 mt-1.5 text-slate">Venues that book acts like yours · {regionLabel(region, radius)} · {results.length} shown</p>
       <div className="flex flex-wrap items-start gap-7">
