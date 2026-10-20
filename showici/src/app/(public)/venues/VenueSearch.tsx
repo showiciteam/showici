@@ -41,7 +41,7 @@ export function VenueSearch({ venues }: { venues: Venue[] }) {
             <input type="checkbox" checked={openOnly} onChange={(e) => setOpenOnly(e.target.checked)} className="h-[18px] w-[18px] accent-navy" />Open to new acts
           </label>
           <div className="flex flex-col gap-1.5 border-t border-line pt-4 text-[#6E7383]">
-            <span className="text-sm font-bold">🔒 Locked on the free plan</span>
+            <span className="text-sm font-bold">More filters coming soon</span>
             <span className="text-sm">Has PA system · Nights they book · Fee range</span>
           </div>
         </aside>
