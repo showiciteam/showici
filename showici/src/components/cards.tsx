@@ -71,7 +71,8 @@ export function VenueRow({ v }: { v: Venue }) {
       <div className="flex flex-[1_1_240px] flex-col gap-1.5">
         <div className="flex flex-wrap items-center gap-2">
           <span className="h-display text-[21px]">{v.name}</span>
-          {v.openToNewActs && <span className="rounded-full bg-success px-2 py-1 text-xs font-bold text-success-ink">Open to new acts</span>}
+          {v.openToNewActs && v.claimed !== false && <span className="rounded-full bg-success px-2 py-1 text-xs font-bold text-success-ink">Open to new acts</span>}
+          {v.claimed === false && <span className="rounded-full border border-line-strong px-2 py-1 text-xs font-bold text-slate">Not claimed yet</span>}
         </div>
         <span className="text-slate">{[v.type, v.area || v.city, `${v.distanceKm} km away`, v.capacity].filter(Boolean).join(" · ")}</span>
         <div className="flex flex-wrap gap-1.5">{[...v.genres.slice(0, 2), v.nights].filter(Boolean).map((g) => <Tag key={g}>{g}</Tag>)}</div>
