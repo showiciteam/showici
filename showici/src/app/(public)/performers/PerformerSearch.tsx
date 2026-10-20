@@ -61,7 +61,7 @@ export function PerformerSearch({ performers, initialType, initialRadius = 50 }:
             ))}
           </fieldset>
           <div className="flex flex-col gap-1.5 border-t border-line pt-4 text-[#6E7383]">
-            <span className="text-sm font-bold">🔒 Paid filters</span>
+            <span className="text-sm font-bold">More filters coming soon</span>
             <span className="text-sm">Availability by date · Event type · Language · Price range</span>
           </div>
         </aside>
