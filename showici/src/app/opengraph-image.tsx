@@ -11,7 +11,7 @@ const NAVY = "#14213D";
 const BRASS = "#D9A441";
 const WARM_WHITE = "#FBF8F2";
 
-/** Loads one Google Font weight as TTF so the preview matches the site's Fraunces headings. */
+/** Loads one Google Font weight as TTF so the preview matches the site's headings. */
 async function googleFont(family: string, weight: number, italic = false): Promise<ArrayBuffer | null> {
   try {
     const css = await fetch(`https://fonts.googleapis.com/css2?family=${family}:ital,wght@${italic ? 1 : 0},${weight}`, {
@@ -26,11 +26,11 @@ async function googleFont(family: string, weight: number, italic = false): Promi
 
 export default async function OpengraphImage() {
   const logo = `data:image/png;base64,${(await readFile(join(process.cwd(), "public/logo-light.png"))).toString("base64")}`;
-  const [bold, boldItalic, sans] = await Promise.all([googleFont("Fraunces", 700), googleFont("Fraunces", 700, true), googleFont("DM+Sans", 500)]);
+  const [bold, boldItalic, sans] = await Promise.all([googleFont("Plus+Jakarta+Sans", 800), googleFont("Plus+Jakarta+Sans", 800, true), googleFont("Inter", 500)]);
   const fonts = [
-    bold && { name: "Fraunces", data: bold, weight: 700 as const, style: "normal" as const },
-    boldItalic && { name: "Fraunces", data: boldItalic, weight: 700 as const, style: "italic" as const },
-    sans && { name: "DM Sans", data: sans, weight: 500 as const, style: "normal" as const },
+    bold && { name: "Plus Jakarta Sans", data: bold, weight: 800 as const, style: "normal" as const },
+    boldItalic && { name: "Plus Jakarta Sans", data: boldItalic, weight: 800 as const, style: "italic" as const },
+    sans && { name: "Inter", data: sans, weight: 500 as const, style: "normal" as const },
   ].filter((f): f is NonNullable<typeof f> => Boolean(f));
 
   return new ImageResponse(
@@ -45,19 +45,19 @@ export default async function OpengraphImage() {
           padding: "72px 80px",
           background: NAVY,
           color: WARM_WHITE,
-          fontFamily: "Fraunces, serif",
+          fontFamily: "Plus Jakarta Sans, sans-serif",
         }}
       >
         <img src={logo} alt="ShowIci" width={420} height={138} style={{ marginLeft: -8 }} />
 
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-          <div style={{ fontSize: 64, fontWeight: 700, lineHeight: 1.1 }}>Book local talent for every stage.</div>
-          <div style={{ fontSize: 32, color: "#C9CEDA", fontFamily: "DM Sans, sans-serif" }}>
+          <div style={{ fontSize: 64, fontWeight: 800, lineHeight: 1.1 }}>Book local talent for every stage.</div>
+          <div style={{ fontSize: 32, color: "#C9CEDA", fontFamily: "Inter, sans-serif" }}>
             Bands, DJs, comedians, magicians · Venues and private events
           </div>
         </div>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontFamily: "DM Sans, sans-serif" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontFamily: "Inter, sans-serif" }}>
           <div style={{ display: "flex", gap: 14, fontSize: 28 }}>
             {["Free", "No commission", "Français · English"].map((t) => (
               <div key={t} style={{ display: "flex", padding: "10px 20px", borderRadius: 999, border: `2px solid ${BRASS}`, color: BRASS }}>
