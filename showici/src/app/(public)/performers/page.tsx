@@ -4,7 +4,7 @@ import { PerformerSearch } from "./PerformerSearch";
 
 export const metadata = { title: "Find performers in Québec · ShowIci", description: "Bands, DJs, comedians, magicians and other live acts across Québec, starting in Greater Montréal. Free, no commission." };
 
-export default async function PerformersPage({ searchParams }: { searchParams: Promise<{ type?: string; radius?: string; region?: string }> }) {
+export default async function PerformersPage({ searchParams }: { searchParams: Promise<{ type?: string; radius?: string; region?: string; area?: string }> }) {
   const sp = await searchParams;
   const performers = await getPerformers(); // all of Québec; the page filters by region and distance
   if (!performers.length) {
@@ -20,5 +20,5 @@ export default async function PerformersPage({ searchParams }: { searchParams: P
       </div>
     );
   }
-  return <PerformerSearch performers={performers} initialType={sp.type} initialRadius={Number(sp.radius) || undefined} initialRegion={sp.region} />;
+  return <PerformerSearch performers={performers} initialType={sp.type} initialRadius={Number(sp.radius) || undefined} initialRegion={sp.region} initialArea={sp.area} />;
 }

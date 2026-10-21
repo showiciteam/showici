@@ -4,7 +4,7 @@ import { VenueSearch } from "./VenueSearch";
 
 export const metadata = { title: "Find venues in Québec · ShowIci", description: "Pubs, bars, restaurants and halls across Québec that book local acts, starting in Greater Montréal." };
 
-export default async function VenuesPage({ searchParams }: { searchParams: Promise<{ radius?: string; region?: string }> }) {
+export default async function VenuesPage({ searchParams }: { searchParams: Promise<{ radius?: string; region?: string; area?: string }> }) {
   const sp = await searchParams;
   const venues = await getVenues(); // all of Québec; the page filters by region and distance
   if (!venues.length) {
@@ -20,5 +20,5 @@ export default async function VenuesPage({ searchParams }: { searchParams: Promi
       </div>
     );
   }
-  return <VenueSearch venues={venues} initialRadius={Number(sp.radius) || undefined} initialRegion={sp.region} />;
+  return <VenueSearch venues={venues} initialRadius={Number(sp.radius) || undefined} initialRegion={sp.region} initialArea={sp.area} />;
 }

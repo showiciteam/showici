@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { placeLabel } from "@/lib/regions";
 import type { BigEvent, Performer, Show, Story, Venue } from "@/lib/types";
 import { Button, DateBadge, Placeholder, PlayIcon, Stars, Tag } from "./ui";
 
@@ -74,7 +75,7 @@ export function VenueRow({ v }: { v: Venue }) {
           {v.openToNewActs && v.claimed !== false && <span className="rounded-full bg-success px-2 py-1 text-xs font-bold text-success-ink">Open to new acts</span>}
           {v.claimed === false && <span className="rounded-full border border-line-strong px-2 py-1 text-xs font-bold text-slate">Not claimed yet</span>}
         </div>
-        <span className="text-slate">{[v.type, v.area || v.city, `${v.distanceKm} km away`, v.capacity].filter(Boolean).join(" · ")}</span>
+        <span className="text-slate">{[v.type, placeLabel(v.area, v.city), `${v.distanceKm} km away`, v.capacity].filter(Boolean).join(" · ")}</span>
         <div className="flex flex-wrap gap-1.5">{[...v.genres.slice(0, 2), v.nights].filter(Boolean).map((g) => <Tag key={g}>{g}</Tag>)}</div>
       </div>
       <div className="flex flex-wrap gap-2.5">

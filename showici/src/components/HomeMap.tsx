@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Performer, Venue } from "@/lib/types";
-import { ALL_QUEBEC, REGIONS, distanceKm, regionFor, type Region } from "@/lib/regions";
+import { ALL_QUEBEC, GROUP_LABEL, REGIONS, citiesIn, cityFor, inArea, regionFor, type City, type Group, type Region } from "@/lib/regions";
 
 type Filter = "all" | "venues" | "artists";
 type Pick = { kind: "venue"; item: Venue } | { kind: "performer"; item: Performer };
@@ -62,6 +62,7 @@ export function HomeMap({ venues, performers }: { venues: Venue[]; performers: P
   const [filter, setFilter] = useState<Filter>("all");
   const [selected, setSelected] = useState<Pick | null>(null);
   const [region, setRegion] = useState<Region>(REGIONS[0]); // Greater Montréal is the landing view
+  const [city, setCity] = useState<City | null>(null); // optional drill-down, e.g. Greater Montréal → Laval
   const [failed, setFailed] = useState(false);
   const box = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
@@ -69,9 +70,10 @@ export function HomeMap({ venues, performers }: { venues: Venue[]; performers: P
 
   const venuePts = useMemo(() => venues.map((v) => ({ v, at: coords(v) })), [venues]);
   const perfPts = useMemo(() => performers.map((p) => ({ p, at: spread(p.id, coords(p)) })), [performers]);
-  const inRegion = (at: [number, number]) => region.key === ALL_QUEBEC || distanceKm(region, { lat: at[0], lng: at[1] }) <= region.radiusKm;
-  const venueCount = venuePts.filter((x) => inRegion(x.at)).length;
-  const perfCount = perfPts.filter((x) => inRegion(x.at)).length;
+  const inRegion = (cityName: string, at: [number, number], km: number) => inArea(region, city, region.radiusKm, { city: cityName, lat: at[0], lng: at[1], distanceKm: km });
+  const venueCount = venuePts.filter((x) => inRegion(x.v.city, x.at, x.v.distanceKm)).length;
+  const perfCount = perfPts.filter((x) => inRegion(x.p.base, x.at, x.p.distanceKm)).length;
+  const cities = citiesIn(region);
 
   // Build the map once.
   useEffect(() => {
@@ -112,9 +114,10 @@ export function HomeMap({ venues, performers }: { venues: Venue[]; performers: P
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
-    if (region.key === ALL_QUEBEC) map.fitBounds(QUEBEC_BOX);
+    if (city) map.flyTo([city.lat, city.lng], city.zoom ?? 12, { duration: 0.8 });
+    else if (region.key === ALL_QUEBEC) map.fitBounds(QUEBEC_BOX);
     else map.flyTo([region.lat, region.lng], region.zoom, { duration: 0.8 });
-  }, [region]);
+  }, [region, city]);
 
   // Venues / Performers filter.
   useEffect(() => {
@@ -197,10 +200,25 @@ export function HomeMap({ venues, performers }: { venues: Venue[]; performers: P
         <aside className="flex max-w-[360px] flex-[1_1_280px] flex-col gap-3.5">
           <label className="label">
             Region
-            <select className="input" value={region.key} onChange={(e) => setRegion(regionFor(e.target.value))}>
+            <select className="input" value={region.key} onChange={(e) => { setRegion(regionFor(e.target.value)); setCity(null); }}>
               {REGIONS.map((r) => <option key={r.key} value={r.key}>{r.en}</option>)}
             </select>
           </label>
+          {cities.length > 0 && (
+            <label className="label">
+              City
+              <select className="input" value={city?.key ?? ""} onChange={(e) => setCity(cityFor(region, e.target.value))}>
+                <option value="">All of {region.en}</option>
+                {region.key === "montreal"
+                  ? (Object.keys(GROUP_LABEL) as Group[]).map((g) => (
+                      <optgroup key={g} label={GROUP_LABEL[g].en}>
+                        {cities.filter((x) => x.group === g).map((x) => <option key={x.key} value={x.key}>{x.name}</option>)}
+                      </optgroup>
+                    ))
+                  : cities.map((x) => <option key={x.key} value={x.key}>{x.name}</option>)}
+              </select>
+            </label>
+          )}
           <div className="grid grid-cols-2 gap-2.5">
             <div className="card p-4"><span className="text-[13px] text-muted">Venues</span><div className="h-display text-[32px]">{venueCount}</div></div>
             <div className="card p-4"><span className="text-[13px] text-muted">Performers</span><div className="h-display text-[32px]">{perfCount}</div></div>

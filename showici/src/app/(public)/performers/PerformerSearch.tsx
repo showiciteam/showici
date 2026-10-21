@@ -4,13 +4,14 @@ import { useMemo, useState } from "react";
 import { PerformerRow } from "@/components/cards";
 import type { Performer } from "@/lib/types";
 import { RegionFilter, regionLabel } from "@/components/RegionFilter";
-import { ALL_QUEBEC, kmFrom, regionFor } from "@/lib/regions";
+import { ALL_QUEBEC, cityFor, inArea, kmFrom, regionFor } from "@/lib/regions";
 
 const ACT_TYPES = ["Band", "Duo", "DJ", "Stand-up comedy", "Magician"];
 
-export function PerformerSearch({ performers, initialType, initialRadius, initialRegion }: { performers: Performer[]; initialType?: string; initialRadius?: number; initialRegion?: string }) {
+export function PerformerSearch({ performers, initialType, initialRadius, initialRegion, initialArea }: { performers: Performer[]; initialType?: string; initialRadius?: number; initialRegion?: string; initialArea?: string }) {
   const [types, setTypes] = useState<string[]>(initialType ? [initialType] : []);
   const [region, setRegion] = useState(() => regionFor(initialRegion));
+  const [city, setCity] = useState(() => cityFor(regionFor(initialRegion), initialArea));
   const [radius, setRadius] = useState(initialRadius ?? regionFor(initialRegion).radiusKm);
   const [rep, setRep] = useState<"Any" | "Covers" | "Originals" | "Both">("Any");
   const [genre, setGenre] = useState("Any");
@@ -18,16 +19,16 @@ export function PerformerSearch({ performers, initialType, initialRadius, initia
   const results = useMemo(
     () =>
       performers
-        .map((p) => (region.key === ALL_QUEBEC ? p : { ...p, distanceKm: kmFrom(region, p) }))
+        .filter((p) => inArea(region, city, radius, { ...p, city: p.base }))
+        .map((p) => (region.key === ALL_QUEBEC ? p : { ...p, distanceKm: kmFrom(city ?? region, p) }))
         .filter(
           (p) =>
             (types.length === 0 || types.includes(p.actType)) &&
-            (region.key === ALL_QUEBEC || p.distanceKm <= radius) &&
             (rep === "Any" || p.repertoire === rep) &&
             (genre === "Any" || p.genres.some((g) => g.toLowerCase().includes(genre.toLowerCase())))
         )
         .sort((a, b) => a.distanceKm - b.distanceKm),
-    [performers, types, region, radius, rep, genre]
+    [performers, types, region, city, radius, rep, genre]
   );
 
   const toggle = (t: string) => setTypes((cur) => (cur.includes(t) ? cur.filter((x) => x !== t) : [...cur, t]));
@@ -35,11 +36,11 @@ export function PerformerSearch({ performers, initialType, initialRadius, initia
   return (
     <div className="wrap pb-16 pt-8">
       <h1 className="h-display text-[40px]">Find performers</h1>
-      <p className="mb-7 mt-1.5 text-slate">{regionLabel(region, radius)} · {results.length} shown</p>
+      <p className="mb-7 mt-1.5 text-slate">{regionLabel(region, radius, city)} · {results.length} shown</p>
 
       <div className="flex flex-wrap items-start gap-7">
         <aside className="card flex max-w-[320px] flex-[1_1_260px] flex-col gap-[22px] bg-parchment p-[22px]">
-          <RegionFilter region={region} radius={radius} onRegion={(r) => { setRegion(r); setRadius(r.radiusKm); }} onRadius={setRadius} />
+          <RegionFilter region={region} city={city} radius={radius} onRegion={(r) => { setRegion(r); setCity(null); setRadius(r.radiusKm); }} onCity={setCity} onRadius={setRadius} />
           <fieldset className="flex flex-col gap-2.5">
             <legend className="mb-2.5 text-sm font-bold">Type of act</legend>
             {ACT_TYPES.map((t) => (

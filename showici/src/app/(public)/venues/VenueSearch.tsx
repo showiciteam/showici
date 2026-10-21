@@ -4,33 +4,35 @@ import { useMemo, useState } from "react";
 import { VenueRow } from "@/components/cards";
 import type { Venue } from "@/lib/types";
 import { RegionFilter, regionLabel } from "@/components/RegionFilter";
-import { ALL_QUEBEC, kmFrom, regionFor } from "@/lib/regions";
+import { ALL_QUEBEC, cityFor, inArea, kmFrom, regionFor } from "@/lib/regions";
 
 const TYPES = ["Pub", "Bar", "Restaurant", "Brewery", "Café", "Club", "Event hall"];
 
-export function VenueSearch({ venues, initialRadius, initialRegion }: { venues: Venue[]; initialRadius?: number; initialRegion?: string }) {
+export function VenueSearch({ venues, initialRadius, initialRegion, initialArea }: { venues: Venue[]; initialRadius?: number; initialRegion?: string; initialArea?: string }) {
   const [types, setTypes] = useState<string[]>([]); // none ticked = every type
   const [region, setRegion] = useState(() => regionFor(initialRegion));
+  const [city, setCity] = useState(() => cityFor(regionFor(initialRegion), initialArea));
   const [radius, setRadius] = useState(initialRadius ?? regionFor(initialRegion).radiusKm);
   const [openOnly, setOpenOnly] = useState(false);
 
   const results = useMemo(
     () =>
       venues
-        .map((v) => (region.key === ALL_QUEBEC ? v : { ...v, distanceKm: kmFrom(region, v) }))
-        .filter((v) => (types.length === 0 || types.includes(v.type)) && (region.key === ALL_QUEBEC || v.distanceKm <= radius) && (!openOnly || v.openToNewActs))
+        .filter((v) => inArea(region, city, radius, v))
+        .map((v) => (region.key === ALL_QUEBEC ? v : { ...v, distanceKm: kmFrom(city ?? region, v) }))
+        .filter((v) => (types.length === 0 || types.includes(v.type)) && (!openOnly || v.openToNewActs))
         .sort((a, b) => a.distanceKm - b.distanceKm),
-    [venues, types, region, radius, openOnly]
+    [venues, types, region, city, radius, openOnly]
   );
   const toggle = (t: string) => setTypes((cur) => (cur.includes(t) ? cur.filter((x) => x !== t) : [...cur, t]));
 
   return (
     <div className="wrap pb-16 pt-8">
       <h1 className="h-display text-[40px]">Find venues</h1>
-      <p className="mb-7 mt-1.5 text-slate">Venues that book acts like yours · {regionLabel(region, radius)} · {results.length} shown</p>
+      <p className="mb-7 mt-1.5 text-slate">Venues that book acts like yours · {regionLabel(region, radius, city)} · {results.length} shown</p>
       <div className="flex flex-wrap items-start gap-7">
         <aside className="card flex max-w-[320px] flex-[1_1_260px] flex-col gap-[22px] bg-parchment p-[22px]">
-          <RegionFilter region={region} radius={radius} onRegion={(r) => { setRegion(r); setRadius(r.radiusKm); }} onRadius={setRadius} />
+          <RegionFilter region={region} city={city} radius={radius} onRegion={(r) => { setRegion(r); setCity(null); setRadius(r.radiusKm); }} onCity={setCity} onRadius={setRadius} />
           <fieldset className="flex flex-col gap-2.5">
             <legend className="mb-2.5 text-sm font-bold">Venue type</legend>
             {TYPES.map((t) => (

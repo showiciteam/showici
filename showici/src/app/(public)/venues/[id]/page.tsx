@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { placeLabel } from "@/lib/regions";
 import { notFound } from "next/navigation";
 import { SaveButton, ShareButton } from "@/components/ProfileActions";
 import { getReviewsFor, getShows, getVenue } from "@/lib/data";
@@ -12,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const { id } = await params;
   const v = await getVenue(id);
   if (!v) return {};
-  const description = `${v.type} in ${[v.area, v.city].filter(Boolean).join(", ")}. ${v.description}`.slice(0, 200);
+  const description = `${v.type} in ${placeLabel(v.area, v.city).replace(" · ", ", ")}. ${v.description}`.slice(0, 200);
   return { title: `${v.name} · ShowIci`, description, openGraph: { title: `${v.name} on ShowIci`, description, ...(v.photos?.[0] ? { images: [v.photos[0]] } : {}) } };
 }
 
@@ -51,7 +52,7 @@ export default async function VenueProfile({ params }: { params: Promise<{ id: s
         <div className="flex flex-col gap-1.5">
           <h1 className="h-display text-[34px] leading-tight sm:text-[44px]">{v.name}</h1>
           {unclaimed && <span className="w-fit rounded-full border border-line-strong bg-white px-3 py-1 text-[13px] font-bold text-slate">Listed by ShowIci · Not claimed yet</span>}
-          <span className="text-[17px] text-slate">{[v.type, [v.area, v.city].filter(Boolean).join(", "), v.capacity].filter(Boolean).join(" · ")}</span>
+          <span className="text-[17px] text-slate">{[v.type, placeLabel(v.area, v.city), v.capacity].filter(Boolean).join(" · ")}</span>
           {unclaimed ? null : v.rating > 0 ? (
             <span className="flex items-center gap-1.5"><Stars rating={v.rating} /><strong>{v.rating}</strong><span className="hint text-sm">from performers</span></span>
           ) : (
