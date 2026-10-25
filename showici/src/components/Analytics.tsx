@@ -1,18 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import Script from "next/script";
 import { useEffect, useState } from "react";
 import { useLang } from "@/lib/i18n";
+import { CONSENT_KEY as KEY } from "@/lib/analytics";
 
 /**
- * Google Analytics (GA4), loaded only after the visitor accepts analytics cookies.
- * Québec's Law 25 requires consent before tracking technology is turned on, so until
- * the visitor clicks "Accept", no Google script or cookie is loaded at all.
+ * Cookie banner for Google Analytics (GA4). The Google tag itself is in the root layout
+ * (GA_HEAD_SCRIPT) and loads for every visitor in Google's consent mode: until the visitor
+ * clicks "Accept", analytics cookies stay off and Google only gets cookieless pings.
  * The choice is kept in this browser; "Cookie settings" in the footer reopens the banner.
  */
-export const GA_ID = "G-BSM43KZ1HZ";
-const KEY = "showici-analytics-consent"; // "granted" | "denied"
 const OPEN_EVENT = "showici:cookie-settings";
 
 /** Reopens the consent banner (used by the footer link). */
@@ -64,16 +62,14 @@ export function Analytics() {
       window.localStorage.setItem(KEY, value);
     } catch {}
     const w = window as unknown as { gtag?: (...a: unknown[]) => void };
+    w.gtag?.("consent", "update", { analytics_storage: value });
     if (value === "denied" && choice === "granted") {
-      // Turned off after being on: stop sending and remove GA cookies, then reload so the script is gone.
-      w.gtag?.("consent", "update", { analytics_storage: "denied" });
+      // Turned off after being on: remove the Google Analytics cookies already set.
       document.cookie.split(";").map((c) => c.split("=")[0].trim()).filter((n) => n === "_ga" || n.startsWith("_ga_")).forEach((n) => {
         const host = window.location.hostname.replace(/^www\./, "");
         document.cookie = `${n}=; Max-Age=0; path=/`;
         document.cookie = `${n}=; Max-Age=0; path=/; domain=.${host}`;
       });
-      window.location.reload();
-      return;
     }
     setChoice(value);
     setOpen(false);
@@ -82,18 +78,6 @@ export function Analytics() {
   const t = T[lang];
   return (
     <>
-      {choice === "granted" && (
-        <>
-          <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="afterInteractive" />
-          <Script id="ga4" strategy="afterInteractive">
-            {`window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('consent', 'default', { analytics_storage: 'granted', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' });
-gtag('js', new Date());
-gtag('config', '${GA_ID}');`}
-          </Script>
-        </>
-      )}
       {ready && open && (
         <div role="dialog" aria-live="polite" aria-label={lang === "fr" ? "Témoins" : "Cookies"} className="fixed inset-x-3 bottom-3 z-[300] mx-auto flex max-w-[760px] flex-wrap items-center gap-4 rounded-[16px] border border-line bg-white p-4 shadow-2xl sm:inset-x-6 sm:bottom-6 sm:p-5">
           <p className="min-w-0 flex-[1_1_320px] text-[15px] text-ink-2">
