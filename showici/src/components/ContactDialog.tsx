@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { sendContactRequest } from "@/lib/actions";
 import { useLang } from "@/lib/i18n";
+import { FollowCard } from "./Social";
 
 type L = "en" | "fr";
 type Field = { key: string; en: string; fr: string; type?: "text" | "url" | "date"; placeholder?: string; required?: boolean };
@@ -114,6 +115,7 @@ export function ContactDialog({ onClose }: { onClose: () => void }) {
         {sent ? (
           <div className="mt-4 flex flex-col gap-5">
             <p className="rounded-xl bg-success px-4 py-3 font-medium text-success-ink">{T.done[lang]}</p>
+            <FollowCard context="thanks" />
             <button type="button" onClick={onClose} className="self-end rounded-[10px] bg-navy px-5 py-3 font-bold text-white">{T.close[lang]}</button>
           </div>
         ) : (

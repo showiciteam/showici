@@ -5,6 +5,8 @@ import { countConversations, getBookingRequests, getContactAllowance, getMyPerfo
 import { requireUser } from "@/lib/session";
 import { AvailabilityToggle } from "./AvailabilityToggle";
 import { BookingRequests } from "./BookingRequests";
+import { PromoteKit } from "@/components/Social";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata = { title: "Dashboard · ShowIci" };
 
@@ -58,6 +60,8 @@ export default async function PerformerDashboard() {
           )}
 
           <BookingRequests requests={bookings} />
+
+          <PromoteKit kind="performer" id={me?.published ? me.id : user ? null : "p1"} siteUrl={SITE_URL} />
 
           <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-3.5">
             {stats.map(([k, v]) => <div key={k} className="card flex flex-col gap-1.5 p-5"><span className="text-sm text-muted">{k}</span><span className="h-display text-[34px]">{v}</span></div>)}

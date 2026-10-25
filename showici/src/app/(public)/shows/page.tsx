@@ -3,6 +3,7 @@ import { ShowsFilters } from "./ShowsFilters";
 import { getShows, getVenues } from "@/lib/data";
 import { Placeholder } from "@/components/ui";
 import { EmptyState } from "@/components/EmptyState";
+import { FollowCard } from "@/components/Social";
 
 export const metadata = { title: "Shows near you · ShowIci" };
 
@@ -19,6 +20,7 @@ export default async function ShowsPage() {
       </div>
       <h1 className="h-display text-[44px]">Shows across Québec</h1>
       <p className="mb-[22px] mt-2 text-[17px] text-slate">Live music, comedy and more at local pubs and bars. Spectacles locaux, près de chez vous.</p>
+      <FollowCard context="shows" className="mb-[22px]" />
       {shows.length > 0 && <ShowsFilters />}
 
       {shows.length === 0 ? (

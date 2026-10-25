@@ -4,6 +4,8 @@ import { Button, Placeholder } from "@/components/ui";
 import { getPerformers, getShows, getVenue } from "@/lib/data";
 import { getMyVenue, getSavedPerformers, nextNights } from "@/lib/dashboard";
 import { requireUser } from "@/lib/session";
+import { PromoteKit } from "@/components/Social";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata = { title: "My shows · ShowIci" };
 
@@ -68,6 +70,8 @@ export default async function VenueDashboard() {
               )}
             </div>
           </section>
+
+          <PromoteKit kind="venue" id={venue?.published ? venue.id : user ? null : "v1"} siteUrl={SITE_URL} />
 
           <div className="flex flex-wrap items-start gap-6">
             <section className="card min-w-0 flex-[999_1_520px] p-[22px]">

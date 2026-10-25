@@ -9,6 +9,7 @@ import { Button, DateBadge, Placeholder } from "@/components/ui";
 import { saveShow, setShowStatus } from "@/lib/actions";
 import { getBrowserSupabase, supabaseEnabled } from "@/lib/supabase/client";
 import { isoToMontreal, montrealToISO } from "@/lib/time";
+import { TagUsTip } from "@/components/Social";
 
 type Me = { name: string; venueId: string | null; venueName: string; area: string };
 
@@ -152,6 +153,7 @@ export default function PostShow() {
                 <textarea rows={3} value={descEn} onChange={(e) => setDescEn(e.target.value)} className={`input ${lang[0] === "English" ? "" : "hidden"}`} placeholder="Show description in English." />
               </div>
               {status && <Notice kind={status.kind}>{status.msg}</Notice>}
+              <TagUsTip />
               <div className="flex flex-wrap items-center justify-end gap-2.5">
                 {showId && currentStatus !== "cancelled" && <button type="button" disabled={busy} onClick={cancelShow} className="mr-auto text-sm font-bold text-red-700 underline">Cancel this show</button>}
                 <Button variant="secondary" disabled={busy} onClick={() => save("draft")}>Save draft</Button>

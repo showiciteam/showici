@@ -1,6 +1,7 @@
 import { about } from "@/lib/about";
 import { SITE_URL } from "@/lib/site";
 import { AboutView } from "./AboutView";
+import { SOCIAL_URLS } from "@/lib/social";
 
 const TITLE = "What is ShowIci? · Qu'est-ce que ShowIci?";
 const DESCRIPTION = "ShowIci connects local artists (musicians, bands, DJs, magicians, stand-up comedians) with venues and event planners across Québec, starting in Montréal. Bilingual, zero commission.";
@@ -26,6 +27,7 @@ function jsonLd() {
     areaServed: { "@type": "AdministrativeArea", name: "Québec, Canada" },
     address: { "@type": "PostalAddress", addressLocality: "Montréal", addressRegion: "QC", addressCountry: "CA" },
     knowsLanguage: ["fr", "en"],
+    sameAs: SOCIAL_URLS,
   };
   const page = { "@type": "AboutPage", "@id": `${SITE_URL}/about`, url: `${SITE_URL}/about`, name: "What is ShowIci?", inLanguage: "en-CA", about: { "@id": org["@id"] } };
   const faq = {

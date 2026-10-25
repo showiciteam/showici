@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { placeLabel } from "@/lib/regions";
 import { notFound } from "next/navigation";
-import { SaveButton, ShareButton } from "@/components/ProfileActions";
+import { SaveButton } from "@/components/ProfileActions";
 import { getReviewsFor, getShows, getVenue } from "@/lib/data";
 import { isSaved } from "@/lib/dashboard";
 import { getSessionUser } from "@/lib/session";
 import { supabaseEnabled } from "@/lib/supabase/client";
 import { Button, Placeholder, Stars, Tag } from "@/components/ui";
 import { PhotoGallery, VideoPreview, youTubeId } from "@/components/Media";
+import { ShareMenu } from "@/components/Social";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -61,7 +62,7 @@ export default async function VenueProfile({ params }: { params: Promise<{ id: s
         </div>
         <div className="flex flex-wrap gap-2.5">
           {isMe ? <Button href="/register/venue" variant="secondary">Edit my venue</Button> : <SaveButton kind="venue" id={v.id} initial={following} signedIn={Boolean(user)} />}
-          <ShareButton title={`${v.name} on ShowIci`} />
+          <ShareMenu title={`${v.name} on ShowIci`} caption={`${v.name} on ShowIci: live entertainment in ${v.city}.`} />
           {unclaimed ? <Button href={`/venues/${v.id}/claim`}>Claim this venue</Button> : !isMe && <Button href={`/messages?to=${v.id}`}>Message about a gig</Button>}
         </div>
       </div>

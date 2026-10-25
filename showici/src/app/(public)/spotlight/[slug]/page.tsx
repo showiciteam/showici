@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Button, Placeholder, VideoBox } from "@/components/ui";
 import { getStories } from "@/lib/data";
+import { FollowCard } from "@/components/Social";
 
 export async function generateStaticParams() {
   return (await getStories()).map((s) => ({ slug: s.slug }));
@@ -59,6 +60,7 @@ export default async function SpotlightArticle({ params }: { params: Promise<{ s
       </article>
       <section className="border-t border-line bg-parchment">
         <div className="wrap flex flex-col gap-5 pb-16 pt-12">
+          <FollowCard context="spotlight" />
           <h2 className="h-display text-[28px]">More from Spotlight Time</h2>
           <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-[18px]">
             {more.map((m) => (

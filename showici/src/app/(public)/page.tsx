@@ -4,6 +4,12 @@ import { HomeMap } from "@/components/HomeMap";
 import { PerformerCard, ShowCard } from "@/components/cards";
 import { Section } from "@/components/ui";
 import { getBigEvents, getPerformers, getShows, getVenues } from "@/lib/data";
+import { FollowBand } from "@/components/Social";
+import { SITE_URL } from "@/lib/site";
+import { SOCIAL_URLS } from "@/lib/social";
+
+/** Who ShowIci is, for search engines: links the site to its social accounts. */
+const orgLd = { "@context": "https://schema.org", "@type": "Organization", "@id": `${SITE_URL}/#organization`, name: "ShowIci", url: SITE_URL, logo: `${SITE_URL}/logo.png`, sameAs: SOCIAL_URLS };
 
 const roles = [
   {
@@ -41,6 +47,7 @@ export default async function Home() {
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd).replace(/</g, "\\u003c") }} />
       <Hero />
 
       <section className="wrap pb-[72px]">
@@ -113,6 +120,7 @@ export default async function Home() {
 
       <HomeMap venues={venues} performers={performers} />
       {/* "Free during launch" banner removed for now; it was a navy box linking to /signup. */}
+      <FollowBand />
       <div className="pb-[72px]" />
     </>
   );

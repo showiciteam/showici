@@ -7,6 +7,7 @@ import { Logo } from "@/components/Logo";
 import { LangToggle } from "@/components/Header";
 import { Notice } from "@/components/form";
 import { signUp } from "@/lib/actions";
+import { FollowCard } from "@/components/Social";
 
 type Role = "venue" | "planner" | "performer";
 const roles: { id: Role; label: string; hint: string }[] = [
@@ -61,6 +62,7 @@ export default function SignupPage() {
           <p className="hint text-sm">Nothing there after a few minutes? Check your spam folder.</p>
           <Link href="/login" className="font-bold">Back to log in</Link>
         </div>
+        <FollowCard context="thanks" className="w-full max-w-[580px]" />
       </div>
     );
   }

@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ShareButton } from "@/components/ProfileActions";
 import { getPerformer, getShow, getShows, getVenue } from "@/lib/data";
 import { supabaseEnabled } from "@/lib/supabase/client";
 import { Button, Placeholder, Stars, VideoBox } from "@/components/ui";
+import { ShareMenu } from "@/components/Social";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -73,7 +73,7 @@ export default async function ShowDetail({ params }: { params: Promise<{ id: str
             <div className="flex justify-between border-t border-line pt-3.5"><span className="text-muted">Entry</span><strong>{show.entry}</strong></div>
             {show.ticketUrl && <Button href={show.ticketUrl} external variant="brass">Get tickets ↗</Button>}
             {show.startsAt && <Button href={`/shows/${show.id}/calendar`} external>Add to calendar</Button>}
-            <ShareButton title={show.title} label="Share this show" />
+            <ShareMenu title={show.title} label="Share this show" caption={`${show.title}, ${show.longDate}${venue ? ` at ${venue.name}` : ""}. See you there!`} />
           </div>
           {venue && (
             <div className="card overflow-hidden">

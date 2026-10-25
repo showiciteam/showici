@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ShareButton, SaveButton } from "@/components/ProfileActions";
+import { SaveButton } from "@/components/ProfileActions";
 import { getPerformer, getReviewsFor, getShows, getVenues } from "@/lib/data";
 import { isSaved } from "@/lib/dashboard";
 import { getSessionUser } from "@/lib/session";
@@ -8,6 +8,7 @@ import { supabaseEnabled } from "@/lib/supabase/client";
 import { Button, Placeholder, Stars, Tag } from "@/components/ui";
 import { PhotoGallery, VideoPreview } from "@/components/Media";
 import { actFamily } from "@/lib/acts";
+import { ShareMenu } from "@/components/Social";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -75,7 +76,7 @@ export default async function PerformerProfile({ params }: { params: Promise<{ i
             ) : (
               <SaveButton kind="performer" id={p.id} initial={saved} signedIn={Boolean(user)} />
             )}
-            <ShareButton title={`${p.name} on ShowIci`} />
+            <ShareMenu title={`${p.name} on ShowIci`} caption={`${p.name} on ShowIci: ${p.actType}, ${p.genres.slice(0, 2).join(", ")}. Book local talent.`} />
             {!isMe && <Button href={`/messages?to=${p.id}`} className="px-6">Send message</Button>}
           </div>
         </div>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { StoryCard } from "@/components/cards";
 import { Button, PlayIcon } from "@/components/ui";
 import { getStories } from "@/lib/data";
+import { FollowCard } from "@/components/Social";
 
 export const metadata = { title: "Spotlight Time · ShowIci" };
 
@@ -35,6 +36,7 @@ export default async function SpotlightPage() {
         <div className="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-[22px]">
           {stories.map((s) => <StoryCard key={s.slug} s={s} />)}
         </div>
+        <FollowCard context="spotlight" />
         <section id="nominate" className="flex flex-wrap items-center justify-between gap-6 rounded-[22px] border border-line bg-parchment p-9">
           <div className="flex max-w-[640px] flex-col gap-2">
             <h2 className="h-display text-[30px]">Know someone who deserves the spotlight?</h2>

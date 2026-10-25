@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="60" viewBox="0 0 200 60" role="img" aria-label="Trouvez-nous sur ShowIci">
+  <rect width="200" height="60" rx="12" fill="#14213D"/>
+  <g fill="none" stroke="#D9A441" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" transform="translate(14 15) scale(1.25)">
+    <rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/>
+  </g>
+  <text x="56" y="25" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700" letter-spacing="0.6" fill="#D9A441">TROUVEZ-NOUS SUR</text>
+  <text x="56" y="46" font-family="Georgia, 'Times New Roman', serif" font-size="22" font-weight="700" fill="#FFFFFF">Show<tspan fill="#D9A441">Ici</tspan></text>
+</svg>

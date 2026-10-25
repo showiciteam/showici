@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui";
 import { claimVenue } from "@/lib/actions";
+import { FollowCard } from "@/components/Social";
 
 const ROLES = ["Owner", "Manager", "Booker / programmer", "Staff member"];
 
@@ -32,6 +33,7 @@ export function ClaimForm({ venueId, venueName, userName, userEmail, siteDomain 
           <Button href="/register/venue">Complete my venue page</Button>
           <Button href="/dashboard/venue" variant="secondary">Go to my dashboard</Button>
         </div>
+        <FollowCard context="thanks" />
       </div>
     );
   }
@@ -40,6 +42,7 @@ export function ClaimForm({ venueId, venueName, userName, userEmail, siteDomain 
       <div className="card mt-8 flex flex-col gap-3 p-6">
         <p className="rounded-xl bg-success px-4 py-3 font-medium text-success-ink">Thanks! Your claim was sent.</p>
         <p className="text-slate">We&apos;ll confirm with {venueName} and email you at {userEmail} as soon as it&apos;s approved, normally within 2 business days.</p>
+        <FollowCard context="thanks" />
       </div>
     );
   }

@@ -7,6 +7,7 @@ import { ChipGroup, Notice } from "@/components/form";
 import { Button } from "@/components/ui";
 import { insertRow } from "@/lib/actions";
 import { getBrowserSupabase, supabaseEnabled } from "@/lib/supabase/client";
+import { FollowCard } from "@/components/Social";
 
 export default function EventRequestPage() {
   const router = useRouter();
@@ -88,6 +89,7 @@ export default function EventRequestPage() {
               <span>Your request is private. It&apos;s never shown on public listings, only to signed-in performers who match it. Payment is agreed directly between you and the performer.</span>
             </div>
             {status && <Notice kind={status.kind}>{status.msg}</Notice>}
+            {status?.kind === "ok" && <FollowCard context="thanks" />}
             <div className="flex flex-wrap justify-end gap-2.5">
               <Button type="submit" disabled={busy || signedIn === false} className="px-7">{busy ? "Posting…" : "Post my request"}</Button>
             </div>

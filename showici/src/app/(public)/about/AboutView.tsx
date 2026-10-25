@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { about } from "@/lib/about";
 import { useLang } from "@/lib/i18n";
+import { FollowCard } from "@/components/Social";
 
 /** About page body: follows the FR / EN switch in the header. */
 export function AboutView() {
@@ -81,6 +82,10 @@ export function AboutView() {
             <p className="mt-2.5 text-slate">{a}</p>
           </details>
         ))}
+      </section>
+
+      <section className="wrap mt-14 max-w-[860px]">
+        <FollowCard context="about" />
       </section>
 
       <section className="wrap mt-14">
