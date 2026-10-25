@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useLang } from "@/lib/i18n";
 import { ContactButton } from "./ContactDialog";
+import { openCookieSettings } from "./Analytics";
 import { SOCIAL_HANDLE } from "@/lib/social";
 import { SocialLinks } from "./Social";
 
@@ -27,6 +28,7 @@ export function Footer() {
           <ContactButton label={t("footer.contact")} className="text-muted hover:text-navy hover:underline" />
           <Link href="/terms" className="text-muted">{t("footer.terms")}</Link>
           <Link href="/privacy" className="text-muted">{t("footer.privacy")}</Link>
+          <button type="button" onClick={openCookieSettings} className="text-muted hover:text-navy hover:underline">{lang === "fr" ? "Témoins" : "Cookie settings"}</button>
         </div>
       </div>
     </footer>

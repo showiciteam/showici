@@ -6,8 +6,8 @@
 
 export type LegalDoc = { title: string; updated: string; intro: string; sections: { h: string; p: string[] }[] };
 
-const UPDATED_EN = "Last updated: October 20, 2026";
-const UPDATED_FR = "Dernière mise à jour : 20 octobre 2026";
+const UPDATED_EN = "Last updated: October 25, 2026";
+const UPDATED_FR = "Dernière mise à jour : 25 octobre 2026";
 const PRIVACY_EMAIL = "privacy@showici.com";
 
 export const terms: Record<"en" | "fr", LegalDoc> = {
@@ -151,7 +151,8 @@ export const privacy: Record<"en" | "fr", LegalDoc> = {
         "- Venue claims: when you claim a venue page, your name, role at the venue, email and phone number, used only to confirm the claim.",
         "- Venues listed before their owner joins: public business information about the venue (name, address, public phone number, website), taken from OpenStreetMap and the venue's own pages. It is about the business, not about a person.",
         "- Technical: a login session cookie needed to keep you signed in, your language choice saved in your browser, and the basic connection logs (IP address, browser, time) that our hosting providers keep for security.",
-        "Apart from those public venue listings, we collect this information directly from you when you fill in a form or use the site. We don't buy information about you, and we don't use advertising or third-party tracking cookies.",
+        "- Site statistics, only if you accept: Google Analytics cookies that record how the site is used (pages viewed, approximate location from your IP address, device and browser, how you arrived). We use it to see which pages help people and to improve ShowIci, not for advertising. If you decline, Google Analytics isn't loaded at all. You can change your choice anytime with \"Cookie settings\" at the bottom of every page.",
+        "Apart from those public venue listings, we collect this information directly from you when you fill in a form or use the site. We don't buy information about you, and we don't use advertising cookies. Google Analytics cookies are only used if you accept them.",
       ] },
       { h: "3. Why we use it", p: [
         "- To create and secure your account and let you sign in and reset your password.",
@@ -173,6 +174,7 @@ export const privacy: Record<"en" | "fr", LegalDoc> = {
         "- Supabase: database, sign-in and file storage (photos, logos).",
         "- Vercel: website hosting.",
         "- Resend: sending emails (sign-up confirmation, password reset, new-message alerts).",
+        "- Google (Google Analytics): site statistics, only for visitors who accept analytics cookies. Google keeps this data for the period set in our account, 14 months at most.",
         "- OpenStreetMap and komoot (Photon): map images and address suggestions. What you type in an address field is sent to suggest matches.",
         "- YouTube (Google): videos load from YouTube when you press play.",
         "- Cloudflare (cdnjs) and Noembed: map code and video titles.",
@@ -216,7 +218,8 @@ export const privacy: Record<"en" | "fr", LegalDoc> = {
         "- Réclamation d'une salle : lorsque vous réclamez la page d'une salle, votre nom, votre rôle à la salle, votre courriel et votre numéro de téléphone, utilisés seulement pour confirmer la réclamation.",
         "- Salles affichées avant l'inscription de leur propriétaire : des renseignements d'entreprise publics sur la salle (nom, adresse, numéro de téléphone public, site web), tirés d'OpenStreetMap et des pages de la salle. Ils concernent l'entreprise, pas une personne.",
         "- Données techniques : un témoin (cookie) de session nécessaire pour rester connecté, votre choix de langue enregistré dans votre navigateur, et les journaux de connexion de base (adresse IP, navigateur, heure) conservés par nos hébergeurs pour la sécurité.",
-        "Sauf pour ces fiches de salles publiques, nous recueillons ces renseignements directement auprès de vous lorsque vous remplissez un formulaire ou utilisez le site. Nous n'achetons pas de renseignements sur vous et n'utilisons ni publicité ni témoins de suivi de tiers.",
+        "- Statistiques du site, seulement si vous acceptez : des témoins Google Analytics qui enregistrent l'utilisation du site (pages consultées, emplacement approximatif selon votre adresse IP, appareil et navigateur, provenance de la visite). Nous nous en servons pour savoir quelles pages sont utiles et améliorer ShowIci, jamais pour la publicité. Si vous refusez, Google Analytics n'est pas chargé du tout. Vous pouvez changer votre choix en tout temps avec « Témoins » au bas de chaque page.",
+        "Sauf pour ces fiches de salles publiques, nous recueillons ces renseignements directement auprès de vous lorsque vous remplissez un formulaire ou utilisez le site. Nous n'achetons pas de renseignements sur vous et n'utilisons pas de témoins publicitaires. Les témoins Google Analytics ne sont utilisés que si vous les acceptez.",
       ] },
       { h: "3. Pourquoi nous les utilisons", p: [
         "- Créer et protéger votre compte, et vous permettre de vous connecter et de réinitialiser votre mot de passe.",
@@ -238,6 +241,7 @@ export const privacy: Record<"en" | "fr", LegalDoc> = {
         "- Supabase : base de données, connexion et stockage de fichiers (photos, logos).",
         "- Vercel : hébergement du site.",
         "- Resend : envoi des courriels (confirmation d'inscription, réinitialisation du mot de passe, avis de nouveau message).",
+        "- Google (Google Analytics) : statistiques du site, seulement pour les visiteurs qui acceptent les témoins de mesure d'audience. Google conserve ces données pendant la durée réglée dans notre compte, au plus 14 mois.",
         "- OpenStreetMap et komoot (Photon) : images de carte et suggestions d'adresses. Ce que vous tapez dans un champ d'adresse est transmis pour proposer des résultats.",
         "- YouTube (Google) : les vidéos se chargent depuis YouTube lorsque vous appuyez sur lecture.",
         "- Cloudflare (cdnjs) et Noembed : code de la carte et titres des vidéos.",
