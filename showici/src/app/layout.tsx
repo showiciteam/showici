@@ -42,7 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <head>
         {/* Impact.com site verification (uses "value", not "content", as Impact asks). */}
-        <meta name="impact-site-verification" {...{ value: "3ca1d817-7c26-4038-b783-cb800530ba3d" }} />
+        <meta name="impact-site-verification" {...{ value: "9cc853e1-6bb8-46b3-afd7-b0254c0f74d7" }} />
         {/* Google tag (gtag.js), in consent mode: cookies stay off until the visitor accepts in the banner. */}
         <script dangerouslySetInnerHTML={{ __html: GA_HEAD_SCRIPT }} />
         <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
