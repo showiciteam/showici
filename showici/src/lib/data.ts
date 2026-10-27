@@ -98,6 +98,8 @@ function toVenue(r: any): Venue {
     sourceRef: r.source_ref ?? undefined,
     street: r.street ?? "",
     photos: photoUrls(r.venue_photos),
+    logo: r.logo_path ? mediaUrl(r.logo_path) : undefined,
+    videos: (r.venue_videos ?? []).slice().sort((a: any, b: any) => (a.position ?? 0) - (b.position ?? 0)).map((v: any) => ({ title: v.title ?? "", featured: !!v.featured, url: v.youtube_url })),
     links: linkList([["Website", r.website], ["Instagram", r.instagram], ["Facebook", r.facebook], ["YouTube", r.youtube_url]]),
   };
 }
@@ -167,7 +169,7 @@ export async function getVenues(opts: NearOpts = {}): Promise<Venue[]> {
 export async function getVenue(id: string): Promise<Venue | undefined> {
   const sb = await getServerSupabase();
   if (!sb) return mock.venues.find((v) => v.id === id) ?? mock.venues[0];
-  const { data } = await sb.from("venues_view").select("*, venue_photos(*)").eq("id", id).maybeSingle();
+  const { data } = await sb.from("venues_view").select("*, venue_photos(*), venue_videos(*)").eq("id", id).maybeSingle();
   return data ? toVenue(data) : undefined;
 }
 

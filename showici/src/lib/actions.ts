@@ -190,14 +190,17 @@ export interface VenueInput {
   website: string;
   instagram: string;
   facebook: string;
-  youtube_url: string;
   contact_name: string;
   contact_role: string;
   phone: string;
+  /** YouTube links of the room; the featured one also goes in `youtube_url` for older readers. */
+  videos: { youtube_url: string; title: string; featured: boolean }[];
   photos: File[];
   removedPhotos?: string[];
   publish: boolean;
   geo?: Geo | null;
+  /** Logo: keep `path`, or upload `file`; both empty removes it. */
+  logo?: { file: File | null; path: string | null };
 }
 
 /** Creates the venue, or updates it when `existingId` is given. */
@@ -206,17 +209,30 @@ export async function saveVenue(input: VenueInput, existingId?: string): Promise
   const uid = await currentUserId();
   if (!sb) return { ok: true, demo: true };
   if (!uid) return { ok: false, error: "Please create an account or log in first." };
-  const { photos, removedPhotos = [], phone, publish, geo, ...fields } = input;
-  const row = { ...fields, published: publish, ...locationFor(fields.city, geo, !existingId) };
+  const { videos, photos, removedPhotos = [], phone, publish, geo, logo, ...fields } = input;
+  const logo_path = await imageSlot(logo);
+  const featured = videos.find((v) => v.featured) ?? videos[0];
+  const row = {
+    ...fields,
+    youtube_url: featured?.youtube_url ?? null,
+    published: publish,
+    ...locationFor(fields.city, geo, !existingId),
+    ...(logo ? { logo_path: logo_path ?? null } : {}),
+  };
 
   let id = existingId;
   if (id) {
     const { error } = await sb.from("venues").update(row).eq("id", id);
     if (error) return { ok: false, error: error.message };
+    await sb.from("venue_videos").delete().eq("venue_id", id);
   } else {
     const { data, error } = await sb.from("venues").insert({ ...row, owner: uid }).select("id").single();
     if (error) return { ok: false, error: error.message };
     id = data.id as string;
+  }
+  if (videos.length) {
+    const { error } = await sb.from("venue_videos").insert(videos.map((v, i) => ({ ...v, venue_id: id, position: i })));
+    if (error) return { ok: false, error: error.message };
   }
   if (removedPhotos.length) {
     await sb.from("venue_photos").delete().eq("venue_id", id).in("storage_path", removedPhotos);

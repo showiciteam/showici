@@ -67,6 +67,10 @@ export interface Venue {
   phone?: string;
   /** "osm:n123" when the listing started from OpenStreetMap data (credited on the page). */
   sourceRef?: string;
+  /** Logo uploaded by the venue (live data). */
+  logo?: string;
+  /** YouTube videos of the room, featured first is not guaranteed: use `featured`. */
+  videos?: { title: string; featured?: boolean; url: string }[];
 }
 
 export interface Show {

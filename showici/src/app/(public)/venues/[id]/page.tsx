@@ -30,8 +30,12 @@ export default async function VenueProfile({ params }: { params: Promise<{ id: s
   const isMe = Boolean(user && v.ownerId && user.id === v.ownerId);
   const unclaimed = v.claimed === false;
   const address = [v.street, v.city].filter(Boolean).join(", ");
-  const video = v.links?.find((l) => youTubeId(l.url));
-  const otherLinks = (v.links ?? []).filter((l) => l !== video);
+  // Videos added on the form; venues saved before that may only have one YouTube link.
+  const legacy = v.links?.find((l) => youTubeId(l.url));
+  const videos = v.videos?.length ? v.videos : legacy ? [{ title: "", featured: true, url: legacy.url }] : [];
+  const featured = videos.find((x) => x.featured) ?? videos[0];
+  const moreVideos = videos.filter((x) => x !== featured);
+  const otherLinks = (v.links ?? []).filter((l) => !youTubeId(l.url));
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${v.name}, ${address}`)}`;
 
   return (
@@ -51,6 +55,11 @@ export default async function VenueProfile({ params }: { params: Promise<{ id: s
       )}
 
       <div className="mb-6 mt-5 flex flex-wrap items-end justify-between gap-4">
+        <div className="flex items-center gap-4 sm:gap-5">
+          {v.logo && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={v.logo} alt={`${v.name} logo`} className="h-[76px] w-[76px] flex-none rounded-full border border-line bg-white object-cover sm:h-[96px] sm:w-[96px]" />
+          )}
         <div className="flex flex-col gap-1.5">
           <h1 className="h-display text-[34px] leading-tight sm:text-[44px]">{v.name}</h1>
           {unclaimed && <span className="w-fit rounded-full border border-line-strong bg-white px-3 py-1 text-[13px] font-bold text-slate">Listed by ShowIci · Not claimed yet</span>}
@@ -60,6 +69,7 @@ export default async function VenueProfile({ params }: { params: Promise<{ id: s
           ) : (
             <span className="hint text-sm">No reviews yet</span>
           )}
+        </div>
         </div>
         <div className="flex flex-wrap gap-2.5">
           {isMe ? <Button href="/register/venue" variant="secondary">Edit my venue</Button> : <SaveButton kind="venue" id={v.id} initial={following} signedIn={Boolean(user)} />}
@@ -84,10 +94,15 @@ export default async function VenueProfile({ params }: { params: Promise<{ id: s
             <h2 className="h-display text-[26px]">About the venue</h2>
             <p className="whitespace-pre-line text-[17px] leading-relaxed text-ink-2">{v.description || "No description yet."}</p>
           </section>
-          {video && (
+          {featured && (
             <section className="flex flex-col gap-3">
               <h2 className="h-display text-[26px]">See the room</h2>
-              <VideoPreview url={video.url} big />
+              <VideoPreview url={featured.url} title={featured.title} big />
+              {moreVideos.length > 0 && (
+                <div className="mt-1 grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-x-3 gap-y-4">
+                  {moreVideos.map((x) => <VideoPreview key={x.url} url={x.url} title={x.title} />)}
+                </div>
+              )}
             </section>
           )}
           <section className="flex flex-col gap-3">

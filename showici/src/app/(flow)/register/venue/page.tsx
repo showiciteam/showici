@@ -2,20 +2,21 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { ChipGroup, Dropzone, FormCard, Notice } from "@/components/form";
+import { useEffect, useMemo, useState } from "react";
+import { ChipGroup, Dropzone, FormCard, Notice, SingleImage } from "@/components/form";
 import { Button } from "@/components/ui";
 import { saveVenue, type Geo } from "@/lib/actions";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
+import { VideoEditor, type EditableVideo } from "@/components/VideoEditor";
 import { mediaUrl } from "@/lib/media";
 import { getBrowserSupabase } from "@/lib/supabase/client";
 
-const steps = ["Venue basics", "Space and equipment", "Photos", "What you book", "Links", "Contact and publish"];
+const steps = ["Venue basics", "Space and equipment", "Logo and photos", "Videos", "What you book", "Links", "Contact and publish"];
 const EQUIPMENT = ["PA / sound system", "Microphones", "Drum kit", "Amps (backline)", "Stage lighting", "Piano / keyboard", "Sound technician", "Parking for load-in"];
 
 const EMPTY = {
   name: "", street: "", city: "Montréal", postal: "", description: "", capacity: "50 – 150", stage: "Small stage", setting: "Indoor",
-  fee: "$200 – $500", lead: "2 – 4 weeks", open: true, website: "", instagram: "", facebook: "", youtube: "",
+  fee: "$200 – $500", lead: "2 – 4 weeks", open: true, website: "", instagram: "", facebook: "",
   contact: "", role: "Manager", phone: "",
 };
 
@@ -34,6 +35,11 @@ export default function RegisterVenue() {
   const [photos, setPhotos] = useState<File[]>([]);
   const [savedPhotos, setSavedPhotos] = useState<string[]>([]);
   const [removedPhotos, setRemovedPhotos] = useState<string[]>([]);
+  const [videos, setVideos] = useState<EditableVideo[]>([]);
+  // Logo: a saved storage path, or a newly picked file (shown as a local preview).
+  const [logoPath, setLogoPath] = useState<string | null>(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const logoUrl = useMemo(() => (logoFile ? URL.createObjectURL(logoFile) : logoPath ? mediaUrl(logoPath) : undefined), [logoFile, logoPath]);
   const [status, setStatus] = useState<{ kind: "ok" | "error"; msg: string } | null>(null);
   const [busy, setBusy] = useState(false);
   // undefined: address untouched; null: typed by hand; set: picked from the suggestions (exact map pin)
@@ -46,7 +52,7 @@ export default function RegisterVenue() {
       const uid = sb ? (await sb.auth.getUser()).data.user?.id : undefined;
       if (!sb || !uid) return setLoading(false);
       const [{ data: v }, { data: contact }] = await Promise.all([
-        sb.from("venues").select("*, venue_photos(*)").eq("owner", uid).order("created_at").limit(1).maybeSingle(),
+        sb.from("venues").select("*, venue_photos(*), venue_videos(*)").eq("owner", uid).order("created_at").limit(1).maybeSingle(),
         sb.from("private_contacts").select("phone").eq("profile_id", uid).maybeSingle(),
       ]);
       if (v) {
@@ -56,7 +62,7 @@ export default function RegisterVenue() {
           name: v.name ?? "", street: v.street ?? "", city: v.city ?? "Montréal", postal: v.postal_code ?? "", description: v.description ?? "",
           capacity: v.capacity ?? "50 – 150", stage: v.stage ?? "Small stage", setting: v.setting ?? "Indoor", fee: v.fee_range ?? "Prefer not to say",
           lead: v.lead_time ?? "2 – 4 weeks", open: v.open_to_new_acts ?? true, website: v.website ?? "", instagram: v.instagram ?? "",
-          facebook: v.facebook ?? "", youtube: v.youtube_url ?? "", contact: v.contact_name ?? "", role: v.contact_role ?? "Manager", phone: contact?.phone ?? "",
+          facebook: v.facebook ?? "", contact: v.contact_name ?? "", role: v.contact_role ?? "Manager", phone: contact?.phone ?? "",
         });
         setType([v.type]);
         setEquipment(v.equipment ?? []);
@@ -65,6 +71,11 @@ export default function RegisterVenue() {
         setNights((v.nights ?? "").split(",").map((s: string) => s.trim()).filter(Boolean));
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setSavedPhotos((v.venue_photos ?? []).sort((a: any, b: any) => (a.position ?? 0) - (b.position ?? 0)).map((x: any) => x.storage_path));
+        setLogoPath(v.logo_path ?? null);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const saved = (v.venue_videos ?? []).sort((a: any, b: any) => (a.position ?? 0) - (b.position ?? 0)).map((x: any) => ({ youtube_url: x.youtube_url, title: x.title ?? "", featured: !!x.featured }));
+        // Venues saved before the video list existed had a single YouTube link: start the list with it.
+        setVideos(saved.length ? saved : v.youtube_url ? [{ youtube_url: v.youtube_url, title: "", featured: true }] : []);
       } else if (contact?.phone) {
         set("phone", contact.phone);
       }
@@ -80,8 +91,9 @@ export default function RegisterVenue() {
         name: f.name, type: type[0], street: f.street, city: f.city, postal_code: f.postal, description: f.description,
         capacity: f.capacity, stage: f.stage, setting: f.setting, equipment, books, genres, nights: nights.join(", "),
         fee_range: f.fee, lead_time: f.lead, open_to_new_acts: f.open, website: f.website, instagram: f.instagram,
-        facebook: f.facebook, youtube_url: f.youtube, contact_name: f.contact, contact_role: f.role, phone: f.phone,
-        photos, removedPhotos, publish, geo,
+        facebook: f.facebook, contact_name: f.contact, contact_role: f.role, phone: f.phone,
+        videos: videos.map((v, i) => ({ ...v, title: v.title.trim() || `Video ${i + 1}` })),
+        photos, removedPhotos, publish, geo, logo: { file: logoFile, path: logoPath },
       },
       existingId,
     );
@@ -142,7 +154,9 @@ export default function RegisterVenue() {
             <ChipGroup legend="Equipment on site" options={EQUIPMENT} value={equipment} onChange={setEquipment} />
           </FormCard>
 
-          <FormCard id="v3" title="3. Photos of your venue">
+          <FormCard id="v3" title="3. Logo and photos">
+            <SingleImage label="Logo" shape="round" hint="Shown next to your venue's name. Square works best. JPG or PNG." url={logoUrl} onFile={setLogoFile} onRemove={() => { setLogoFile(null); setLogoPath(null); }} />
+            <h3 className="mt-1 text-[17px] font-bold">Photos</h3>
             {savedPhotos.length > 0 && (
               <div className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-3">
                 {savedPhotos.map((path, i) => (
@@ -158,7 +172,17 @@ export default function RegisterVenue() {
             <Dropzone files={photos} onFiles={(fs) => setPhotos(fs.slice(0, Math.max(0, 12 - savedPhotos.length)))} hint="Show the stage, the room on a busy night, and the outside. JPG or PNG, up to 10 MB, 12 photos max." />
           </FormCard>
 
-          <FormCard id="v4" title="4. What you book">
+          <FormCard id="v4" title="4. Videos">
+            <VideoEditor
+              videos={videos}
+              onChange={setVideos}
+              intro="Paste YouTube links that show your room: a night with a band, the stage, the crowd. Performers love seeing where they'd play."
+              previewLabel="PREVIEW: how your videos appear on your venue page"
+              titlePlaceholder="e.g. Friday night with a live band"
+            />
+          </FormCard>
+
+          <FormCard id="v5" title="5. What you book">
             <ChipGroup legend="Types of acts" options={["Bands", "Solo / duo", "DJs", "Stand-up comedy", "Magicians", "Trivia / karaoke hosts"]} value={books} onChange={setBooks} />
             <ChipGroup legend="Genres your crowd likes" options={["Rock", "Pop", "Blues", "Jazz", "Folk / trad québécois", "Country", "Latin", "Electronic"]} value={genres} onChange={setGenres} />
             <ChipGroup legend="Nights with live entertainment" options={["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]} value={nights} onChange={setNights} />
@@ -169,16 +193,15 @@ export default function RegisterVenue() {
             <label className="flex items-center gap-2.5 font-medium"><input type="checkbox" checked={f.open} onChange={(e) => set("open", e.target.checked)} className="h-[18px] w-[18px] accent-navy" />Open to new and emerging acts</label>
           </FormCard>
 
-          <FormCard id="v5" title="5. Links">
+          <FormCard id="v6" title="6. Links">
             <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] items-start gap-3.5">
               <label className="label">Website<input type="url" value={f.website} onChange={(e) => set("website", e.target.value)} className="input" placeholder="https://" /></label>
               <label className="label">Instagram<input type="url" value={f.instagram} onChange={(e) => set("instagram", e.target.value)} className="input" placeholder="https://instagram.com/…" /></label>
               <label className="label">Facebook<input type="url" value={f.facebook} onChange={(e) => set("facebook", e.target.value)} className="input" placeholder="https://facebook.com/…" /></label>
-              <label className="label">YouTube video of your venue<input type="url" value={f.youtube} onChange={(e) => set("youtube", e.target.value)} className="input" placeholder="https://www.youtube.com/watch?v=…" /><span className="hint">Optional</span></label>
             </div>
           </FormCard>
 
-          <FormCard id="v6" title="6. Booking contact and publish">
+          <FormCard id="v7" title="7. Booking contact and publish">
             <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] items-start gap-3.5">
               <label className="label">Booking contact name<input value={f.contact} onChange={(e) => set("contact", e.target.value)} className="input" /></label>
               <label className="label">Role<select value={f.role} onChange={(e) => set("role", e.target.value)} className="input"><option>Owner</option><option>Manager</option><option>Booker</option></select></label>

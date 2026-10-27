@@ -3,11 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { ChipGroup, Dropzone, FormCard, Notice, SingleImage } from "@/components/form";
-import { Button, PlayIcon } from "@/components/ui";
+import { Button } from "@/components/ui";
 import { ACT_TYPES, LANGUAGES, actFamily, joinOther, splitOther } from "@/lib/acts";
 import { savePerformer, type Geo } from "@/lib/actions";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
-import { VideoPreview } from "@/components/Media";
+import { VideoEditor, type EditableVideo } from "@/components/VideoEditor";
 import { mediaUrl } from "@/lib/media";
 import { getBrowserSupabase } from "@/lib/supabase/client";
 
@@ -16,8 +16,6 @@ const steps = [
   ["where", "Where you play"], ["events", "Events and availability"], ["publish", "Review and publish"],
 ];
 
-type Video = { youtube_url: string; title: string; featured: boolean };
-const ytId = (u: string) => u.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/)?.[1];
 
 const EMPTY = {
   name: "", members: "4", contact: "", phone: "", rep: "Covers", bio: "", setLength: "2 × 45 min", fee: "$300 – $600",
@@ -38,9 +36,7 @@ export default function RegisterPerformer() {
   const [photos, setPhotos] = useState<File[]>([]);
   const [savedPhotos, setSavedPhotos] = useState<string[]>([]);
   const [removedPhotos, setRemovedPhotos] = useState<string[]>([]);
-  const [videos, setVideos] = useState<Video[]>([]);
-  const [videoUrl, setVideoUrl] = useState("");
-  const [videoError, setVideoError] = useState("");
+  const [videos, setVideos] = useState<EditableVideo[]>([]);
   const [radius, setRadius] = useState(50);
   const [available, setAvailable] = useState(true);
   const [published, setPublished] = useState(false);
@@ -114,22 +110,6 @@ export default function RegisterPerformer() {
     setGenres((g) => g.filter((x) => x === "Other" || fam.styles.includes(x)));
     if (!fam.repertoire.includes(f.rep)) set("rep", fam.repertoire[fam.repertoire.length - 1]);
     if (!fam.ownSound) set("ownSound", false);
-  }
-
-  async function addVideo() {
-    if (!ytId(videoUrl)) return setVideoError("That doesn't look like a YouTube link.");
-    setVideoError("");
-    const url = videoUrl;
-    setVideos((v) => [...v, { youtube_url: url, title: "", featured: v.length === 0 }]);
-    setVideoUrl("");
-    // Fill in the real YouTube title so the profile doesn't say "Video 2".
-    try {
-      const r = await fetch(`https://noembed.com/embed?url=${encodeURIComponent(url)}`);
-      const d = await r.json();
-      if (d?.title) setVideos((v) => v.map((x) => (x.youtube_url === url && !x.title ? { ...x, title: String(d.title).slice(0, 80) } : x)));
-    } catch {
-      // keep it empty; the person can type a title
-    }
   }
 
   async function save(publish: boolean) {
@@ -240,52 +220,12 @@ export default function RegisterPerformer() {
           </FormCard>
 
           <FormCard id="videos" title="4. Videos and links">
-            <p className="text-slate">Paste YouTube links of your live performances. Bookers decide mostly from videos, so show them your best 3 to 5.</p>
-            <div className="flex flex-wrap items-end gap-2.5">
-              <label className="label flex-[1_1_320px]">YouTube link
-                <input type="url" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addVideo())} className="input" placeholder="https://www.youtube.com/watch?v=…" />
-              </label>
-              <Button onClick={addVideo}>Add video</Button>
-            </div>
-            {videoError && <Notice kind="error">{videoError}</Notice>}
-            {videos.length > 0 && (
-              <ul className="flex flex-col gap-2.5">
-                {videos.map((v, i) => (
-                  <li key={v.youtube_url + i} className={`flex flex-wrap items-center gap-3.5 rounded-xl border p-2.5 ${v.featured ? "border-brass bg-brass-tint/40" : "border-line bg-white"}`}>
-                    <span className="relative flex-none">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={`https://i.ytimg.com/vi/${ytId(v.youtube_url)}/mqdefault.jpg`} alt="" className="aspect-video w-[132px] rounded-lg bg-navy object-cover" />
-                      {v.featured && <span className="absolute left-1.5 top-1.5 rounded bg-navy px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-white">FEATURED</span>}
-                    </span>
-                    <label className="flex min-w-0 flex-[1_1_200px] flex-col gap-1 text-xs font-bold text-muted">Title
-                      <input value={v.title} placeholder="e.g. Live at Bar Le Ritz" onChange={(e) => setVideos(videos.map((x, j) => (j === i ? { ...x, title: e.target.value } : x)))} className="input py-2.5 text-[15px]" />
-                    </label>
-                    <span className="flex gap-2">
-                      {!v.featured && <button type="button" onClick={() => setVideos(videos.map((x, j) => ({ ...x, featured: j === i })))} className="min-h-10 rounded-full border border-line-strong px-3.5 text-sm font-bold text-navy hover:border-navy">☆ Make featured</button>}
-                      <button type="button" aria-label="Remove video" onClick={() => setVideos(videos.filter((_, j) => j !== i).map((x, j, arr) => ({ ...x, featured: arr.some((y) => y.featured) ? x.featured : j === 0 })))} className="min-h-10 rounded-[10px] border border-line-strong px-3">✕</button>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <div className="flex flex-col gap-3 rounded-2xl bg-parchment p-5">
-              <span className="text-sm font-bold text-brass-dark">PREVIEW: how your videos appear on your profile</span>
-              {videos.length ? (
-                <>
-                  {(() => {
-                    const feat = videos.find((v) => v.featured) ?? videos[0];
-                    return <VideoPreview url={feat.youtube_url} title={feat.title || "Featured video"} big />;
-                  })()}
-                  {videos.length > 1 && (
-                    <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-3">
-                      {videos.filter((v) => v !== (videos.find((x) => x.featured) ?? videos[0])).map((v, i) => <VideoPreview key={v.youtube_url + i} url={v.youtube_url} title={v.title || `Video ${i + 2}`} />)}
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div className="flex aspect-[16/7] items-center justify-center gap-3 rounded-xl bg-navy text-white"><PlayIcon color="#D9A441" /> Add a video to see your showcase</div>
-              )}
-            </div>
+            <VideoEditor
+              videos={videos}
+              onChange={setVideos}
+              intro="Paste YouTube links of your live performances. Bookers decide mostly from videos, so show them your best 3 to 5."
+              previewLabel="PREVIEW: how your videos appear on your profile"
+            />
             <h3 className="mt-2 text-[17px] font-bold">Other links</h3>
             <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] items-start gap-3.5">
               <label className="label">Instagram<input type="url" value={f.instagram} onChange={(e) => set("instagram", e.target.value)} className="input" placeholder="https://instagram.com/…" /></label>
