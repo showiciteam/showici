@@ -7,7 +7,8 @@ import { isSaved } from "@/lib/dashboard";
 import { getSessionUser } from "@/lib/session";
 import { supabaseEnabled } from "@/lib/supabase/client";
 import { Button, Placeholder, Stars, Tag } from "@/components/ui";
-import { PhotoGallery, VideoPreview, youTubeId } from "@/components/Media";
+import { PhotoGallery, VideoPreview } from "@/components/Media";
+import { youTubeId } from "@/lib/youtube";
 import { ShareMenu } from "@/components/Social";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
