@@ -28,6 +28,23 @@ function category(e: any): string {
   return "Event";
 }
 
+/** Listings that aren't shows: building tours, meal or lounge packages, parking, ticket upgrades. */
+const NOT_A_SHOW = /visites? guid|guided tour|\brepas\b|restaurant|salon des|lounge|parking|stationnement|surclassement|upgrade|forfait|package|gift card|carte-cadeau/i;
+function isShow(e: any) {
+  const type = e.classifications?.map((c: any) => `${c.type?.name ?? ""} ${c.subType?.name ?? ""}`).join(" ") ?? "";
+  return !NOT_A_SHOW.test(e.name ?? "") && !/upsell|parking|add-on|merchandise/i.test(type);
+}
+
+const CITY_FIX: Record<string, string> = { montreal: "Montréal", quebec: "Québec", "quebec city": "Québec", "trois-rivieres": "Trois-Rivières", levis: "Lévis" };
+/** "GATINEAU" → "Gatineau", "Montreal" → "Montréal". */
+function cityName(raw?: string) {
+  if (!raw) return "";
+  const fixed = CITY_FIX[raw.trim().toLowerCase()];
+  if (fixed) return fixed;
+  const small = new Set(["sur", "de", "du", "des", "la", "le", "les", "en", "aux"]);
+  return raw.trim().toLowerCase().split(/([\s-])/).map((w, i) => (i > 0 && small.has(w)) || /^[\s-]$/.test(w) ? w : w.charAt(0).toUpperCase() + w.slice(1)).join("");
+}
+
 function clock(t?: string) {
   if (!t) return "";
   const [h, m] = t.split(":").map(Number);
@@ -42,7 +59,7 @@ function bestImage(images: any[] = []): string | undefined {
 
 function toEvent(e: any, i: number): BigEvent | null {
   const localDate: string | undefined = e.dates?.start?.localDate;
-  if (!localDate || !e.url) return null;
+  if (!localDate || !e.url || !isShow(e)) return null;
   const d = new Date(`${localDate}T12:00:00`);
   const venue = e._embedded?.venues?.[0];
   const min = e.priceRanges?.[0]?.min;
@@ -51,7 +68,7 @@ function toEvent(e: any, i: number): BigEvent | null {
     category: category(e),
     name: e.name,
     venue: venue?.name ?? "",
-    city: venue?.city?.name ?? "",
+    city: cityName(venue?.city?.name),
     lat: venue?.location?.latitude ? Number(venue.location.latitude) : undefined,
     lng: venue?.location?.longitude ? Number(venue.location.longitude) : undefined,
     day: d.toLocaleDateString("en-CA", { weekday: "short" }).replace(".", "").toUpperCase(),
