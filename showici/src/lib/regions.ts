@@ -1,14 +1,15 @@
 /**
  * ShowIci covers the province of Québec, with Greater Montréal as the main landing area.
- * Each region has a centre point (used to sort results and move the map). Regions around Montréal
- * also list their cities, so a venue in Terrebonne shows up under Lanaudière and one in Blainville
- * under Laurentides, and visitors can drill down from Greater Montréal to a single city.
+ * Each region has a centre point (used to sort results and move the map). Regions around Montréal,
+ * the Outaouais, Estrie, Centre-du-Québec and Saguenay–Lac-Saint-Jean also list their towns, so a venue
+ * in Terrebonne shows up under Lanaudière, one in Maniwaki under the Outaouais even though it's far
+ * from Gatineau, and visitors can drill down to a single town. Towns not listed fall back to distance.
  * Keys are used in URLs (?region=montreal&area=laval), so don't rename them.
  */
 export type Region = { key: string; en: string; fr: string; lat: number; lng: number; zoom: number; radiusKm: number };
 
 /** Official administrative region a city belongs to (shown next to the city name). */
-type Admin = "montreal" | "laval" | "monteregie" | "lanaudiere" | "laurentides";
+type Admin = "montreal" | "laval" | "monteregie" | "lanaudiere" | "laurentides" | "gatineau" | "sherbrooke" | "drummondville" | "saguenay";
 /** Part of Greater Montréal, used to group the drill-down list. Cities outside Greater Montréal have none. */
 export type Group = "island" | "laval" | "south" | "north";
 
@@ -39,6 +40,10 @@ export const ADMIN_LABEL: Record<Admin, { en: string; fr: string }> = {
   monteregie: { en: "Montérégie", fr: "Montérégie" },
   lanaudiere: { en: "Lanaudière", fr: "Lanaudière" },
   laurentides: { en: "Laurentides", fr: "Laurentides" },
+  gatineau: { en: "Outaouais", fr: "Outaouais" },
+  sherbrooke: { en: "Estrie", fr: "Estrie" },
+  drummondville: { en: "Centre-du-Québec", fr: "Centre-du-Québec" },
+  saguenay: { en: "Saguenay–Lac-Saint-Jean", fr: "Saguenay–Lac-Saint-Jean" },
 };
 
 export const GROUP_LABEL: Record<Group, { en: string; fr: string }> = {
@@ -91,6 +96,49 @@ export const CITIES: City[] = [
   c("saint-sauveur", "Saint-Sauveur", 45.8833, -74.1667, "laurentides", undefined, undefined, 13),
   c("sainte-agathe", "Sainte-Agathe-des-Monts", 46.05, -74.2833, "laurentides", undefined, undefined, 12),
   c("mont-tremblant", "Mont-Tremblant", 46.1185, -74.5962, "laurentides", undefined, undefined, 12),
+  // Outaouais (region "gatineau")
+  c("gatineau", "Gatineau", 45.4765, -75.7013, "gatineau", undefined, ["Hull", "Vieux-Hull", "Aylmer", "Buckingham", "Masson-Angers", "Gatineau (Hull)"], 11),
+  c("chelsea", "Chelsea", 45.5167, -75.7833, "gatineau", undefined, ["Old Chelsea"], 12),
+  c("la-peche", "La Pêche", 45.6417, -75.9083, "gatineau", undefined, ["Wakefield", "Sainte-Cécile-de-Masham"], 12),
+  c("pontiac", "Pontiac", 45.5833, -76.1167, "gatineau", undefined, ["Quyon", "Luskville"], 11),
+  c("low", "Low", 45.8, -75.95, "gatineau", undefined, undefined, 12),
+  c("clarendon", "Clarendon", 45.6333, -76.4833, "gatineau", undefined, ["Shawville"], 12),
+  c("sheenboro", "Sheenboro", 45.9703, -77.2325, "gatineau", undefined, undefined, 12),
+  c("montebello", "Montebello", 45.65, -74.9333, "gatineau", undefined, undefined, 13),
+  c("maniwaki", "Maniwaki", 46.3833, -75.9667, "gatineau", undefined, undefined, 12),
+  // Estrie (region "sherbrooke")
+  c("sherbrooke", "Sherbrooke", 45.4042, -71.8929, "sherbrooke", undefined, ["Lennoxville", "Fleurimont", "Rock Forest"], 11),
+  c("magog", "Magog", 45.2667, -72.15, "sherbrooke", undefined, ["Orford"], 12),
+  c("north-hatley", "North Hatley", 45.2833, -71.9667, "sherbrooke", undefined, ["Hatley", "Ayer's Cliff"], 13),
+  c("coaticook", "Coaticook", 45.1333, -71.8, "sherbrooke", undefined, undefined, 12),
+  c("lac-brome", "Lac-Brome", 45.2167, -72.5167, "sherbrooke", undefined, ["Knowlton"], 12),
+  c("sutton", "Sutton", 45.1053, -72.6153, "sherbrooke", undefined, undefined, 13),
+  c("bromont", "Bromont", 45.3167, -72.65, "sherbrooke", undefined, undefined, 12),
+  c("waterloo", "Waterloo", 45.35, -72.5167, "sherbrooke", undefined, undefined, 13),
+  c("eastman", "Eastman", 45.3, -72.3167, "sherbrooke", undefined, undefined, 13),
+  c("richmond", "Richmond", 45.6623, -72.1438, "sherbrooke", undefined, undefined, 13),
+  c("valcourt", "Valcourt", 45.5, -72.3167, "sherbrooke", undefined, undefined, 13),
+  c("saint-camille", "Saint-Camille", 45.6837, -71.7037, "sherbrooke", undefined, undefined, 13),
+  c("east-angus", "East Angus", 45.4833, -71.6667, "sherbrooke", undefined, undefined, 13),
+  c("cookshire-eaton", "Cookshire-Eaton", 45.4167, -71.6333, "sherbrooke", undefined, ["Cookshire"], 12),
+  c("stanstead", "Stanstead", 45.0167, -72.1, "sherbrooke", undefined, ["Rock Island"], 13),
+  // Centre-du-Québec (region "drummondville"). Nicolet and Bécancour are left to distance so they still show near Trois-Rivières.
+  c("drummondville", "Drummondville", 45.8833, -72.4833, "drummondville", undefined, undefined, 12),
+  c("victoriaville", "Victoriaville", 46.05, -71.9667, "drummondville", undefined, ["Arthabaska"], 12),
+  c("plessisville", "Plessisville", 46.2167, -71.7667, "drummondville", undefined, undefined, 13),
+  c("warwick", "Warwick", 45.95, -71.9833, "drummondville", undefined, undefined, 13),
+  c("kingsey-falls", "Kingsey Falls", 45.85, -72.0667, "drummondville", undefined, undefined, 13),
+  c("tingwick", "Tingwick", 45.8833, -71.95, "drummondville", undefined, undefined, 13),
+  // Saguenay–Lac-Saint-Jean (region "saguenay")
+  c("saguenay", "Saguenay", 48.4284, -71.0685, "saguenay", undefined, ["Chicoutimi", "Jonquière", "Arvida", "La Baie", "Kénogami"], 11),
+  c("alma", "Alma", 48.55, -71.65, "saguenay", undefined, undefined, 12),
+  c("saint-felicien", "Saint-Félicien", 48.65, -72.45, "saguenay", undefined, undefined, 12),
+  c("dolbeau-mistassini", "Dolbeau-Mistassini", 48.8833, -72.2333, "saguenay", undefined, ["Dolbeau", "Mistassini"], 12),
+  c("roberval", "Roberval", 48.5167, -72.2333, "saguenay", undefined, undefined, 12),
+  c("hebertville", "Hébertville", 48.4, -71.6833, "saguenay", undefined, undefined, 13),
+  c("saint-gedeon", "Saint-Gédéon", 48.5, -71.7667, "saguenay", undefined, undefined, 13),
+  c("saint-fulgence", "Saint-Fulgence", 48.45, -70.9, "saguenay", undefined, undefined, 13),
+  c("lanse-saint-jean", "L'Anse-Saint-Jean", 48.2333, -70.2, "saguenay", undefined, undefined, 13),
 ];
 
 const norm = (s: string) =>
