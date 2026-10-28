@@ -71,31 +71,38 @@ export default async function Home() {
         </Section>
       </div>
 
-      <section className="wrap pt-16">
-        <div className="flex flex-col gap-5 rounded-[22px] bg-navy p-8 text-white">
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div className="flex flex-col gap-1.5">
-              <span className="text-xs font-bold tracking-[0.1em] text-brass">BIG EVENTS · TICKETS</span>
-              <h2 className="font-display text-[34px] font-extrabold tracking-tight">Big events this month</h2>
-              <span className="text-[15px] text-on-navy">Concerts, festivals and tours in your area. Tickets sold on Ticketmaster.</span>
+      {bigEvents.length > 0 && (
+        <section className="wrap pt-16">
+          <div className="flex flex-col gap-5 rounded-[22px] bg-navy p-8 text-white">
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <div className="flex flex-col gap-1.5">
+                <span className="text-xs font-bold tracking-[0.1em] text-brass">BIG EVENTS · TICKETS</span>
+                <h2 className="font-display text-[34px] font-extrabold tracking-tight">Big events coming up</h2>
+                <span className="text-[15px] text-on-navy">Concerts, festivals and tours in your area. Tickets sold on Ticketmaster.</span>
+              </div>
+              <Link href="/events" className="rounded-[10px] bg-brass px-[18px] py-3 font-bold text-navy no-underline hover:text-navy">See all big events</Link>
             </div>
-            <Link href="/events" className="rounded-[10px] bg-brass px-[18px] py-3 font-bold text-navy no-underline hover:text-navy">See all big events</Link>
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-3.5">
+              {bigEvents.slice(0, 4).map((e) => (
+                <a key={e.id} href={e.url} target="_blank" rel="noopener noreferrer sponsored" className="flex flex-col overflow-hidden rounded-[14px] bg-[#1E2D4D] text-white no-underline hover:text-white">
+                  {e.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={e.image} alt="" loading="lazy" className="aspect-video w-full bg-navy-soft object-cover" />
+                  ) : (
+                    <div className="aspect-video bg-navy-soft" />
+                  )}
+                  <div className="flex flex-col gap-1 p-3.5">
+                    <span className="text-xs font-bold text-brass">{e.category.toUpperCase()} · {e.day} {e.month ? `${e.month.toUpperCase()} ` : ""}{e.date}</span>
+                    <strong>{e.name}</strong>
+                    <span className="text-[13px] text-on-navy">{[e.venue, e.city].filter(Boolean).join(", ")} · Get tickets ↗</span>
+                  </div>
+                </a>
+              ))}
+            </div>
+            <span className="text-xs text-[#9AA3B8]">ShowIci may earn a commission on ticket sales. It never changes your price.</span>
           </div>
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-3.5">
-            {bigEvents.slice(0, 4).map((e) => (
-              <a key={e.id} href={e.url} target="_blank" rel="noopener noreferrer sponsored" className="flex flex-col overflow-hidden rounded-[14px] bg-[#1E2D4D] text-white no-underline hover:text-white">
-                <div className="aspect-video bg-navy-soft" />
-                <div className="flex flex-col gap-1 p-3.5">
-                  <span className="text-xs font-bold text-brass">{e.category.toUpperCase()} · {e.day} {e.date}</span>
-                  <strong>{e.name}</strong>
-                  <span className="text-[13px] text-on-navy">{e.venue} · Get tickets ↗</span>
-                </div>
-              </a>
-            ))}
-          </div>
-          <span className="text-xs text-[#9AA3B8]">ShowIci may earn a commission on ticket sales. It never changes your price.</span>
-        </div>
-      </section>
+        </section>
+      )}
 
       <Section title="Performers available nearby" action={<Link href="/performers" className="font-bold no-underline">Browse all performers →</Link>}>
         <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-4">

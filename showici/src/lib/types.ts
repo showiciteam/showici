@@ -117,6 +117,16 @@ export interface BigEvent {
   price: string;
   tone: Tone;
   url: string;
+  /** Live (Ticketmaster) data only. */
+  image?: string;
+  city?: string;
+  lat?: number;
+  lng?: number;
+  month?: string;
+  /** YYYY-MM-DD, local date of the (first) show. */
+  startDate?: string;
+  /** How many other dates the same show has at the same venue. */
+  moreDates?: number;
 }
 
 export interface EventRequest {

@@ -94,14 +94,20 @@ export function BigEventCard({ e }: { e: BigEvent }) {
   return (
     <article className="card flex flex-col overflow-hidden">
       <div className="relative">
-        <Placeholder tone={e.tone} className="aspect-video" />
+        {e.image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={e.image} alt="" loading="lazy" className="aspect-video w-full bg-navy-soft object-cover" />
+        ) : (
+          <Placeholder tone={e.tone} className="aspect-video" />
+        )}
         <span className="absolute bottom-3 left-3"><DateBadge day={e.day} date={e.date} dark /></span>
       </div>
       <div className="flex flex-1 flex-col gap-1.5 p-4">
         <span className="eyebrow">{e.category}</span>
         <span className="h-display text-[19px] leading-tight">{e.name}</span>
-        <span className="text-sm text-slate">{e.venue} · {e.time}</span>
-        <span className="text-sm text-muted">{e.price}</span>
+        <span className="text-sm text-slate">{[e.venue, e.city].filter(Boolean).join(", ")}</span>
+        <span className="text-sm text-slate">{[e.month ? `${e.month} ${e.date}` : "", e.time].filter(Boolean).join(" · ")}{e.moreDates ? ` · +${e.moreDates} more date${e.moreDates > 1 ? "s" : ""}` : ""}</span>
+        {e.price && <span className="text-sm text-muted">{e.price}</span>}
         <Button href={e.url} external className="mt-auto text-sm">Get tickets ↗</Button>
         <span className="text-center text-[11px] text-muted">On Ticketmaster</span>
       </div>

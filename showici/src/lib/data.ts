@@ -2,7 +2,8 @@
 import * as mock from "./mock";
 import { getServerSupabase } from "./supabase/server";
 import { mediaUrl } from "./media";
-import type { EventRequest, Performer, Review, Show, Tone, Venue } from "./types";
+import type { BigEvent, EventRequest, Performer, Review, Show, Tone, Venue } from "./types";
+import { getTicketmasterEvents } from "./ticketmaster";
 
 const TONES: Tone[] = ["ph-1", "ph-2", "ph-3", "ph-4", "ph-5"];
 export const toneFor = (id: string) => TONES[[...id].reduce((a, c) => a + c.charCodeAt(0), 0) % TONES.length];
@@ -277,7 +278,20 @@ export async function getReviewsFor(profileId?: string): Promise<Review[]> {
 
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
-export const getBigEvents = async () => mock.bigEvents; // Replace with the Ticketmaster Discovery API (see /api/big-events).
+/**
+ * Big events (concerts, comedy, sports…) sold on Ticketmaster in Québec.
+ * Without a TICKETMASTER_API_KEY the site shows the sample cards from mock.ts.
+ */
+export async function getBigEvents(): Promise<BigEvent[]> {
+  const key = process.env.TICKETMASTER_API_KEY;
+  if (!key) return mock.bigEvents;
+  try {
+    return await getTicketmasterEvents(key);
+  } catch (e) {
+    console.error("getBigEvents", e);
+    return [];
+  }
+}
 export const getStories = async () => mock.stories;
 export const getNews = async () => mock.news;
 export const getThreads = async () => mock.threads; // Sample threads for demo mode. Live inboxes use getInbox() in dashboard.ts.

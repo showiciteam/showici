@@ -1,14 +1,14 @@
 import Link from "next/link";
-import { BigEventCard } from "@/components/cards";
 import { Button } from "@/components/ui";
 import { getBigEvents } from "@/lib/data";
-import { EventFilters } from "./EventFilters";
+import { EventsBrowser } from "./EventFilters";
 
 export const metadata = { title: "Big events and tickets · ShowIci" };
+// Ticketmaster data is refreshed at most once an hour.
+export const revalidate = 3600;
 
 export default async function BigEventsPage() {
   const events = await getBigEvents();
-  const [featured, ...rest] = events;
 
   return (
     <div className="wrap flex flex-col gap-[26px] pb-[72px] pt-10">
@@ -23,25 +23,7 @@ export default async function BigEventsPage() {
         </div>
         <span className="max-w-[300px] text-right text-[13px] text-muted">ShowIci may earn a commission when you buy tickets through these links. It never changes your price.</span>
       </div>
-      <EventFilters />
-
-      {featured && (
-        <a href={featured.url} target="_blank" rel="noopener noreferrer sponsored" className="flex flex-wrap overflow-hidden rounded-[22px] bg-navy text-white no-underline hover:text-white">
-          <div className="flex min-h-80 flex-[1_1_520px] items-center justify-center bg-navy-soft font-bold text-on-navy">[Event image from Ticketmaster]</div>
-          <div className="flex flex-[1_1_360px] flex-col justify-center gap-3 p-8">
-            <span className="eyebrow text-brass">{featured.category} · Featured</span>
-            <span className="font-display text-[34px] font-extrabold leading-tight">{featured.name}</span>
-            <span className="text-on-navy">{featured.venue} · {featured.day} {featured.date} · {featured.time}</span>
-            <span className="text-on-navy">{featured.price}</span>
-            <span className="mt-2 w-fit rounded-[10px] bg-brass px-[18px] py-3 font-bold text-navy">Get tickets ↗</span>
-            <span className="text-xs text-[#9AA3B8]">Tickets sold on Ticketmaster</span>
-          </div>
-        </a>
-      )}
-
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-[18px]">
-        {rest.map((e) => <BigEventCard key={e.id} e={e} />)}
-      </div>
+      <EventsBrowser events={events} />
 
       <section className="flex flex-wrap items-center justify-between gap-6 rounded-[22px] border border-line bg-parchment p-8">
         <div className="flex max-w-[640px] flex-col gap-1.5">
