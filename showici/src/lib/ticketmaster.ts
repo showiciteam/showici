@@ -21,21 +21,21 @@ function category(e: any): string {
   const sub = c?.subGenre?.name ?? "";
   if (/festival/i.test(`${genre} ${sub} ${e.name}`)) return "Festival";
   if (segment === "Music") return "Concert";
-  if (segment === "Sports") return "Sports";
   if (/comedy/i.test(`${genre} ${sub}`)) return "Comedy";
   if (/family|children/i.test(`${segment} ${genre} ${sub}`)) return "Family";
   if (segment === "Arts & Theatre") return "Theatre";
   return "Event";
 }
 
-/** Listings that aren't shows: building tours, meal or lounge packages, parking, ticket upgrades. */
+/** Listings that aren't shows: building tours, meal or lounge packages, parking, ticket upgrades. Sports are left out too. */
 const NOT_A_SHOW = /visites? guid|guided tour|\brepas\b|restaurant|salon des|lounge|parking|stationnement|surclassement|upgrade|forfait|package|gift card|carte-cadeau/i;
 function isShow(e: any) {
   const type = e.classifications?.map((c: any) => `${c.type?.name ?? ""} ${c.subType?.name ?? ""}`).join(" ") ?? "";
-  return !NOT_A_SHOW.test(e.name ?? "") && !/upsell|parking|add-on|merchandise/i.test(type);
+  const sports = e.classifications?.some((c: any) => c.segment?.name === "Sports");
+  return !sports && !NOT_A_SHOW.test(e.name ?? "") && !/upsell|parking|add-on|merchandise/i.test(type);
 }
 
-const CITY_FIX: Record<string, string> = { montreal: "Montréal", quebec: "Québec", "quebec city": "Québec", "trois-rivieres": "Trois-Rivières", levis: "Lévis" };
+const CITY_FIX: Record<string, string> = { montreal: "Montréal", quebec: "Québec", "quebec city": "Québec", "trois-rivieres": "Trois-Rivières", "trois rivieres": "Trois-Rivières", "trois-rivières": "Trois-Rivières", levis: "Lévis" };
 /** "GATINEAU" → "Gatineau", "Montreal" → "Montréal". */
 function cityName(raw?: string) {
   if (!raw) return "";

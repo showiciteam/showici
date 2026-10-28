@@ -79,7 +79,7 @@ export const bigEvents: BigEvent[] = [
   { id: "b1", category: "Concert", name: "[Headliner] world tour", venue: "[Arena name]", day: "FRI", date: "16", time: "8:00 pm", price: "From [$price]", tone: "ph-1", url: "#" },
   { id: "b2", category: "Comedy", name: "[Comedian] live", venue: "[Theatre name]", day: "SAT", date: "17", time: "7:30 pm", price: "From [$price]", tone: "ph-2", url: "#" },
   { id: "b3", category: "Theatre", name: "[Touring musical]", venue: "[Theatre name]", day: "TUE", date: "20", time: "7:00 pm", price: "From [$price]", tone: "ph-3", url: "#" },
-  { id: "b4", category: "Sports", name: "[Home team] vs [Away team]", venue: "[Arena name]", day: "THU", date: "22", time: "7:00 pm", price: "From [$price]", tone: "ph-4", url: "#" },
+  { id: "b4", category: "Comedy", name: "[Comedy festival gala]", venue: "[Theatre name]", day: "THU", date: "22", time: "7:00 pm", price: "From [$price]", tone: "ph-4", url: "#" },
   { id: "b5", category: "Concert", name: "[Band] with special guests", venue: "[Concert hall]", day: "SAT", date: "24", time: "8:30 pm", price: "From [$price]", tone: "ph-5", url: "#" },
   { id: "b6", category: "Family", name: "[Family show]", venue: "[Venue name]", day: "SUN", date: "25", time: "2:00 pm", price: "From [$price]", tone: "ph-1", url: "#" },
   { id: "b7", category: "Festival", name: "[Winter festival]", venue: "[Park name]", day: "FRI", date: "30", time: "All weekend", price: "From [$price]", tone: "ph-2", url: "#" },

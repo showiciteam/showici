@@ -6,7 +6,7 @@ import { Chip } from "@/components/ui";
 import { ALL_QUEBEC, REGIONS, distanceKm } from "@/lib/regions";
 import type { BigEvent } from "@/lib/types";
 
-const CATEGORIES = ["All", "Concert", "Festival", "Comedy", "Theatre", "Family", "Sports"];
+const CATEGORIES = ["All", "Concert", "Festival", "Comedy", "Theatre", "Family"];
 const LABEL: Record<string, string> = { Concert: "Concerts", Festival: "Festivals" };
 const WHEN = [
   { key: "all", label: "Any date" },

@@ -279,7 +279,7 @@ export async function getReviewsFor(profileId?: string): Promise<Review[]> {
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
 /**
- * Big events (concerts, comedy, sports…) sold on Ticketmaster in Québec.
+ * Big events (concerts, comedy, theatre, festivals; no sports) sold on Ticketmaster in Québec.
  * Without a TICKETMASTER_API_KEY the site shows the sample cards from mock.ts.
  */
 export async function getBigEvents(): Promise<BigEvent[]> {
