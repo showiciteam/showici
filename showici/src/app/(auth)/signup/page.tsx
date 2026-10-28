@@ -73,8 +73,7 @@ export default function SignupPage() {
       <form onSubmit={submit} className="card flex w-full max-w-[580px] flex-col gap-[22px] px-8 py-9">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h1 className="h-display mb-1.5 text-[32px]">Create your free account</h1>
-            <p className="text-slate">Free during launch. No commission on bookings.</p>
+            <h1 className="h-display text-[32px]">Create your free account</h1>
           </div>
           <div className="rounded-full bg-navy p-1"><LangToggle /></div>
         </div>
