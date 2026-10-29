@@ -99,7 +99,6 @@ export default async function Home() {
                 </a>
               ))}
             </div>
-            <span className="text-xs text-[#9AA3B8]">ShowIci may earn a commission on ticket sales. It never changes your price.</span>
           </div>
         </section>
       )}
