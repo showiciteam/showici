@@ -1,15 +1,19 @@
 /**
  * ShowIci covers the province of Québec, with Greater Montréal as the main landing area.
  * Each region has a centre point (used to sort results and move the map). Regions around Montréal,
- * the Outaouais, Estrie, Centre-du-Québec and Saguenay–Lac-Saint-Jean also list their towns, so a venue
- * in Terrebonne shows up under Lanaudière, one in Maniwaki under the Outaouais even though it's far
- * from Gatineau, and visitors can drill down to a single town. Towns not listed fall back to distance.
+ * the Outaouais, Estrie, Centre-du-Québec, Saguenay–Lac-Saint-Jean, Abitibi-Témiscamingue, Bas-Saint-Laurent
+ * and Gaspésie, and the Côte-Nord also list their towns, so a venue in Terrebonne shows up under Lanaudière,
+ * one in Maniwaki under the Outaouais even though it's far from Gatineau, and visitors can drill down to a
+ * single town. Towns not listed fall back to distance.
  * Keys are used in URLs (?region=montreal&area=laval), so don't rename them.
  */
 export type Region = { key: string; en: string; fr: string; lat: number; lng: number; zoom: number; radiusKm: number };
 
 /** Official administrative region a city belongs to (shown next to the city name). */
-type Admin = "montreal" | "laval" | "monteregie" | "lanaudiere" | "laurentides" | "gatineau" | "sherbrooke" | "drummondville" | "saguenay";
+type Admin = "montreal" | "laval" | "monteregie" | "lanaudiere" | "laurentides" | "gatineau" | "sherbrooke" | "drummondville" | "saguenay" | "rouyn-noranda" | "rimouski" | "gaspesie" | "cote-nord";
+/** The filter region an administrative region is listed under (same key unless noted). */
+const REGION_OF: Partial<Record<Admin, string>> = { gaspesie: "rimouski" };
+const regionOf = (admin: Admin) => REGION_OF[admin] ?? admin;
 /** Part of Greater Montréal, used to group the drill-down list. Cities outside Greater Montréal have none. */
 export type Group = "island" | "laval" | "south" | "north";
 
@@ -29,6 +33,7 @@ export const REGIONS: Region[] = [
   { key: "laurentides", en: "Laurentides", fr: "Laurentides", lat: 45.8, lng: -74.0, zoom: 9, radiusKm: 60 },
   { key: "lanaudiere", en: "Lanaudière", fr: "Lanaudière", lat: 45.85, lng: -73.5, zoom: 9, radiusKm: 50 },
   { key: "saguenay", en: "Saguenay–Lac-Saint-Jean", fr: "Saguenay–Lac-Saint-Jean", lat: 48.4284, lng: -71.0685, zoom: 9, radiusKm: 100 },
+  { key: "cote-nord", en: "Côte-Nord", fr: "Côte-Nord", lat: 49.4, lng: -67.0, zoom: 7, radiusKm: 250 },
   { key: "rimouski", en: "Bas-Saint-Laurent and Gaspésie", fr: "Bas-Saint-Laurent et Gaspésie", lat: 48.4489, lng: -68.5236, zoom: 8, radiusKm: 200 },
   { key: "rouyn-noranda", en: "Abitibi-Témiscamingue", fr: "Abitibi-Témiscamingue", lat: 48.2366, lng: -79.0231, zoom: 8, radiusKm: 150 },
   { key: ALL_QUEBEC, en: "All of Québec", fr: "Tout le Québec", lat: 47.3, lng: -72.5, zoom: 6, radiusKm: 2000 },
@@ -44,6 +49,10 @@ export const ADMIN_LABEL: Record<Admin, { en: string; fr: string }> = {
   sherbrooke: { en: "Estrie", fr: "Estrie" },
   drummondville: { en: "Centre-du-Québec", fr: "Centre-du-Québec" },
   saguenay: { en: "Saguenay–Lac-Saint-Jean", fr: "Saguenay–Lac-Saint-Jean" },
+  "rouyn-noranda": { en: "Abitibi-Témiscamingue", fr: "Abitibi-Témiscamingue" },
+  rimouski: { en: "Bas-Saint-Laurent", fr: "Bas-Saint-Laurent" },
+  gaspesie: { en: "Gaspésie–Îles-de-la-Madeleine", fr: "Gaspésie–Îles-de-la-Madeleine" },
+  "cote-nord": { en: "Côte-Nord", fr: "Côte-Nord" },
 };
 
 export const GROUP_LABEL: Record<Group, { en: string; fr: string }> = {
@@ -139,6 +148,55 @@ export const CITIES: City[] = [
   c("saint-gedeon", "Saint-Gédéon", 48.5, -71.7667, "saguenay", undefined, undefined, 13),
   c("saint-fulgence", "Saint-Fulgence", 48.45, -70.9, "saguenay", undefined, undefined, 13),
   c("lanse-saint-jean", "L'Anse-Saint-Jean", 48.2333, -70.2, "saguenay", undefined, undefined, 13),
+  // Abitibi-Témiscamingue (region "rouyn-noranda")
+  c("rouyn-noranda", "Rouyn-Noranda", 48.2366, -79.0231, "rouyn-noranda", undefined, ["Noranda", "Évain", "Cadillac"], 12),
+  c("val-dor", "Val-d'Or", 48.0975, -77.7828, "rouyn-noranda", undefined, undefined, 12),
+  c("amos", "Amos", 48.5667, -78.1167, "rouyn-noranda", undefined, undefined, 12),
+  c("la-sarre", "La Sarre", 48.8, -79.2, "rouyn-noranda", undefined, undefined, 13),
+  c("ville-marie", "Ville-Marie", 47.3333, -79.4333, "rouyn-noranda", undefined, undefined, 13),
+  c("temiscaming", "Témiscaming", 46.7167, -79.1, "rouyn-noranda", undefined, undefined, 13),
+  c("malartic", "Malartic", 48.1333, -78.1333, "rouyn-noranda", undefined, undefined, 13),
+  c("senneterre", "Senneterre", 48.3833, -77.2333, "rouyn-noranda", undefined, undefined, 13),
+  c("macamic", "Macamic", 48.75, -79.0, "rouyn-noranda", undefined, undefined, 13),
+  // Bas-Saint-Laurent (region "rimouski")
+  c("rimouski", "Rimouski", 48.4489, -68.5236, "rimouski", undefined, ["Le Bic", "Bic", "Pointe-au-Père", "Sainte-Blandine"], 12),
+  c("riviere-du-loup", "Rivière-du-Loup", 47.8333, -69.5333, "rimouski", undefined, undefined, 12),
+  c("matane", "Matane", 48.85, -67.5333, "rimouski", undefined, undefined, 12),
+  c("amqui", "Amqui", 48.4667, -67.4333, "rimouski", undefined, undefined, 13),
+  c("mont-joli", "Mont-Joli", 48.5833, -68.1833, "rimouski", undefined, undefined, 13),
+  c("trois-pistoles", "Trois-Pistoles", 48.1167, -69.1833, "rimouski", undefined, undefined, 13),
+  c("la-pocatiere", "La Pocatière", 47.3667, -70.0333, "rimouski", undefined, undefined, 13),
+  c("kamouraska", "Kamouraska", 47.5667, -69.8667, "rimouski", undefined, undefined, 13),
+  c("saint-andre-de-kamouraska", "Saint-André-de-Kamouraska", 47.6667, -69.7333, "rimouski", undefined, undefined, 13),
+  c("saint-pascal", "Saint-Pascal", 47.5333, -69.8, "rimouski", undefined, undefined, 13),
+  c("cacouna", "Cacouna", 47.9167, -69.5, "rimouski", undefined, undefined, 13),
+  c("temiscouata-sur-le-lac", "Témiscouata-sur-le-Lac", 47.6833, -68.8833, "rimouski", undefined, ["Cabano", "Notre-Dame-du-Lac"], 13),
+  c("sainte-flavie", "Sainte-Flavie", 48.6, -68.2333, "rimouski", undefined, undefined, 13),
+  c("causapscal", "Causapscal", 48.3667, -67.2333, "rimouski", undefined, undefined, 13),
+  // Gaspésie–Îles-de-la-Madeleine (listed under the "rimouski" region)
+  c("gaspe", "Gaspé", 48.8333, -64.4833, "gaspesie", undefined, undefined, 12),
+  c("perce", "Percé", 48.5244, -64.2133, "gaspesie", undefined, ["L'Anse-à-Beaufils"], 13),
+  c("carleton-sur-mer", "Carleton-sur-Mer", 48.1, -66.1333, "gaspesie", undefined, ["Carleton"], 13),
+  c("maria", "Maria", 48.1667, -65.9833, "gaspesie", undefined, undefined, 13),
+  c("new-richmond", "New Richmond", 48.1667, -65.8667, "gaspesie", undefined, undefined, 13),
+  c("bonaventure", "Bonaventure", 48.05, -65.4833, "gaspesie", undefined, undefined, 13),
+  c("paspebiac", "Paspébiac", 48.0333, -65.25, "gaspesie", undefined, undefined, 13),
+  c("chandler", "Chandler", 48.35, -64.6833, "gaspesie", undefined, undefined, 13),
+  c("grande-riviere", "Grande-Rivière", 48.4, -64.5, "gaspesie", undefined, undefined, 13),
+  c("sainte-anne-des-monts", "Sainte-Anne-des-Monts", 49.1333, -66.4833, "gaspesie", undefined, undefined, 13),
+  c("cap-chat", "Cap-Chat", 49.1, -66.6833, "gaspesie", undefined, undefined, 13),
+  c("iles-de-la-madeleine", "Les Îles-de-la-Madeleine", 47.3833, -61.85, "gaspesie", undefined, ["Îles-de-la-Madeleine", "Cap-aux-Meules", "Havre-Aubert", "L'Étang-du-Nord", "Grande-Entrée"], 11),
+  // Côte-Nord (region "cote-nord")
+  c("baie-comeau", "Baie-Comeau", 49.2167, -68.15, "cote-nord", undefined, ["Hauterive"], 12),
+  c("sept-iles", "Sept-Îles", 50.2167, -66.3833, "cote-nord", undefined, undefined, 12),
+  c("port-cartier", "Port-Cartier", 50.0333, -66.8667, "cote-nord", undefined, undefined, 13),
+  c("tadoussac", "Tadoussac", 48.1444, -69.7167, "cote-nord", undefined, undefined, 14),
+  c("les-bergeronnes", "Les Bergeronnes", 48.25, -69.55, "cote-nord", undefined, ["Bergeronnes"], 13),
+  c("les-escoumins", "Les Escoumins", 48.35, -69.4, "cote-nord", undefined, ["Escoumins"], 13),
+  c("forestville", "Forestville", 48.7333, -69.0833, "cote-nord", undefined, undefined, 13),
+  c("havre-saint-pierre", "Havre-Saint-Pierre", 50.2333, -63.6, "cote-nord", undefined, undefined, 13),
+  c("natashquan", "Natashquan", 50.1833, -61.8167, "cote-nord", undefined, undefined, 13),
+  c("fermont", "Fermont", 52.7833, -67.0833, "cote-nord", undefined, undefined, 13),
 ];
 
 const norm = (s: string) =>
@@ -159,7 +217,7 @@ export function regionFor(key?: string | null): Region {
 /** Cities a visitor can drill down to inside a region (Greater Montréal: grouped by shore). Empty for other regions. */
 export function citiesIn(region: Region): City[] {
   if (region.key === DEFAULT_REGION) return CITIES.filter((x) => x.group);
-  return CITIES.filter((x) => x.admin === region.key);
+  return CITIES.filter((x) => regionOf(x.admin) === region.key);
 }
 
 export function cityFor(region: Region, key?: string | null): City | null {
@@ -192,7 +250,7 @@ export function inArea(region: Region, city: City | null, radius: number, x: { c
   if (region.key === ALL_QUEBEC) return true;
   const known = cityOf(x.city);
   if (city) return known ? known.key === city.key : kmFrom(city, x) <= 5;
-  if (known && hasCityList(region)) return region.key === DEFAULT_REGION ? Boolean(known.group) : known.admin === region.key;
+  if (known && hasCityList(region)) return region.key === DEFAULT_REGION ? Boolean(known.group) : regionOf(known.admin) === region.key;
   if (known) return false; // a city we know around Montréal is never in, say, Québec City
   return kmFrom(region, x) <= (hasCityList(region) ? region.radiusKm : radius);
 }
