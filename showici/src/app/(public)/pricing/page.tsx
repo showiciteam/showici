@@ -1,29 +1,8 @@
-import { PricingView } from "./PricingView";
+import { redirect } from "next/navigation";
 
-const TITLE = "Pricing · Prix · ShowIci";
-const DESCRIPTION = "ShowIci is free during its launch across Québec: every feature, unlimited contacts and zero commission for venues, performers and event planners.";
-const SHARE_TITLE = "ShowIci is free: no fees, no commission";
-// Setting openGraph here replaces the site-wide one, so the share picture is listed again.
-const IMAGE = { url: "/opengraph-image", width: 1200, height: 630, alt: "ShowIci · Book local talent for every stage" };
-const SHARE_DESCRIPTION = "Venues, performers and event planners across Québec use every ShowIci feature for free during the launch. Unlimited contacts, zero commission.";
-
-export const metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
-  // What Facebook, WhatsApp, LinkedIn, iMessage and X show when this page is shared.
-  openGraph: {
-    type: "website",
-    siteName: "ShowIci",
-    url: "/pricing",
-    title: SHARE_TITLE,
-    description: SHARE_DESCRIPTION,
-    locale: "en_CA",
-    alternateLocale: ["fr_CA"],
-    images: [IMAGE],
-  },
-  twitter: { card: "summary_large_image", title: SHARE_TITLE, description: SHARE_DESCRIPTION, images: [IMAGE] },
-};
-
+// The pricing page is off for now: links to /pricing go to the home page instead (a temporary redirect).
+// The page itself is kept in PricingView.tsx; to bring it back, render <PricingView /> here again
+// and re-add the footer link (components/Footer.tsx) and the sitemap entry (app/sitemap.ts).
 export default function PricingPage() {
-  return <PricingView />;
+  redirect("/");
 }

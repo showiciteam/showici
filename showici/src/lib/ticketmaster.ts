@@ -4,8 +4,6 @@ import type { BigEvent, Tone } from "./types";
  * Upcoming Ticketmaster events in Québec, from the free Discovery API (developer.ticketmaster.com).
  * Needs TICKETMASTER_API_KEY in the environment. Results are cached for an hour, so the site makes
  * a handful of calls per hour at most, far under the default 5,000 calls/day quota.
- * Once ShowIci's Impact publisher ID is added to the Ticketmaster developer account, the event
- * URLs returned here already carry the affiliate tracking.
  */
 const API = "https://app.ticketmaster.com/discovery/v2/events.json";
 const PAGE_SIZE = 200; // the API's maximum; it never returns past the 1,000th result (size × page < 1000)

@@ -23,7 +23,6 @@ export function Footer() {
         <div className="flex flex-wrap gap-5">
           <Link href="/spotlight" className="text-muted">Spotlight Time</Link>
           <Link href="/news" className="text-muted">{t("nav.news")}</Link>
-          <Link href="/pricing" className="text-muted">Pricing</Link>
           <Link href="/about" className="text-muted">{t("footer.about")}</Link>
           <ContactButton label={t("footer.contact")} className="text-muted hover:text-navy hover:underline" />
           <Link href="/terms" className="text-muted">{t("footer.terms")}</Link>

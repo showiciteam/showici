@@ -14,7 +14,6 @@ const PUBLIC_PAGES: { path: string; priority: number; changeFrequency: "daily" |
   { path: "/spotlight", priority: 0.6, changeFrequency: "weekly" },
   { path: "/news", priority: 0.5, changeFrequency: "weekly" },
   { path: "/about", priority: 0.6, changeFrequency: "monthly" },
-  { path: "/pricing", priority: 0.5, changeFrequency: "monthly" },
   { path: "/terms", priority: 0.2, changeFrequency: "monthly" },
   { path: "/privacy", priority: 0.2, changeFrequency: "monthly" },
 ];
