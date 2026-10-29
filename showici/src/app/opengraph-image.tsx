@@ -8,7 +8,7 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 const NAVY = "#14213D";
-const BRASS = "#D9A441";
+const BRASS = "#A485FF";
 const WARM_WHITE = "#FBF8F2";
 
 /** Loads one Google Font weight as TTF so the preview matches the site's headings. */

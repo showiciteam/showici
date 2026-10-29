@@ -85,7 +85,7 @@ export function VideoEditor({ videos, onChange, intro, previewLabel, titlePlaceh
             )}
           </>
         ) : (
-          <div className="flex aspect-[16/7] items-center justify-center gap-3 rounded-xl bg-navy text-white"><PlayIcon color="#D9A441" /> Add a video to see the preview</div>
+          <div className="flex aspect-[16/7] items-center justify-center gap-3 rounded-xl bg-navy text-white"><PlayIcon color="#A485FF" /> Add a video to see the preview</div>
         )}
       </div>
     </>

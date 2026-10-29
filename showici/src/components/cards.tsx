@@ -47,7 +47,7 @@ export function PerformerRow({ p }: { p: Performer }) {
   return (
     <article className="card flex flex-wrap items-center gap-5 p-5">
       <Link href={`/performers/${p.id}`} aria-label={`${p.name} videos`} className="flex h-[100px] w-[168px] flex-none items-center justify-center rounded-xl bg-navy">
-        <PlayIcon size={34} color="#D9A441" />
+        <PlayIcon size={34} color="#A485FF" />
       </Link>
       <div className="flex flex-[1_1_240px] flex-col gap-1.5">
         <span className="flex items-center gap-2">

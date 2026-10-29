@@ -6,10 +6,10 @@ import Link from "next/link";
  * "light" is for navy backgrounds (header, admin sidebar); "color" is the
  * original artwork for light backgrounds (auth pages, emails, print).
  */
-export function Logo({ variant, dark = true, height = 40, href = "/", className = "" }: { variant?: "light" | "color"; dark?: boolean; height?: number; href?: string | null; className?: string } & Record<string, unknown>) {
+export function Logo({ variant, dark = true, height = 58, href = "/", className = "" }: { variant?: "light" | "color"; dark?: boolean; height?: number; href?: string | null; className?: string } & Record<string, unknown>) {
   // `dark` is the older prop: true = sitting on a navy background.
   variant ??= dark ? "light" : "color";
-  const width = Math.round((height * 640) / 210);
+  const width = Math.round((height * 963) / 365);
   const img = (
     <Image
       src={variant === "light" ? "/logo-light.png" : "/logo.png"}

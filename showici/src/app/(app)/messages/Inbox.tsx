@@ -248,7 +248,7 @@ export function Inbox({ live, meId, threads, activeId, messages: initial, starte
             {[["Started", "Oct 5"], ["Their fee", "$300 – $600"], ["Travels", "Up to 50 km"]].map(([k, v]) => (
               <div key={k} className="flex justify-between text-sm"><span className="text-muted">{k}</span><span>{v}</span></div>
             ))}
-            <div className="flex aspect-video items-center justify-center rounded-[10px] bg-navy"><PlayIcon color="#D9A441" /></div>
+            <div className="flex aspect-video items-center justify-center rounded-[10px] bg-navy"><PlayIcon color="#A485FF" /></div>
             <span className="hint">Their featured video</span>
           </>
         )}

@@ -5,9 +5,9 @@
   --color-navy-deep: #0B1426;
   --color-navy-soft: #2B3A5C;
   --color-navy-line: #5B6787;
-  --color-brass: #D9A441;
-  --color-brass-dark: #8A6417;
-  --color-brass-tint: #F3E7CC;
+  --color-brass: #A485FF; /* "brass" tokens now hold the purple from the logo (names kept so classes don't change) */
+  --color-brass-dark: #6D3CE8;
+  --color-brass-tint: #EEE8FF;
   --color-ivory: #FAF8F4;
   --color-parchment: #F4F1EA;
   --color-line: #E6E1D6;
@@ -17,7 +17,7 @@
   --color-muted: #5F6677;
   --color-on-navy: #C9CFDC;
   --color-ph-1: #DCE1EA;
-  --color-ph-2: #EADFC8;
+  --color-ph-2: #E6E0F5;
   --color-ph-3: #CCD6E6;
   --color-ph-4: #DDE3D6;
   --color-ph-5: #E3DDE6;

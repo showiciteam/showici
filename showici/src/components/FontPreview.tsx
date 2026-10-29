@@ -45,7 +45,7 @@ export function FontPreview() {
       <div style={{ position: "fixed", left: 12, bottom: 12, zIndex: 1000, display: "flex", flexWrap: "wrap", alignItems: "center", gap: 6, background: "#14213D", color: "#fff", padding: "8px 10px", borderRadius: 12, boxShadow: "0 6px 20px rgba(0,0,0,.25)", font: "600 13px system-ui, sans-serif", maxWidth: "calc(100vw - 24px)" }}>
         <span style={{ marginRight: 4 }}>Font preview: {o.name}</span>
         {Object.keys(OPTIONS).map((k) => (
-          <button key={k} type="button" onClick={() => go(k)} style={{ font: "700 13px system-ui, sans-serif", width: 28, height: 28, borderRadius: 8, border: 0, cursor: "pointer", background: k === key ? "#D9A441" : "rgba(255,255,255,.12)", color: k === key ? "#14213D" : "#fff" }}>
+          <button key={k} type="button" onClick={() => go(k)} style={{ font: "700 13px system-ui, sans-serif", width: 28, height: 28, borderRadius: 8, border: 0, cursor: "pointer", background: k === key ? "#A485FF" : "rgba(255,255,255,.12)", color: k === key ? "#14213D" : "#fff" }}>
             {k.toUpperCase()}
           </button>
         ))}

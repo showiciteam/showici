@@ -30,7 +30,7 @@ function Overlay({ onClose, label, children }: { onClose: () => void; label: str
 function PlayBadge({ big }: { big?: boolean }) {
   return (
     <span className={`flex items-center justify-center rounded-full bg-[rgba(20,33,61,0.85)] shadow-lg ring-2 ring-white/70 transition group-hover:scale-105 group-hover:bg-navy ${big ? "h-[72px] w-[72px]" : "h-12 w-12"}`}>
-      <svg viewBox="0 0 24 24" className={big ? "ml-1 h-8 w-8" : "ml-0.5 h-5 w-5"} fill="#D9A441" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
+      <svg viewBox="0 0 24 24" className={big ? "ml-1 h-8 w-8" : "ml-0.5 h-5 w-5"} fill="#A485FF" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
     </span>
   );
 }

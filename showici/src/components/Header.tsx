@@ -107,6 +107,7 @@ export function Header({ user }: { user?: { name: string; home: string } | null 
           </div>
         </div>
       </nav>
+      <div aria-hidden="true" className="h-[3px] bg-[linear-gradient(90deg,#1FD8F5_0%,#8A4DFF_50%,#F23FD2_100%)]" />
     </header>
   );
 }
@@ -159,6 +160,7 @@ export function AppHeader({ role, name, live = false }: { role: AppRole; name: s
         </span>
         {live && <LogoutButton />}
       </nav>
+      <div aria-hidden="true" className="h-[3px] bg-[linear-gradient(90deg,#1FD8F5_0%,#8A4DFF_50%,#F23FD2_100%)]" />
     </header>
   );
 }

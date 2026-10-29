@@ -79,7 +79,7 @@ export default async function VenueProfile({ params }: { params: Promise<{ id: s
       </div>
 
       {unclaimed && (
-        <div className="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-[18px] border border-[#E2C98F] bg-brass-tint px-5 py-4">
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-[18px] border border-[#CDBDFF] bg-brass-tint px-5 py-4">
           <div className="flex max-w-[680px] flex-col gap-1">
             <strong className="text-[17px]">Is this your venue?</strong>
             <span className="text-ink-2">We listed {v.name} from public information so local artists can find it. Claim it to add photos, post your shows, fix any details and get messages from artists. It&apos;s free.</span>

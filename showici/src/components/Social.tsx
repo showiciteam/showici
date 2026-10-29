@@ -117,7 +117,7 @@ export function FollowCard({ context, className = "" }: { context: Context; clas
   const { lang } = useLang();
   const t = CARD[context][lang];
   return (
-    <div className={`flex flex-wrap items-center justify-between gap-4 rounded-[18px] border border-[#E2C98F] bg-brass-tint px-5 py-4 ${className}`}>
+    <div className={`flex flex-wrap items-center justify-between gap-4 rounded-[18px] border border-[#CDBDFF] bg-brass-tint px-5 py-4 ${className}`}>
       <div className="flex max-w-[560px] flex-col gap-1">
         <strong className="text-[17px] text-navy">{t.title}</strong>
         <span className="text-[15px] text-ink-2">{t.text}</span>

@@ -54,7 +54,7 @@ export default async function Home() {
         <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-4">
           {roles.map((r) => (
             <Link key={r.href} href={r.href} className="flex flex-col gap-2.5 rounded-[18px] border border-line bg-parchment p-7 text-navy no-underline hover:text-navy hover:shadow-md">
-              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#8A6417" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{r.icon}</svg>
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#6D3CE8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{r.icon}</svg>
               <span className="h-display text-2xl">{r.title}</span>
               <span className="leading-normal text-slate">{r.text}</span>
               <span className="mt-1.5 font-bold text-navy">{r.cta}</span>

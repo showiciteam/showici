@@ -55,8 +55,8 @@ function spread(id: string, [lat, lng]: [number, number]): [number, number] {
   return [lat + Math.sin(angle) * r, lng + Math.cos(angle) * r * 1.4];
 }
 
-const VENUE_ICON = `<span style="display:flex;width:34px;height:34px;align-items:center;justify-content:center;border-radius:10px;border:2px solid #fff;background:#14213D;box-shadow:0 2px 6px rgba(0,0,0,.3)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D9A441" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V9l9-5 9 5v12"/><path d="M9 21v-6h6v6"/></svg></span>`;
-const PERFORMER_ICON = `<span style="display:flex;width:30px;height:30px;align-items:center;justify-content:center;border-radius:999px;border:2px solid #fff;background:#D9A441;box-shadow:0 2px 6px rgba(0,0,0,.3)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#14213D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg></span>`;
+const VENUE_ICON = `<span style="display:flex;width:34px;height:34px;align-items:center;justify-content:center;border-radius:10px;border:2px solid #fff;background:#14213D;box-shadow:0 2px 6px rgba(0,0,0,.3)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A485FF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V9l9-5 9 5v12"/><path d="M9 21v-6h6v6"/></svg></span>`;
+const PERFORMER_ICON = `<span style="display:flex;width:30px;height:30px;align-items:center;justify-content:center;border-radius:999px;border:2px solid #fff;background:#A485FF;box-shadow:0 2px 6px rgba(0,0,0,.3)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#14213D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg></span>`;
 
 export function HomeMap({ venues, performers }: { venues: Venue[]; performers: Performer[] }) {
   const [filter, setFilter] = useState<Filter>("all");

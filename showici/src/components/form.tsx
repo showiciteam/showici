@@ -48,7 +48,7 @@ export function Dropzone({ files, onFiles, hint }: { files: File[]; onFiles: (f:
           onFiles([...files, ...Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith("image/"))].slice(0, 12));
         }}
       >
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#8A6417" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 16V4" /><path d="M7 9l5-5 5 5" /><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" /></svg>
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6D3CE8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 16V4" /><path d="M7 9l5-5 5 5" /><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" /></svg>
         <span className="text-[17px] font-bold">Drag photos here, or <span className="text-brass-dark underline">browse your files</span></span>
         <span className="hint">{hint}</span>
         <input

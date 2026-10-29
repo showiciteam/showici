@@ -63,7 +63,7 @@ export default async function VenueDashboard() {
             <div className="grid grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-2.5">
               {nights.map(([day, act]) =>
                 act ? (
-                  <Link key={day} href="/shows" className="flex min-h-[92px] flex-col gap-1 rounded-xl border border-[#E2C98F] bg-brass-tint p-3 text-navy no-underline"><span className="hint font-bold">{day}</span><strong className="text-sm">{act}</strong></Link>
+                  <Link key={day} href="/shows" className="flex min-h-[92px] flex-col gap-1 rounded-xl border border-[#CDBDFF] bg-brass-tint p-3 text-navy no-underline"><span className="hint font-bold">{day}</span><strong className="text-sm">{act}</strong></Link>
                 ) : (
                   <Link key={day} href="/performers" className="flex min-h-[92px] flex-col gap-1 rounded-xl border-2 border-dashed border-line-strong p-3 text-muted no-underline"><span className="text-[13px] font-bold">{day}</span><span className="text-sm font-bold text-brass-dark">+ Book an act</span></Link>
                 )

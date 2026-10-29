@@ -112,7 +112,7 @@ export default function RegisterVenue() {
       <h1 className="h-display text-[44px]">{existingId ? "Update your venue" : "List your venue"}</h1>
       <p className="mb-8 mt-2.5 max-w-[720px] text-lg text-slate">Tell performers what your space is like and what you book. Your upcoming shows also appear on ShowIci&apos;s public listings.</p>
       {!existingId && (
-        <p className="-mt-4 mb-8 max-w-[720px] rounded-xl border border-[#E2C98F] bg-brass-tint px-4 py-3 text-[15px] text-ink-2">
+        <p className="-mt-4 mb-8 max-w-[720px] rounded-xl border border-[#CDBDFF] bg-brass-tint px-4 py-3 text-[15px] text-ink-2">
           Is your venue already on ShowIci? Find it under <Link href="/venues?region=all" className="font-bold">Venues</Link> and click <strong>Claim this venue</strong> instead of creating a new page.
         </p>
       )}
