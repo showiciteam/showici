@@ -2,7 +2,7 @@
  * ShowIci covers the province of Québec, with Greater Montréal as the main landing area.
  * Each region has a centre point (used to sort results and move the map). Regions around Montréal,
  * the Outaouais, Estrie, Centre-du-Québec, Saguenay–Lac-Saint-Jean, Abitibi-Témiscamingue, Bas-Saint-Laurent
- * and Gaspésie, and the Côte-Nord also list their towns, so a venue in Terrebonne shows up under Lanaudière,
+ * and Gaspésie, the Côte-Nord, Québec City/Charlevoix and the Beauce also list their towns, so a venue in Terrebonne shows up under Lanaudière,
  * one in Maniwaki under the Outaouais even though it's far from Gatineau, and visitors can drill down to a
  * single town. Towns not listed fall back to distance.
  * Keys are used in URLs (?region=montreal&area=laval), so don't rename them.
@@ -10,9 +10,9 @@
 export type Region = { key: string; en: string; fr: string; lat: number; lng: number; zoom: number; radiusKm: number };
 
 /** Official administrative region a city belongs to (shown next to the city name). */
-type Admin = "montreal" | "laval" | "monteregie" | "lanaudiere" | "laurentides" | "gatineau" | "sherbrooke" | "drummondville" | "saguenay" | "rouyn-noranda" | "rimouski" | "gaspesie" | "cote-nord";
+type Admin = "montreal" | "laval" | "monteregie" | "lanaudiere" | "laurentides" | "gatineau" | "sherbrooke" | "drummondville" | "saguenay" | "rouyn-noranda" | "rimouski" | "gaspesie" | "cote-nord" | "quebec" | "charlevoix" | "levis" | "beauce";
 /** The filter region an administrative region is listed under (same key unless noted). */
-const REGION_OF: Partial<Record<Admin, string>> = { gaspesie: "rimouski" };
+const REGION_OF: Partial<Record<Admin, string>> = { gaspesie: "rimouski", charlevoix: "quebec", levis: "quebec" };
 const regionOf = (admin: Admin) => REGION_OF[admin] ?? admin;
 /** Part of Greater Montréal, used to group the drill-down list. Cities outside Greater Montréal have none. */
 export type Group = "island" | "laval" | "south" | "north";
@@ -24,7 +24,8 @@ export const DEFAULT_REGION = "montreal";
 
 export const REGIONS: Region[] = [
   { key: "montreal", en: "Greater Montréal", fr: "Grand Montréal", lat: 45.5019, lng: -73.5674, zoom: 10, radiusKm: 50 },
-  { key: "quebec", en: "Québec City", fr: "Ville de Québec", lat: 46.8139, lng: -71.208, zoom: 10, radiusKm: 50 },
+  { key: "quebec", en: "Québec City, Lévis and Charlevoix", fr: "Québec, Lévis et Charlevoix", lat: 46.8139, lng: -71.208, zoom: 9, radiusKm: 60 },
+  { key: "beauce", en: "Beauce and Chaudière-Appalaches", fr: "Beauce et Chaudière-Appalaches", lat: 46.25, lng: -70.85, zoom: 9, radiusKm: 80 },
   { key: "gatineau", en: "Gatineau and Outaouais", fr: "Gatineau et Outaouais", lat: 45.4765, lng: -75.7013, zoom: 10, radiusKm: 50 },
   { key: "sherbrooke", en: "Sherbrooke and Eastern Townships", fr: "Sherbrooke et Estrie", lat: 45.4042, lng: -71.8929, zoom: 10, radiusKm: 60 },
   { key: "trois-rivieres", en: "Trois-Rivières and Mauricie", fr: "Trois-Rivières et Mauricie", lat: 46.3432, lng: -72.5477, zoom: 10, radiusKm: 60 },
@@ -53,6 +54,10 @@ export const ADMIN_LABEL: Record<Admin, { en: string; fr: string }> = {
   rimouski: { en: "Bas-Saint-Laurent", fr: "Bas-Saint-Laurent" },
   gaspesie: { en: "Gaspésie–Îles-de-la-Madeleine", fr: "Gaspésie–Îles-de-la-Madeleine" },
   "cote-nord": { en: "Côte-Nord", fr: "Côte-Nord" },
+  quebec: { en: "Capitale-Nationale", fr: "Capitale-Nationale" },
+  charlevoix: { en: "Charlevoix", fr: "Charlevoix" },
+  levis: { en: "Chaudière-Appalaches", fr: "Chaudière-Appalaches" },
+  beauce: { en: "Chaudière-Appalaches", fr: "Chaudière-Appalaches" },
 };
 
 export const GROUP_LABEL: Record<Group, { en: string; fr: string }> = {
@@ -201,7 +206,34 @@ export const CITIES: City[] = [
   c("grande-riviere", "Grande-Rivière", 48.4, -64.5, "gaspesie", undefined, undefined, 13),
   c("sainte-anne-des-monts", "Sainte-Anne-des-Monts", 49.1333, -66.4833, "gaspesie", undefined, undefined, 13),
   c("cap-chat", "Cap-Chat", 49.1, -66.6833, "gaspesie", undefined, undefined, 13),
+  c("petite-vallee", "Petite-Vallée", 49.2167, -65.0333, "gaspesie", undefined, ["Cloridorme"], 13),
   c("iles-de-la-madeleine", "Les Îles-de-la-Madeleine", 47.3833, -61.85, "gaspesie", undefined, ["Îles-de-la-Madeleine", "Cap-aux-Meules", "Havre-Aubert", "L'Étang-du-Nord", "Grande-Entrée"], 11),
+  // Québec City and area (region "quebec"; Lévis and Charlevoix are listed there too)
+  c("quebec", "Québec", 46.8139, -71.208, "quebec", undefined, ["Québec City", "Ville de Québec", "Quebec City", "Sainte-Foy", "Sillery", "Beauport", "Charlesbourg", "Limoilou", "Cap-Rouge", "Loretteville", "Val-Bélair", "Vanier"], 11),
+  c("lancienne-lorette", "L'Ancienne-Lorette", 46.7944, -71.35, "quebec", undefined, undefined, 13),
+  c("saint-augustin-de-desmaures", "Saint-Augustin-de-Desmaures", 46.7333, -71.4667, "quebec", undefined, ["Saint-Augustin"], 13),
+  c("wendake", "Wendake", 46.8667, -71.35, "quebec", undefined, undefined, 13),
+  c("stoneham", "Stoneham-et-Tewkesbury", 46.9833, -71.3833, "quebec", undefined, ["Stoneham"], 13),
+  c("ile-dorleans", "Île d'Orléans", 46.9, -71.0, "quebec", undefined, ["Île-d'Orléans", "Saint-Pierre-de-l'Île-d'Orléans", "Sainte-Pétronille", "Saint-Laurent-de-l'Île-d'Orléans", "Sainte-Famille"], 12),
+  c("donnacona", "Donnacona", 46.6833, -71.7333, "quebec", undefined, undefined, 13),
+  c("saint-raymond", "Saint-Raymond", 46.9, -71.8333, "quebec", undefined, undefined, 13),
+  c("levis", "Lévis", 46.8033, -71.1779, "levis", undefined, ["Saint-Romuald", "Saint-Nicolas", "Charny", "Saint-Jean-Chrysostome", "Pintendre", "Saint-Rédempteur"], 12),
+  c("baie-saint-paul", "Baie-Saint-Paul", 47.4419, -70.4986, "charlevoix", undefined, undefined, 13),
+  c("la-malbaie", "La Malbaie", 47.6544, -70.1528, "charlevoix", undefined, ["Pointe-au-Pic"], 13),
+  c("clermont", "Clermont", 47.6875, -70.2308, "charlevoix", undefined, undefined, 13),
+  c("saint-irenee", "Saint-Irénée", 47.5667, -70.2333, "charlevoix", undefined, undefined, 13),
+  c("les-eboulements", "Les Éboulements", 47.4833, -70.3167, "charlevoix", undefined, undefined, 13),
+  c("isle-aux-coudres", "L'Isle-aux-Coudres", 47.3833, -70.3667, "charlevoix", undefined, ["Île-aux-Coudres", "Isle-aux-Coudres"], 13),
+  c("saint-simeon", "Saint-Siméon", 47.8333, -69.8833, "charlevoix", undefined, undefined, 13),
+  c("petite-riviere-saint-francois", "Petite-Rivière-Saint-François", 47.3167, -70.5667, "charlevoix", undefined, undefined, 13),
+  // Beauce and Chaudière-Appalaches (region "beauce")
+  c("saint-georges", "Saint-Georges", 46.1167, -70.6667, "beauce", undefined, undefined, 12),
+  c("sainte-marie", "Sainte-Marie", 46.45, -71.0333, "beauce", undefined, undefined, 13),
+  c("beauceville", "Beauceville", 46.2167, -70.7833, "beauce", undefined, undefined, 13),
+  c("saint-joseph-de-beauce", "Saint-Joseph-de-Beauce", 46.3, -70.8833, "beauce", undefined, undefined, 13),
+  c("lac-etchemin", "Lac-Etchemin", 46.4, -70.5, "beauce", undefined, undefined, 13),
+  c("thetford-mines", "Thetford Mines", 46.1, -71.3, "beauce", undefined, undefined, 13),
+  c("montmagny", "Montmagny", 46.9833, -70.55, "beauce", undefined, undefined, 13),
   // Côte-Nord (region "cote-nord")
   c("baie-comeau", "Baie-Comeau", 49.2167, -68.15, "cote-nord", undefined, ["Hauterive"], 12),
   c("sept-iles", "Sept-Îles", 50.2167, -66.3833, "cote-nord", undefined, undefined, 12),
