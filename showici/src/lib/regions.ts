@@ -95,7 +95,8 @@ export const CITIES: City[] = [
   c("blainville", "Blainville", 45.6667, -73.8833, "laurentides", "north", undefined, 13),
   c("boisbriand", "Boisbriand", 45.6167, -73.8333, "laurentides", "north", undefined, 13),
   c("sainte-therese", "Sainte-Thérèse", 45.6333, -73.85, "laurentides", "north", ["Rosemère", "Lorraine", "Bois-des-Filion"], 13),
-  c("saint-eustache", "Saint-Eustache", 45.565, -73.905, "laurentides", "north", ["Deux-Montagnes"], 13),
+  c("saint-eustache", "Saint-Eustache", 45.565, -73.905, "laurentides", "north", ["Deux-Montagnes", "Sainte-Marthe-sur-le-Lac", "Saint-Joseph-du-Lac"], 13),
+  c("oka", "Oka", 45.4646, -74.0886, "laurentides", "north", ["Saint-Placide", "Pointe-Calumet"], 13),
   c("mirabel", "Mirabel", 45.65, -74.0833, "laurentides", "north", undefined, 12),
   // Same regions, outside Greater Montréal
   c("saint-jean", "Saint-Jean-sur-Richelieu", 45.3071, -73.2626, "monteregie", undefined, ["Saint-Jean"], 12),
