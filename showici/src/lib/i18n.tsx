@@ -21,6 +21,7 @@ const dict = {
     "hero.title2": "for every stage.",
     "hero.sub":
       "Bands, DJs, comedians and magicians for venues and private events. No commission.",
+    "hero.banner": "Bands, DJs, comedians and magicians. No commission.",
     "search.lookingFor": "I'm looking for",
     "search.type": "Type of act",
     "search.near": "Region",
@@ -47,6 +48,7 @@ const dict = {
     "hero.title2": "pour toutes les scènes.",
     "hero.sub":
       "Groupes, DJ, humoristes et magiciens pour les salles et les événements privés. Sans commission.",
+    "hero.banner": "Groupes, DJ, humoristes et magiciens. Sans commission.",
     "search.lookingFor": "Je cherche",
     "search.type": "Type de numéro",
     "search.near": "Région",

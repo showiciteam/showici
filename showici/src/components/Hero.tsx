@@ -21,8 +21,7 @@ export function Hero() {
 
   return (
     <section className="wrap pb-14 pt-8">
-      <h1 className="sr-only">{t("hero.title1")} {t("hero.title2")} {t("hero.sub")}</h1>
-      <div className="overflow-hidden rounded-[18px] border border-line bg-navy">
+      <div className="@container relative overflow-hidden rounded-[18px] border border-line bg-navy">
         <video
           ref={video}
           className="block aspect-[1600/840] w-full object-cover"
@@ -38,6 +37,18 @@ export function Hero() {
           <source src="/hero/hero.webm" type="video/webm" />
           <source src="/hero/hero.mp4" type="video/mp4" />
         </video>
+        {/* The banner wording sits on top of the video as text, so it follows the FR / EN switch. */}
+        <div className="absolute inset-0 flex items-center justify-center p-[3cqw]">
+          <div className="rounded-[14px] bg-black/85 px-[4cqw] py-[3cqw] text-center shadow-[0_0_60px_30px_rgba(0,0,0,0.55)]">
+            <h1 className="font-display font-extrabold uppercase leading-[1.05] tracking-[-0.01em] text-[clamp(20px,4.6cqw,76px)]">
+              <span className="block text-white">{t("hero.title1")}</span>
+              <span className="block bg-[linear-gradient(90deg,#1FD8F5_0%,#A485FF_45%,#F23FD2_100%)] bg-clip-text text-transparent">
+                {t("hero.title2")}
+              </span>
+            </h1>
+            <p className="mt-[1.6cqw] font-semibold text-white/95 text-[clamp(12px,1.7cqw,27px)]">{t("hero.banner")}</p>
+          </div>
+        </div>
       </div>
 
       <form
