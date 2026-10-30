@@ -2,7 +2,7 @@
  * ShowIci covers the province of Québec, with Greater Montréal as the main landing area.
  * Each region has a centre point (used to sort results and move the map). Regions around Montréal,
  * the Outaouais, Estrie, Centre-du-Québec, Saguenay–Lac-Saint-Jean, Abitibi-Témiscamingue, Bas-Saint-Laurent
- * and Gaspésie, the Côte-Nord, Québec City/Charlevoix and the Beauce also list their towns, so a venue in Terrebonne shows up under Lanaudière,
+ * and Gaspésie, the Côte-Nord, Nord-du-Québec, Québec City/Charlevoix and the Beauce also list their towns, so a venue in Terrebonne shows up under Lanaudière,
  * one in Maniwaki under the Outaouais even though it's far from Gatineau, and visitors can drill down to a
  * single town. Towns not listed fall back to distance.
  * Keys are used in URLs (?region=montreal&area=laval), so don't rename them.
@@ -10,7 +10,7 @@
 export type Region = { key: string; en: string; fr: string; lat: number; lng: number; zoom: number; radiusKm: number };
 
 /** Official administrative region a city belongs to (shown next to the city name). */
-type Admin = "montreal" | "laval" | "monteregie" | "lanaudiere" | "laurentides" | "gatineau" | "sherbrooke" | "drummondville" | "saguenay" | "rouyn-noranda" | "rimouski" | "gaspesie" | "cote-nord" | "quebec" | "charlevoix" | "levis" | "beauce";
+type Admin = "montreal" | "laval" | "monteregie" | "lanaudiere" | "laurentides" | "gatineau" | "sherbrooke" | "drummondville" | "saguenay" | "rouyn-noranda" | "rimouski" | "gaspesie" | "cote-nord" | "quebec" | "charlevoix" | "levis" | "beauce" | "nord-du-quebec";
 /** The filter region an administrative region is listed under (same key unless noted). */
 const REGION_OF: Partial<Record<Admin, string>> = { gaspesie: "rimouski", charlevoix: "quebec", levis: "quebec" };
 const regionOf = (admin: Admin) => REGION_OF[admin] ?? admin;
@@ -35,6 +35,7 @@ export const REGIONS: Region[] = [
   { key: "lanaudiere", en: "Lanaudière", fr: "Lanaudière", lat: 45.85, lng: -73.5, zoom: 9, radiusKm: 50 },
   { key: "saguenay", en: "Saguenay–Lac-Saint-Jean", fr: "Saguenay–Lac-Saint-Jean", lat: 48.4284, lng: -71.0685, zoom: 9, radiusKm: 100 },
   { key: "cote-nord", en: "Côte-Nord", fr: "Côte-Nord", lat: 49.4, lng: -67.0, zoom: 7, radiusKm: 250 },
+  { key: "nord-du-quebec", en: "Nord-du-Québec (Chibougamau)", fr: "Nord-du-Québec (Chibougamau)", lat: 49.8, lng: -75.8, zoom: 7, radiusKm: 300 },
   { key: "rimouski", en: "Bas-Saint-Laurent and Gaspésie", fr: "Bas-Saint-Laurent et Gaspésie", lat: 48.4489, lng: -68.5236, zoom: 8, radiusKm: 200 },
   { key: "rouyn-noranda", en: "Abitibi-Témiscamingue", fr: "Abitibi-Témiscamingue", lat: 48.2366, lng: -79.0231, zoom: 8, radiusKm: 150 },
   { key: ALL_QUEBEC, en: "All of Québec", fr: "Tout le Québec", lat: 47.3, lng: -72.5, zoom: 6, radiusKm: 2000 },
@@ -54,6 +55,7 @@ export const ADMIN_LABEL: Record<Admin, { en: string; fr: string }> = {
   rimouski: { en: "Bas-Saint-Laurent", fr: "Bas-Saint-Laurent" },
   gaspesie: { en: "Gaspésie–Îles-de-la-Madeleine", fr: "Gaspésie–Îles-de-la-Madeleine" },
   "cote-nord": { en: "Côte-Nord", fr: "Côte-Nord" },
+  "nord-du-quebec": { en: "Nord-du-Québec", fr: "Nord-du-Québec" },
   quebec: { en: "Capitale-Nationale", fr: "Capitale-Nationale" },
   charlevoix: { en: "Charlevoix", fr: "Charlevoix" },
   levis: { en: "Chaudière-Appalaches", fr: "Chaudière-Appalaches" },
@@ -247,6 +249,11 @@ export const CITIES: City[] = [
   c("havre-saint-pierre", "Havre-Saint-Pierre", 50.2333, -63.6, "cote-nord", undefined, undefined, 13),
   c("natashquan", "Natashquan", 50.1833, -61.8167, "cote-nord", undefined, undefined, 13),
   c("fermont", "Fermont", 52.7833, -67.0833, "cote-nord", undefined, undefined, 13),
+  // Nord-du-Québec / Jamésie (region "nord-du-quebec")
+  c("chibougamau", "Chibougamau", 49.9134, -74.3796, "nord-du-quebec", undefined, undefined, 12),
+  c("chapais", "Chapais", 49.7833, -74.85, "nord-du-quebec", undefined, ["Oujé-Bougoumou"], 13),
+  c("lebel-sur-quevillon", "Lebel-sur-Quévillon", 49.05, -76.9833, "nord-du-quebec", undefined, undefined, 13),
+  c("matagami", "Matagami", 49.75, -77.6333, "nord-du-quebec", undefined, undefined, 13),
 ];
 
 const norm = (s: string) =>
