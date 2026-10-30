@@ -122,6 +122,7 @@ export const CITIES: City[] = [
   c("saint-sauveur", "Saint-Sauveur", 45.8833, -74.1667, "laurentides", undefined, undefined, 13),
   c("sainte-agathe", "Sainte-Agathe-des-Monts", 46.05, -74.2833, "laurentides", undefined, undefined, 12),
   c("mont-tremblant", "Mont-Tremblant", 46.1185, -74.5962, "laurentides", undefined, undefined, 12),
+  c("mont-laurier", "Mont-Laurier", 46.5517, -75.4986, "laurentides", undefined, ["Ferme-Neuve", "Lac-des-Écorces"], 12),
   c("val-david", "Val-David", 46.03, -74.2, "laurentides", undefined, undefined, 13),
   c("val-morin", "Val-Morin", 46.0, -74.1833, "laurentides", undefined, undefined, 13),
   c("sainte-adele", "Sainte-Adèle", 45.95, -74.1333, "laurentides", undefined, ["Mont-Rolland"], 13),
