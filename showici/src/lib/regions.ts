@@ -190,7 +190,7 @@ export const CITIES: City[] = [
   c("amqui", "Amqui", 48.4667, -67.4333, "rimouski", undefined, undefined, 13),
   c("mont-joli", "Mont-Joli", 48.5833, -68.1833, "rimouski", undefined, undefined, 13),
   c("trois-pistoles", "Trois-Pistoles", 48.1167, -69.1833, "rimouski", undefined, undefined, 13),
-  c("la-pocatiere", "La Pocatière", 47.3667, -70.0333, "rimouski", undefined, undefined, 13),
+  c("la-pocatiere", "La Pocatière", 47.3667, -70.0333, "rimouski", undefined, ["Rivière-Ouelle"], 13),
   c("kamouraska", "Kamouraska", 47.5667, -69.8667, "rimouski", undefined, undefined, 13),
   c("saint-andre-de-kamouraska", "Saint-André-de-Kamouraska", 47.6667, -69.7333, "rimouski", undefined, undefined, 13),
   c("saint-pascal", "Saint-Pascal", 47.5333, -69.8, "rimouski", undefined, undefined, 13),
