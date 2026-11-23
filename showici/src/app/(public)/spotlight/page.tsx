@@ -4,7 +4,7 @@ import { Button, PlayIcon } from "@/components/ui";
 import { getStories } from "@/lib/data";
 import { FollowCard } from "@/components/Social";
 
-export const metadata = { title: "Spotlight Time · ShowIci" };
+export const metadata = { title: "Spotlight Time · ShowIci", description: "ShowIci Spotlight: interviews with Québec artists and the local live-music scene." };
 
 export default async function SpotlightPage() {
   const stories = await getStories();
