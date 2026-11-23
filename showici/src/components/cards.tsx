@@ -109,7 +109,7 @@ export function BigEventCard({ e }: { e: BigEvent }) {
         <span className="text-sm text-slate">{[e.month ? `${e.month} ${e.date}` : "", e.time].filter(Boolean).join(" · ")}{e.moreDates ? ` · +${e.moreDates} more date${e.moreDates > 1 ? "s" : ""}` : ""}</span>
         {e.price && <span className="text-sm text-muted">{e.price}</span>}
         <Button href={e.url} external className="mt-auto text-sm">Get tickets ↗</Button>
-        <span className="text-center text-[11px] text-muted">On Ticketmaster</span>
+        <span className="text-center text-[11px] text-muted">Ticketmaster or partner site</span>
       </div>
     </article>
   );

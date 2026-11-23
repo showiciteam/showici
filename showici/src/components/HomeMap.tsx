@@ -220,8 +220,8 @@ export function HomeMap({ venues, performers }: { venues: Venue[]; performers: P
             </label>
           )}
           <div className="grid grid-cols-2 gap-2.5">
-            <div className="card p-4"><span className="text-[13px] text-muted">Venues</span><div className="h-display text-[32px]">{venueCount}</div></div>
-            <div className="card p-4"><span className="text-[13px] text-muted">Performers</span><div className="h-display text-[32px]">{perfCount}</div></div>
+            <div className={`card p-4 ${perfCount === 0 ? "col-span-2" : ""}`}><span className="text-[13px] text-muted">Venues</span><div className="h-display text-[32px]">{venueCount}</div></div>
+            {perfCount > 0 && <div className="card p-4"><span className="text-[13px] text-muted">Performers</span><div className="h-display text-[32px]">{perfCount}</div></div>}
           </div>
           <div className="card flex flex-col gap-2.5 p-4">
             <strong className="text-[15px]">Newest on the map</strong>
