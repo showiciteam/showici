@@ -3,7 +3,7 @@ import { Placeholder } from "@/components/ui";
 import { getNews } from "@/lib/data";
 import { NewsSidebar } from "./NewsSidebar";
 
-export const metadata = { title: "News · ShowIci" };
+export const metadata = { title: "News · ShowIci", description: "News and updates from ShowIci and the Québec live-entertainment scene." };
 
 export default async function NewsPage() {
   const posts = await getNews();
