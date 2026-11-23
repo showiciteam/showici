@@ -60,6 +60,7 @@ export interface Venue {
   /** Live data only. */
   ownerId?: string;
   street?: string;
+  postalCode?: string;
   photos?: string[];
   links?: { label: string; url: string }[];
   /** False for venues ShowIci listed from public sources that no owner has claimed yet. */

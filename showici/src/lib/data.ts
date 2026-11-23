@@ -98,6 +98,7 @@ function toVenue(r: any): Venue {
     phone: r.phone ?? "",
     sourceRef: r.source_ref ?? undefined,
     street: r.street ?? "",
+    postalCode: r.postal_code ?? undefined,
     photos: photoUrls(r.venue_photos),
     logo: r.logo_path ? mediaUrl(r.logo_path) : undefined,
     videos: (r.venue_videos ?? []).slice().sort((a: any, b: any) => (a.position ?? 0) - (b.position ?? 0)).map((v: any) => ({ title: v.title ?? "", featured: !!v.featured, url: v.youtube_url })),
