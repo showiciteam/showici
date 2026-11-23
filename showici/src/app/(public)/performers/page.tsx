@@ -2,7 +2,7 @@ import { getPerformers } from "@/lib/data";
 import { EmptyState } from "@/components/EmptyState";
 import { PerformerSearch } from "./PerformerSearch";
 
-export const metadata = { title: "Find performers in Québec · ShowIci", description: "Bands, DJs, comedians, magicians and other live acts across Québec, starting in Greater Montréal. Free, no commission." };
+export const metadata = { title: "Find performers in Québec · ShowIci", description: "Bands, DJs, comedians, magicians and other live acts across Québec, starting in Greater Montréal. No commission." };
 
 export default async function PerformersPage({ searchParams }: { searchParams: Promise<{ type?: string; radius?: string; region?: string; area?: string }> }) {
   const sp = await searchParams;
