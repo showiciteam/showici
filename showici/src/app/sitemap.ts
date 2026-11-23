@@ -18,7 +18,12 @@ const PUBLIC_PAGES: { path: string; priority: number; changeFrequency: "daily" |
   { path: "/privacy", priority: 0.2, changeFrequency: "monthly" },
 ];
 
-/** Published performer, venue and show pages, read with the public key (no session needed). */
+/**
+ * Published performer, venue and show pages, read with the public key (no session needed).
+ * lastModified is the date the record was created: the tables don't track edits yet, and a
+ * real date is better than the deploy time. Unclaimed venues with no upcoming show are left
+ * out (their pages are noindex) until they're claimed or a show is posted.
+ */
 async function dynamicPages(): Promise<MetadataRoute.Sitemap> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -27,19 +32,21 @@ async function dynamicPages(): Promise<MetadataRoute.Sitemap> {
     const sb = createClient(url, key, { auth: { persistSession: false } });
     const [performers, venues, shows] = await Promise.all([
       sb.from("performers_view").select("id, created_at").limit(5000),
-      sb.from("venues_view").select("id, created_at").limit(5000),
-      sb.from("shows").select("id, created_at").eq("status", "live").gte("starts_at", new Date().toISOString()).limit(5000),
+      sb.from("venues_view").select("id, created_at, owner").limit(5000),
+      sb.from("shows").select("id, created_at, venue_id").eq("status", "live").gte("starts_at", new Date().toISOString()).limit(5000),
     ]);
+    const withShows = new Set((shows.data ?? []).map((s) => s.venue_id));
+    const listedVenues = (venues.data ?? []).filter((v) => v.owner || withShows.has(v.id));
     const rows = (prefix: string, data: { id: string; created_at: string }[] | null, priority: number) =>
       (data ?? []).map((r) => ({ url: `${SITE_URL}${prefix}/${r.id}`, lastModified: new Date(r.created_at), changeFrequency: "weekly" as const, priority }));
-    return [...rows("/performers", performers.data, 0.8), ...rows("/venues", venues.data, 0.8), ...rows("/shows", shows.data, 0.7)];
+    return [...rows("/performers", performers.data, 0.8), ...rows("/venues", listedVenues, 0.8), ...rows("/shows", shows.data, 0.7)];
   } catch {
     return [];
   }
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const now = new Date();
-  const fixed = PUBLIC_PAGES.map((p) => ({ url: `${SITE_URL}${p.path === "/" ? "" : p.path}`, lastModified: now, changeFrequency: p.changeFrequency, priority: p.priority }));
+  // No lastModified on the fixed pages: they don't have a tracked edit date, and the deploy time isn't one.
+  const fixed = PUBLIC_PAGES.map((p) => ({ url: `${SITE_URL}${p.path === "/" ? "" : p.path}`, changeFrequency: p.changeFrequency, priority: p.priority }));
   return [...fixed, ...(await dynamicPages())];
 }

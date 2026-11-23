@@ -11,11 +11,6 @@ export const metadata: Metadata = {
   title: SITE_TITLE,
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
-  keywords: [
-    "Québec", "Quebec", "Montréal", "Montreal", "live music", "musique live", "bands", "DJ", "comedians", "humoristes", "magicians",
-    "book a band", "réserver un groupe", "pubs", "bars", "venues", "salles", "weddings", "mariages", "quinceañera",
-    "private events", "événements privés",
-  ],
   openGraph: {
     type: "website",
     siteName: SITE_NAME,
@@ -31,6 +26,8 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
   },
   robots: { index: true, follow: true },
+  // Every page points to its own address on www.showici.com (no query strings, no apex domain).
+  alternates: { canonical: "./" },
 };
 
 export const viewport: Viewport = {
