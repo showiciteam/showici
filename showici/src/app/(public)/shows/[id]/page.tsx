@@ -4,6 +4,7 @@ import { getPerformer, getShow, getShows, getVenue } from "@/lib/data";
 import { supabaseEnabled } from "@/lib/supabase/client";
 import { Button, Placeholder, Stars, VideoBox } from "@/components/ui";
 import { ShareMenu } from "@/components/Social";
+import { JsonLd, showLd } from "@/lib/jsonld";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -27,6 +28,7 @@ export default async function ShowDetail({ params }: { params: Promise<{ id: str
 
   return (
     <div className="wrap pb-[72px] pt-7">
+      <JsonLd data={showLd(show, venue, performer)} />
       <Link href="/shows" className="font-bold no-underline">← All shows</Link>
       <div className="mt-[18px] flex flex-wrap items-start gap-8">
         <div className="flex min-w-0 flex-[999_1_560px] flex-col gap-7">
