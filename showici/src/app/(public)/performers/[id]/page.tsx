@@ -9,6 +9,7 @@ import { Button, Placeholder, Stars, Tag } from "@/components/ui";
 import { PhotoGallery, VideoPreview } from "@/components/Media";
 import { actFamily } from "@/lib/acts";
 import { ShareMenu } from "@/components/Social";
+import { JsonLd, performerLd } from "@/lib/jsonld";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -45,6 +46,7 @@ export default async function PerformerProfile({ params }: { params: Promise<{ i
 
   return (
     <>
+      <JsonLd data={performerLd(p)} />
       {header ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={header} alt={`${p.name} live`} className="h-[220px] w-full object-cover sm:h-[300px]" />
@@ -114,7 +116,7 @@ export default async function PerformerProfile({ params }: { params: Promise<{ i
                 )}
               </section>
             )}
-            <section className="flex flex-col gap-3.5">
+            {(upcoming.length > 0 || isMe) && <section className="flex flex-col gap-3.5">
               <h2 className="h-display text-[28px]">Upcoming shows</h2>
               {upcoming.length === 0 && <p className="text-slate">No public shows posted right now.</p>}
               {upcoming.map((s) => (
@@ -124,7 +126,7 @@ export default async function PerformerProfile({ params }: { params: Promise<{ i
                   <span className="font-bold text-brass-dark">Details →</span>
                 </Link>
               ))}
-            </section>
+            </section>}
             <section id="reviews" className="flex flex-col gap-3.5">
               <h2 className="h-display text-[28px]">Reviews from bookers</h2>
               {supabaseEnabled ? (
