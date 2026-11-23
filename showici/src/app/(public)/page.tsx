@@ -5,11 +5,8 @@ import { PerformerCard, ShowCard } from "@/components/cards";
 import { Section } from "@/components/ui";
 import { getBigEvents, getPerformers, getShows, getVenues } from "@/lib/data";
 import { FollowBand } from "@/components/Social";
-import { SITE_URL } from "@/lib/site";
-import { SOCIAL_URLS } from "@/lib/social";
+import { JsonLd, siteLd } from "@/lib/jsonld";
 
-/** Who ShowIci is, for search engines: links the site to its social accounts. */
-const orgLd = { "@context": "https://schema.org", "@type": "Organization", "@id": `${SITE_URL}/#organization`, name: "ShowIci", url: SITE_URL, logo: `${SITE_URL}/logo.png`, sameAs: SOCIAL_URLS };
 
 const roles = [
   {
@@ -47,7 +44,7 @@ export default async function Home() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd).replace(/</g, "\\u003c") }} />
+      <JsonLd data={siteLd()} />
       <Hero />
 
       <section className="wrap pb-[72px]">
@@ -63,13 +60,13 @@ export default async function Home() {
         </div>
       </section>
 
-      <div className="border-y border-line bg-parchment">
+      {shows.length > 0 && <div className="border-y border-line bg-parchment">
         <Section title="This week across Québec" action={<Link href="/shows" className="font-bold no-underline">See all shows →</Link>}>
           <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-4">
             {shows.slice(0, 4).map((s) => <ShowCard key={s.id} show={s} venue={venueById[s.venueId]} />)}
           </div>
         </Section>
-      </div>
+      </div>}
 
       {bigEvents.length > 0 && (
         <section className="wrap pt-16">
@@ -78,7 +75,7 @@ export default async function Home() {
               <div className="flex flex-col gap-1.5">
                 <span className="text-xs font-bold tracking-[0.1em] text-brass">BIG EVENTS · TICKETS</span>
                 <h2 className="font-display text-[34px] font-extrabold tracking-tight">Big events coming up</h2>
-                <span className="text-[15px] text-on-navy">Concerts, festivals and tours in your area. Tickets sold on Ticketmaster.</span>
+                <span className="text-[15px] text-on-navy">Concerts, festivals and tours in your area. Tickets from Ticketmaster and its partner sites.</span>
               </div>
               <Link href="/events" className="rounded-[10px] bg-brass px-[18px] py-3 font-bold text-navy no-underline hover:text-navy">See all big events</Link>
             </div>
@@ -103,11 +100,11 @@ export default async function Home() {
         </section>
       )}
 
-      <Section title="Performers available nearby" action={<Link href="/performers" className="font-bold no-underline">Browse all performers →</Link>}>
+      {performers.length > 0 && <Section title="Performers available nearby" action={<Link href="/performers" className="font-bold no-underline">Browse all performers →</Link>}>
         <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-4">
           {performers.slice(0, 4).map((p) => <PerformerCard key={p.id} p={p} />)}
         </div>
-      </Section>
+      </Section>}
 
       <div className="border-y border-line bg-parchment">
         <section className="wrap py-16">
