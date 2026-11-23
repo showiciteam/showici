@@ -3,7 +3,7 @@ import { Button } from "@/components/ui";
 import { getBigEvents } from "@/lib/data";
 import { EventsBrowser } from "./EventFilters";
 
-export const metadata = { title: "Big events and tickets · ShowIci" };
+export const metadata = { title: "Big events and tickets · ShowIci", description: "Concerts, festivals, comedy tours and theatre coming up across Québec, with links to buy tickets." };
 // Ticketmaster data is refreshed at most once an hour.
 export const revalidate = 3600;
 
@@ -19,7 +19,7 @@ export default async function BigEventsPage() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-2">
           <h1 className="h-display text-[46px]">Big events in Québec</h1>
-          <p className="max-w-[680px] text-lg text-slate">Concerts, festivals, comedy tours and theatre in your area. Tickets are sold securely on Ticketmaster.</p>
+          <p className="max-w-[680px] text-lg text-slate">Concerts, festivals, comedy tours and theatre in your area. Tickets are sold by Ticketmaster and its partner sites.</p>
         </div>
       </div>
       <EventsBrowser events={events} />

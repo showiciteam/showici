@@ -95,7 +95,7 @@ export function EventsBrowser({ events }: { events: BigEvent[] }) {
             <span className="text-on-navy">{featured.day} {featured.month} {featured.date} · {featured.time}{featured.moreDates ? ` · +${featured.moreDates} more dates` : ""}</span>
             {featured.price && <span className="text-on-navy">{featured.price}</span>}
             <span className="mt-2 w-fit rounded-[10px] bg-brass px-[18px] py-3 font-bold text-navy">Get tickets ↗</span>
-            <span className="text-xs text-[#9AA3B8]">Tickets sold on Ticketmaster</span>
+            <span className="text-xs text-[#9AA3B8]">Tickets from Ticketmaster and partners</span>
           </div>
         </a>
       )}
