@@ -1,14 +1,15 @@
 import Link from "next/link";
 import { ShowsFilters } from "./ShowsFilters";
-import { getShows, getVenues } from "@/lib/data";
+import { getBigEvents, getShows, getVenues } from "@/lib/data";
+import { BigEventCard } from "@/components/cards";
 import { Placeholder } from "@/components/ui";
 import { EmptyState } from "@/components/EmptyState";
 import { FollowCard } from "@/components/Social";
 
-export const metadata = { title: "Shows near you · ShowIci" };
+export const metadata = { title: "Shows near you · ShowIci", description: "Upcoming live shows at pubs, bars and venues across Québec: local bands, DJs, comedians and magicians, starting in Greater Montréal." };
 
 export default async function ShowsPage() {
-  const [shows, venues] = await Promise.all([getShows(), getVenues()]);
+  const [shows, venues, bigEvents] = await Promise.all([getShows(), getVenues(), getBigEvents()]);
   const venueById = Object.fromEntries(venues.map((v) => [v.id, v]));
   const days = [...new Set(shows.map((s) => s.dayLabel))];
 
@@ -26,11 +27,20 @@ export default async function ShowsPage() {
       {shows.length === 0 ? (
         <EmptyState
           title="No upcoming shows yet"
-          body="Venues post their shows here as soon as they are booked. Run a venue? Post your first show for free."
+          body="Venues post their shows here as soon as they are booked. Run a venue? Post your next show on ShowIci."
           cta={{ href: "/register/venue", label: "List your venue" }}
           secondary={{ href: "/events", label: "Browse big events" }}
         />
-      ) : (
+      ) : null}
+      {shows.length === 0 && bigEvents.length > 0 && (
+        <section className="mt-10 flex flex-col gap-4">
+          <h2 className="h-display text-[28px]">Big events coming up</h2>
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4">
+            {bigEvents.slice(0, 8).map((e) => <BigEventCard key={e.id} e={e} />)}
+          </div>
+        </section>
+      )}
+      {shows.length > 0 && (
         <div className="flex flex-wrap items-start gap-6">
           <div className="flex min-w-0 flex-[999_1_560px] flex-col gap-[22px]">
             {days.map((d) => (
