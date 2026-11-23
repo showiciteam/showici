@@ -10,13 +10,17 @@ import { Button, Placeholder, Stars, Tag } from "@/components/ui";
 import { PhotoGallery, VideoPreview } from "@/components/Media";
 import { youTubeId } from "@/lib/youtube";
 import { ShareMenu } from "@/components/Social";
+import { JsonLd, venueLd } from "@/lib/jsonld";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const v = await getVenue(id);
   if (!v) return {};
   const description = `${v.type} in ${placeLabel(v.area, v.city).replace(" · ", ", ")}. ${v.description}`.slice(0, 200);
-  return { title: `${v.name} · ShowIci`, description, openGraph: { title: `${v.name} on ShowIci`, description, ...(v.photos?.[0] ? { images: [v.photos[0]] } : {}) } };
+  // Unclaimed listings with no upcoming show are thin pages: keep them out of search results until
+  // the owner claims the page or a show is posted (then they become indexable on their own).
+  const thin = v.claimed === false && !(await getShows()).some((s) => s.venueId === v.id);
+  return { title: `${v.name} · ShowIci`, description, ...(thin ? { robots: { index: false, follow: true } } : {}), openGraph: { title: `${v.name} on ShowIci`, description, ...(v.photos?.[0] ? { images: [v.photos[0]] } : {}) } };
 }
 
 export default async function VenueProfile({ params }: { params: Promise<{ id: string }> }) {
@@ -40,6 +44,7 @@ export default async function VenueProfile({ params }: { params: Promise<{ id: s
 
   return (
     <div className="wrap pb-[72px] pt-6">
+      <JsonLd data={venueLd(v)} />
       {photos.length > 0 ? (
         <PhotoGallery photos={photos} alt={v.name} layout="hero" />
       ) : supabaseEnabled ? (
@@ -105,7 +110,7 @@ export default async function VenueProfile({ params }: { params: Promise<{ id: s
               )}
             </section>
           )}
-          <section className="flex flex-col gap-3">
+          {(shows.length > 0 || isMe) && <section className="flex flex-col gap-3">
             <h2 className="h-display text-[26px]">Upcoming shows</h2>
             {shows.length === 0 && <p className="text-slate">No shows posted yet.</p>}
             {shows.map((s) => (
@@ -115,7 +120,7 @@ export default async function VenueProfile({ params }: { params: Promise<{ id: s
                 <span className="font-bold text-brass-dark">Details →</span>
               </Link>
             ))}
-          </section>
+          </section>}
           {!unclaimed && <section className="flex flex-col gap-3">
             <h2 className="h-display text-[26px]">What performers say</h2>
             {supabaseEnabled ? (
