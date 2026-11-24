@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { LANG_COOKIE, LANG_HEADER, PATH_HEADER, isPrivatePath, localePath, splitLang } from "@/lib/locale";
 
 // Pages that need a signed-in user. Everything else stays public.
 const PROTECTED = ["/dashboard", "/messages", "/admin", "/requests", "/review"];
@@ -9,17 +10,41 @@ const PROTECTED = ["/dashboard", "/messages", "/admin", "/requests", "/review"];
  * and sends signed-out visitors from private pages to /login.
  */
 export async function middleware(request: NextRequest) {
+  // Language: /fr/… pages are served by the same page files, with the language passed in a header.
+  const { lang: urlLang, path } = splitLang(request.nextUrl.pathname);
+  const cookieLang = request.cookies.get(LANG_COOKIE)?.value;
+  const priv = isPrivatePath(path);
+  // A visitor who picked French and lands on an English public page (e.g. from an email link) goes to the French one.
+  // Search engines don't keep cookies, so they always get the page they asked for.
+  if (!priv && urlLang === "en" && cookieLang === "fr" && request.method === "GET") {
+    const fr = request.nextUrl.clone();
+    fr.pathname = localePath("fr", path);
+    return NextResponse.redirect(fr);
+  }
+  // Private pages have no /fr version: drop the prefix if someone types it.
+  if (priv && urlLang === "fr") {
+    const en = request.nextUrl.clone();
+    en.pathname = path;
+    return NextResponse.redirect(en);
+  }
+  const lang = priv ? (cookieLang === "fr" ? "fr" : "en") : urlLang;
+  request.headers.set(LANG_HEADER, lang);
+  request.headers.set(PATH_HEADER, path);
+  const target = request.nextUrl.clone();
+  target.pathname = path;
+  const pass = () => (urlLang === "fr" ? NextResponse.rewrite(target, { request }) : NextResponse.next({ request }));
+
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key) return NextResponse.next(); // Demo mode: no auth.
+  if (!url || !key) return pass(); // Demo mode: no auth.
 
-  let response = NextResponse.next({ request });
+  let response = pass();
   const supabase = createServerClient(url, key, {
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll: (list) => {
         list.forEach(({ name, value }) => request.cookies.set(name, value));
-        response = NextResponse.next({ request });
+        response = pass();
         list.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
       },
     },
@@ -30,7 +55,6 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const path = request.nextUrl.pathname;
   if (!user && PROTECTED.some((p) => path === p || path.startsWith(`${p}/`))) {
     const login = request.nextUrl.clone();
     login.pathname = "/login";
