@@ -9,7 +9,7 @@ Facts as of November 2026:
 - Commission: none. Fees and payment are agreed directly between the venue or planner and the performer.
 - How booking works: a venue or planner sends a booking request for a date; the performer accepts or declines it and both sides continue in ShowIci messages. Phone numbers and emails in messages are hidden until both sides are ready.
 - Venue listings: some venues were listed by ShowIci from public information so artists can find them; owners can claim their page to manage it.
-- Languages: French and English.
+- Languages: French and English. English pages are at www.showici.com/…, French pages at www.showici.com/fr/….
 - Accounts: 18 and older.
 
 ## Main pages
