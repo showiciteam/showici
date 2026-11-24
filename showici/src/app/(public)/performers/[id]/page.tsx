@@ -41,7 +41,7 @@ export default async function PerformerProfile({ params }: { params: Promise<{ i
     ["Set length", p.setLength],
     ["Typical fee", p.feeRange],
     ["Based in", p.base],
-    ["Travels", `Up to ${p.travelKm} km`],
+    ["Travels", p.claimed === false ? "" : `Up to ${p.travelKm} km`],
   ];
 
   return (
@@ -53,12 +53,12 @@ export default async function PerformerProfile({ params }: { params: Promise<{ i
         <Placeholder tone={p.tone} label={supabaseEnabled ? "" : "[Cover photo: live on stage]"} className="h-[300px]" />
       )}
       <div className="wrap pb-[72px]">
-        <div className="-mt-16 flex flex-wrap items-end gap-6">
+        <div className="flex flex-wrap items-end gap-6">
           {p.logo ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={p.logo} alt={`${p.name} logo`} className="h-[148px] w-[148px] flex-none rounded-full border-[6px] border-ivory bg-white object-cover" />
+            <img src={p.logo} alt={`${p.name} logo`} className="-mt-16 h-[148px] w-[148px] flex-none rounded-full border-[6px] border-ivory bg-white object-cover" />
           ) : (
-            <Placeholder tone="ph-2" label={p.initials} className="h-[148px] w-[148px] flex-none rounded-full border-[6px] border-ivory text-4xl text-navy" />
+            <Placeholder tone="ph-2" label={p.initials} className="-mt-16 h-[148px] w-[148px] flex-none rounded-full border-[6px] border-ivory text-4xl text-navy" />
           )}
           <div className="flex flex-[1_1_320px] flex-col gap-2 pb-1.5">
             <div className="flex flex-wrap items-center gap-2.5">
