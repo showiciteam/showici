@@ -1,7 +1,17 @@
 import Link from "next/link";
 import { placeLabel } from "@/lib/regions";
 import type { BigEvent, Performer, Show, Story, Venue } from "@/lib/types";
+import { youTubeId } from "@/lib/youtube";
 import { Button, DateBadge, Placeholder, PlayIcon, Stars, Tag } from "./ui";
+
+/** Best picture for a performer: cover photo, then first photo, then the main YouTube video's thumbnail. */
+function performerPicture(p: Performer): string | undefined {
+  if (p.cover) return p.cover;
+  if (p.photos?.[0]) return p.photos[0];
+  const v = p.videos.find((x) => x.featured) ?? p.videos[0];
+  const id = youTubeId(v?.url);
+  return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : undefined;
+}
 
 export function ShowCard({ show, venue }: { show: Show; venue?: Venue }) {
   return (
@@ -24,7 +34,12 @@ export function PerformerCard({ p }: { p: Performer }) {
   return (
     <article className="flex flex-col gap-3 rounded-2xl border border-line bg-parchment p-[22px]">
       <div className="flex items-center gap-3.5">
-        <Placeholder tone={p.tone} label={p.initials} className="h-14 w-14 flex-none rounded-full font-display text-xl text-navy" />
+        {performerPicture(p) ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={performerPicture(p)} alt={p.name} loading="lazy" className="h-14 w-14 flex-none rounded-full object-cover" />
+        ) : (
+          <Placeholder tone={p.tone} label={p.initials} className="h-14 w-14 flex-none rounded-full font-display text-xl text-navy" />
+        )}
         <div className="flex flex-col gap-0.5">
           <span className="h-display text-xl">{p.name}</span>
           <span className="text-sm text-muted">{p.base} · travels {p.travelKm} km</span>
@@ -46,8 +61,13 @@ export function PerformerCard({ p }: { p: Performer }) {
 export function PerformerRow({ p }: { p: Performer }) {
   return (
     <article className="card flex flex-wrap items-center gap-5 p-5">
-      <Link href={`/performers/${p.id}`} aria-label={`${p.name} videos`} className="flex h-[100px] w-[168px] flex-none items-center justify-center rounded-xl bg-navy">
-        <PlayIcon size={34} color="#A485FF" />
+      <Link href={`/performers/${p.id}`} aria-label={`${p.name} profile`} className="flex h-[100px] w-[168px] flex-none items-center justify-center overflow-hidden rounded-xl bg-navy">
+        {performerPicture(p) ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={performerPicture(p)} alt={`${p.name} live`} loading="lazy" className="h-full w-full object-cover" />
+        ) : (
+          <PlayIcon size={34} color="#A485FF" />
+        )}
       </Link>
       <div className="flex flex-[1_1_240px] flex-col gap-1.5">
         <span className="flex items-center gap-2">
