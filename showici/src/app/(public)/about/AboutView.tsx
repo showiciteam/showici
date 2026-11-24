@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/LocalLink";
 import { about } from "@/lib/about";
 import { useLang } from "@/lib/i18n";
 import { FollowCard } from "@/components/Social";
