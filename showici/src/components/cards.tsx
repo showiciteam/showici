@@ -17,7 +17,12 @@ export function ShowCard({ show, venue }: { show: Show; venue?: Venue }) {
   return (
     <Link href={`/shows/${show.id}`} className="card flex flex-col overflow-hidden text-navy no-underline hover:text-navy hover:shadow-md">
       <div className="relative">
-        <Placeholder tone={show.tone} className="h-[150px]" />
+        {venue?.logo ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={venue.logo} alt={`${venue.name} logo`} loading="lazy" className="h-[150px] w-full border-b border-line bg-white object-contain p-5" />
+        ) : (
+          <Placeholder tone={show.tone} className="h-[150px]" />
+        )}
         <span className="absolute bottom-3.5 left-3.5"><DateBadge day={show.day} date={show.date} dark /></span>
       </div>
       <div className="flex flex-col gap-1.5 p-[18px]">
@@ -88,7 +93,17 @@ export function PerformerRow({ p }: { p: Performer }) {
 export function VenueRow({ v }: { v: Venue }) {
   return (
     <article className="card flex flex-wrap items-center gap-[18px] p-4">
-      <Placeholder tone={v.tone} className="h-28 w-[170px] flex-none rounded-xl" />
+      <Link href={`/venues/${v.id}`} aria-label={`${v.name} venue page`} className="flex-none">
+        {v.logo ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={v.logo} alt={`${v.name} logo`} loading="lazy" className="h-28 w-[170px] rounded-xl border border-line bg-white object-contain p-3" />
+        ) : v.photos?.[0] ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={v.photos[0]} alt={v.name} loading="lazy" className="h-28 w-[170px] rounded-xl object-cover" />
+        ) : (
+          <Placeholder tone={v.tone} className="h-28 w-[170px] rounded-xl" />
+        )}
+      </Link>
       <div className="flex flex-[1_1_240px] flex-col gap-1.5">
         <div className="flex flex-wrap items-center gap-2">
           <span className="h-display text-[21px]">{v.name}</span>
