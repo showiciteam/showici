@@ -4,39 +4,52 @@ import { Analytics } from "@/components/Analytics";
 import { GA_HEAD_SCRIPT, GA_ID } from "@/lib/analytics";
 import { DemoBanner } from "@/components/DemoBanner";
 import { LanguageProvider } from "@/lib/i18n";
-import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "@/lib/site";
+import { SITE_DESCRIPTION, SITE_DESCRIPTION_FR, SITE_NAME, SITE_TITLE, SITE_TITLE_FR, SITE_URL } from "@/lib/site";
+import { getBarePath, getLang } from "@/lib/lang";
+import { localePath } from "@/lib/locale";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  title: SITE_TITLE,
-  description: SITE_DESCRIPTION,
-  applicationName: SITE_NAME,
-  openGraph: {
-    type: "website",
-    siteName: SITE_NAME,
-    title: SITE_TITLE,
-    description: SITE_DESCRIPTION,
-    // Pages load in English first (the FR / EN switch changes them in the browser).
-    locale: "en_CA",
-    alternateLocale: ["fr_CA"],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: SITE_TITLE,
-    description: SITE_DESCRIPTION,
-  },
-  robots: { index: true, follow: true },
-  // Every page points to its own address on www.showici.com (no query strings, no apex domain).
-  alternates: { canonical: "./" },
-};
+/**
+ * Site-wide defaults. Each page is served in English at /… and in French at /fr/…: the canonical tag
+ * points to the page's own language and hreflang links the two versions.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const lang = await getLang();
+  const path = await getBarePath();
+  const fr = lang === "fr";
+  const title = fr ? SITE_TITLE_FR : SITE_TITLE;
+  const description = fr ? SITE_DESCRIPTION_FR : SITE_DESCRIPTION;
+  const abs = (l: "en" | "fr") => `${SITE_URL}${localePath(l, path) === "/" ? "" : localePath(l, path)}`;
+  return {
+    metadataBase: new URL(SITE_URL),
+    title,
+    description,
+    applicationName: SITE_NAME,
+    openGraph: {
+      type: "website",
+      siteName: SITE_NAME,
+      title,
+      description,
+      url: abs(lang),
+      locale: fr ? "fr_CA" : "en_CA",
+      alternateLocale: [fr ? "en_CA" : "fr_CA"],
+    },
+    twitter: { card: "summary_large_image", title, description },
+    robots: { index: true, follow: true },
+    alternates: {
+      canonical: abs(lang),
+      languages: { "en-CA": abs("en"), "fr-CA": abs("fr"), "x-default": abs("en") },
+    },
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: "#14213D",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const lang = await getLang();
   return (
-    <html lang="en">
+    <html lang={lang === "fr" ? "fr-CA" : "en-CA"}>
       <head>
         {/* Google tag (gtag.js), in consent mode: cookies stay off until the visitor accepts in the banner. */}
         <script dangerouslySetInnerHTML={{ __html: GA_HEAD_SCRIPT }} />
@@ -51,7 +64,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen antialiased">
         <DemoBanner />
-        <LanguageProvider>
+        <LanguageProvider lang={lang}>
           {children}
           <Analytics />
         </LanguageProvider>
