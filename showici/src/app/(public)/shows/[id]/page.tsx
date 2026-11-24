@@ -1,10 +1,14 @@
-import Link from "next/link";
+import Link from "@/components/LocalLink";
 import { notFound } from "next/navigation";
 import { getPerformer, getShow, getShows, getVenue } from "@/lib/data";
 import { supabaseEnabled } from "@/lib/supabase/client";
 import { Button, Placeholder, Stars, VideoBox } from "@/components/ui";
 import { ShareMenu } from "@/components/Social";
 import { JsonLd, showLd } from "@/lib/jsonld";
+import { venueHref } from "@/lib/seo";
+import { getLang } from "@/lib/lang";
+import { tr } from "@/lib/locale";
+import { label, labels } from "@/lib/labels";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -24,43 +28,45 @@ export default async function ShowDetail({ params }: { params: Promise<{ id: str
   const featured = performer?.videos.find((v) => v.featured) ?? performer?.videos[0];
   const cover = performer?.photos?.[0] ?? venue?.photos?.[0];
   const address = venue ? [venue.street, venue.city].filter(Boolean).join(", ") : "";
+  const lang = await getLang();
+  const t = tr(lang);
   const mapsUrl = venue ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${venue.name}, ${address}`)}` : "#";
 
   return (
     <div className="wrap pb-[72px] pt-7">
-      <JsonLd data={showLd(show, venue, performer)} />
-      <Link href="/shows" className="font-bold no-underline">← All shows</Link>
+      <JsonLd data={showLd(show, venue, performer, lang)} />
+      <Link href="/shows" className="font-bold no-underline">{t("← All shows", "← Tous les spectacles")}</Link>
       <div className="mt-[18px] flex flex-wrap items-start gap-8">
         <div className="flex min-w-0 flex-[999_1_560px] flex-col gap-7">
           {cover ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={cover} alt="" className="aspect-[16/8] w-full rounded-[18px] object-cover" />
           ) : (
-            <Placeholder tone={show.tone} label={supabaseEnabled ? "" : "[Show poster or performer photo]"} className="aspect-[16/8] rounded-[18px]" />
+            <Placeholder tone={show.tone} label={supabaseEnabled ? "" : t("[Show poster or performer photo]", "[Affiche ou photo de l'artiste]")} className="aspect-[16/8] rounded-[18px]" />
           )}
           <div className="flex flex-col gap-2.5">
-            <span className="eyebrow">{show.genre} · Live</span>
+            <span className="eyebrow">{label(lang, show.genre)} · {t("Live", "En direct")}</span>
             <h1 className="h-display text-[48px] leading-tight">{show.title}</h1>
             {(show.description || !supabaseEnabled) && (
-              <p className="whitespace-pre-line text-[17px] leading-relaxed text-ink-2">{show.description || "[Show description written by the venue: what to expect, specials, anything guests should know.]"}</p>
+              <p className="whitespace-pre-line text-[17px] leading-relaxed text-ink-2">{show.description || t("[Show description written by the venue: what to expect, specials, anything guests should know.]", "[Description écrite par la salle : à quoi s'attendre, spéciaux, ce que le public doit savoir.]")}</p>
             )}
           </div>
           {featured && (
             <section className="flex flex-col gap-3">
-              <h2 className="h-display text-2xl">Get a taste</h2>
+              <h2 className="h-display text-2xl">{t("Get a taste", "Un avant-goût")}</h2>
               <VideoBox url={featured.url} title={featured.title} big />
             </section>
           )}
           {performer && (
             <section className="flex flex-col gap-3">
-              <h2 className="h-display text-2xl">The performer</h2>
+              <h2 className="h-display text-2xl">{t("The performer", "L'artiste")}</h2>
               <Link href={`/performers/${performer.id}`} className="card flex items-center gap-3.5 p-4 text-navy no-underline hover:text-navy">
                 <Placeholder tone={performer.tone} label={performer.initials} className="h-14 w-14 flex-none rounded-full text-navy" />
                 <span className="flex flex-1 flex-col gap-0.5">
                   <strong className="text-[17px]">{performer.name}</strong>
-                  <span className="text-sm text-muted">{performer.actType} · {performer.genres.join(", ")}{performer.reviewCount > 0 && <> · <Stars rating={performer.rating} /> {performer.rating}</>}</span>
+                  <span className="text-sm text-muted">{label(lang, performer.actType)} · {labels(lang, performer.genres).join(", ")}{performer.reviewCount > 0 && <> · <Stars rating={performer.rating} /> {performer.rating}</>}</span>
                 </span>
-                <span className="font-bold text-brass-dark">View profile →</span>
+                <span className="font-bold text-brass-dark">{t("View profile →", "Voir le profil →")}</span>
               </Link>
             </section>
           )}
@@ -70,26 +76,26 @@ export default async function ShowDetail({ params }: { params: Promise<{ id: str
           <div className="card flex flex-col gap-4 p-[22px]">
             <div className="flex items-center gap-3.5">
               <span className="rounded-xl bg-brass-tint px-3.5 py-2.5 text-center text-[13px] font-bold leading-tight text-navy-deep">{show.day}<br /><span className="font-display text-[26px]">{show.date}</span></span>
-              <span className="flex flex-col gap-1"><strong className="text-lg">{show.longDate}</strong><span className="text-slate">{show.doors ? `Doors ${show.doors} · ` : ""}Show {show.time}</span></span>
+              <span className="flex flex-col gap-1"><strong className="text-lg">{show.longDate}</strong><span className="text-slate">{show.doors ? `${t("Doors", "Portes")} ${show.doors} · ` : ""}{t("Show", "Spectacle")} {show.time}</span></span>
             </div>
-            <div className="flex justify-between border-t border-line pt-3.5"><span className="text-muted">Entry</span><strong>{show.entry}</strong></div>
-            {show.ticketUrl && <Button href={show.ticketUrl} external variant="brass">Get tickets ↗</Button>}
-            {show.startsAt && <Button href={`/shows/${show.id}/calendar`} external>Add to calendar</Button>}
-            <ShareMenu title={show.title} label="Share this show" caption={`${show.title}, ${show.longDate}${venue ? ` at ${venue.name}` : ""}. See you there!`} />
+            <div className="flex justify-between border-t border-line pt-3.5"><span className="text-muted">{t("Entry", "Entrée")}</span><strong>{show.entry}</strong></div>
+            {show.ticketUrl && <Button href={show.ticketUrl} external variant="brass">{t("Get tickets ↗", "Billets ↗")}</Button>}
+            {show.startsAt && <Button href={`/shows/${show.id}/calendar`} external>{t("Add to calendar", "Ajouter au calendrier")}</Button>}
+            <ShareMenu title={show.title} label={t("Share this show", "Partager ce spectacle")} caption={t(`${show.title}, ${show.longDate}${venue ? ` at ${venue.name}` : ""}. See you there!`, `${show.title}, ${show.longDate}${venue ? ` à ${venue.name}` : ""}. On se voit là-bas!`)} />
           </div>
           {venue && (
             <div className="card overflow-hidden">
               <div className="relative h-40 bg-[#E9EDE6]"><span className="absolute left-1/2 top-1/2 -ml-[9px] -mt-[9px] h-[18px] w-[18px] rounded-full border-[3px] border-white bg-navy" /></div>
               <div className="flex flex-col gap-1.5 p-[18px]">
-                <Link href={`/venues/${venue.id}`} className="text-lg font-bold text-navy no-underline">{venue.name}</Link>
+                <Link href={venueHref(venue)} className="text-lg font-bold text-navy no-underline">{venue.name}</Link>
                 <span className="text-slate">{address || venue.city}</span>
-                <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="font-bold no-underline">Get directions →</a>
+                <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="font-bold no-underline">{t("Get directions →", "Itinéraire →")}</a>
               </div>
             </div>
           )}
           {more.length > 0 && (
             <div className="card flex flex-col gap-2.5 p-[18px]">
-              <strong>More at {venue?.name}</strong>
+              <strong>{t("More at", "Aussi à")} {venue?.name}</strong>
               {more.map((m) => (
                 <Link key={m.id} href={`/shows/${m.id}`} className="flex justify-between text-navy no-underline"><span>{m.title}</span><span className="text-sm text-muted">{m.day} {m.date}</span></Link>
               ))}
