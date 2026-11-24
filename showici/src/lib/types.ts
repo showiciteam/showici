@@ -157,6 +157,29 @@ export interface Story {
   photo: string;
   tone: Tone;
   video: boolean;
+  /** Real interview content. Stories without it are sample cards that render placeholders. */
+  article?: StoryArticle;
+  /** Waiting for the artist's approval: reachable by direct link only, not listed and not indexed. */
+  draft?: boolean;
+}
+
+export interface StoryArticleText {
+  category: string;
+  title: string;
+  dek: string;
+  date: string;
+  read: string;
+  quote: string;
+  qa: { q: string; a: string | string[] }[];
+}
+
+export interface StoryArticle {
+  en: StoryArticleText;
+  fr: StoryArticleText;
+  artist: string;
+  videos: { url: string; en: string; fr: string }[];
+  photos: { src: string; en: string; fr: string; credit?: string }[];
+  links: { label: string; url: string }[];
 }
 
 export interface NewsPost {

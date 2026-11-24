@@ -1,4 +1,5 @@
 // Sample data used until Supabase is connected. Names in [brackets] are placeholders.
+import { kbust } from "./spotlight/kbust";
 import type { BigEvent, EventRequest, NewsPost, Performer, Show, Story, Thread, Venue } from "./types";
 
 export const performers: Performer[] = [
@@ -96,6 +97,7 @@ export const eventRequests: EventRequest[] = [
 ];
 
 export const stories: Story[] = [
+  kbust,
   { slug: "twenty-years-of-friday-nights", category: "Performer", city: "Montréal", title: "[Band name]: twenty years of Friday nights", dek: "[How a cover band became a neighbourhood institution.]", date: "Oct 2", read: "6 min read", photo: "[Band photo]", tone: "ph-1", video: true },
   { slug: "why-pub-books-live-music", category: "Venue owner", city: "Verdun", title: "Why [Pub name] books live music every week", dek: "[A pub owner on what live shows do for a room and a business.]", date: "Sep 25", read: "5 min read", photo: "[Pub interior]", tone: "ph-2", video: false },
   { slug: "magician-parties-and-bars", category: "Performer", city: "Laval", title: "The magician who works birthday parties and bars", dek: "[Close-up magic, quinceañeras and learning to read a crowd.]", date: "Sep 18", read: "4 min read", photo: "[Magician portrait]", tone: "ph-3", video: true },

@@ -3,6 +3,20 @@ import { notFound } from "next/navigation";
 import { Button, Placeholder, VideoBox } from "@/components/ui";
 import { getStories } from "@/lib/data";
 import { FollowCard } from "@/components/Social";
+import { SpotlightArticleView } from "@/components/SpotlightArticle";
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const s = (await getStories()).find((x) => x.slug === slug);
+  if (!s?.article) return {};
+  const a = s.article.en;
+  return {
+    title: `${a.title} · ShowIci Spotlight`,
+    description: a.dek,
+    robots: { index: !s.draft, follow: !s.draft },
+    openGraph: { title: a.title, description: a.dek, images: s.article.photos[0] ? [s.article.photos[0].src] : undefined },
+  };
+}
 
 export async function generateStaticParams() {
   return (await getStories()).map((s) => ({ slug: s.slug }));
@@ -13,7 +27,8 @@ export default async function SpotlightArticle({ params }: { params: Promise<{ s
   const stories = await getStories();
   const s = stories.find((x) => x.slug === slug);
   if (!s) notFound();
-  const more = stories.filter((x) => x.slug !== slug).slice(0, 3);
+  const more = stories.filter((x) => x.slug !== slug && !x.draft).slice(0, 3);
+  if (s.article) return <SpotlightArticleView s={s} more={more} />;
   const qa = [
     "How did it all start?",
     "What makes a great night at a local venue?",

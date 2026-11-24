@@ -7,7 +7,7 @@ import { FollowCard } from "@/components/Social";
 export const metadata = { title: "Spotlight Time · ShowIci" };
 
 export default async function SpotlightPage() {
-  const stories = await getStories();
+  const stories = (await getStories()).filter((x) => !x.draft);
   const featured = stories[0];
   return (
     <>
