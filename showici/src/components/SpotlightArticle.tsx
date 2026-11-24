@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
-import { Button, Placeholder, VideoBox } from "@/components/ui";
-import { FollowCard } from "@/components/Social";
+import { Placeholder, VideoBox } from "@/components/ui";
+import { FollowCard, ShareMenu } from "@/components/Social";
 import { useLang } from "@/lib/i18n";
 import type { Story } from "@/lib/types";
 
@@ -33,7 +33,7 @@ export function SpotlightArticleView({ s, more }: { s: Story; more: Story[] }) {
         <div className="my-6 flex flex-wrap items-center gap-3.5 border-y border-line py-4">
           <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-navy font-display text-sm font-extrabold text-brass">SI</span>
           <span className="flex-1 text-[15px]"><strong>{fr ? "Entrevue par ShowIci" : "Interview by ShowIci"}</strong><br /><span className="text-muted">{a.date} · {a.read}</span></span>
-          <Button variant="secondary">{fr ? "Partager" : "Share"}</Button>
+          <ShareMenu title={a.title} caption={fr ? `${art.artist} à l'affiche sur ShowIci : ${a.title}` : `${art.artist} in the ShowIci Spotlight: ${a.title}`} />
         </div>
       </article>
       {art.videos[0] && (

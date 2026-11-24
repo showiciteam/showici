@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Button, Placeholder, VideoBox } from "@/components/ui";
+import { Placeholder, VideoBox } from "@/components/ui";
 import { getStories } from "@/lib/data";
-import { FollowCard } from "@/components/Social";
+import { FollowCard, ShareMenu } from "@/components/Social";
 import { SpotlightArticleView } from "@/components/SpotlightArticle";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -46,7 +46,7 @@ export default async function SpotlightArticle({ params }: { params: Promise<{ s
         <div className="my-6 flex flex-wrap items-center gap-3.5 border-y border-line py-4">
           <span className="h-11 w-11 flex-none rounded-full bg-ph-2" />
           <span className="flex-1 text-[15px]"><strong>Interview by [Writer name]</strong><br /><span className="text-muted">{s.date} · {s.read} · Lire en français</span></span>
-          <Button variant="secondary">Share</Button>
+          <ShareMenu title={s.title} />
         </div>
       </article>
       {s.video && <div className="mx-auto max-w-[1040px] px-6"><VideoBox title="[Interview video on YouTube, plays here]" big /></div>}
