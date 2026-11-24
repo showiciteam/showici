@@ -28,6 +28,8 @@ export interface Performer {
   lng?: number;
   /** Live data only. */
   ownerId?: string;
+  /** False for performers ShowIci listed (e.g. Spotlight interviews) that the artist hasn't claimed yet. */
+  claimed?: boolean;
   photos?: string[];
   links?: { label: string; url: string }[];
   /** Header banner and logo uploaded separately from the gallery. */
@@ -177,6 +179,8 @@ export interface StoryArticle {
   en: StoryArticleText;
   fr: StoryArticleText;
   artist: string;
+  /** The artist's ShowIci performer profile, when there is one. */
+  performerId?: string;
   videos: { url: string; en: string; fr: string }[];
   photos: { src: string; en: string; fr: string; credit?: string }[];
   links: { label: string; url: string }[];

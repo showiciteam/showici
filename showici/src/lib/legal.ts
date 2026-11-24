@@ -38,6 +38,7 @@ export const terms: Record<"en" | "fr", LegalDoc> = {
       { h: "5. Performers", p: [
         "- Your profile must describe your own act. Only post photos, videos and music you have the right to share, and only answer requests you can really fulfil.",
         "- Your phone number stays private: it is never shown on your profile. Only your home city is public; we place you near it on the map, never at an exact address.",
+        "- When we interview an artist (for example for Spotlight), ShowIci may create a performer page for them from the interview and the artist's own public pages (name, bio, city, photos and videos they shared, official links). These pages are marked as not claimed. The artist can claim the page for free to manage it, or ask us to correct or remove it through Contact. A claim is approved only once we have confirmed that the person is the artist or acts for them.",
       ] },
       { h: "6. Messages and contacts", p: [
         "- Use messages for real booking conversations. No spam, advertising, mass messages or harassment.",
@@ -98,6 +99,7 @@ export const terms: Record<"en" | "fr", LegalDoc> = {
       { h: "5. Artistes", p: [
         "- Votre profil doit présenter votre propre numéro. Ne publiez que des photos, vidéos et pièces musicales que vous avez le droit de partager, et ne répondez qu'aux demandes que vous pouvez réellement honorer.",
         "- Votre numéro de téléphone reste privé : il n'est jamais affiché sur votre profil. Seule votre ville est publique; nous vous plaçons près de celle-ci sur la carte, jamais à une adresse exacte.",
+        "- Lorsque nous interviewons un artiste (par exemple pour Spotlight), ShowIci peut lui créer une page d'artiste à partir de l'entrevue et de ses propres pages publiques (nom, biographie, ville, photos et vidéos qu'il nous a transmises, liens officiels). Ces pages sont indiquées comme non revendiquées. L'artiste peut revendiquer la page gratuitement pour la gérer, ou nous demander de la corriger ou de la retirer par la page Contact. Une revendication n'est approuvée qu'une fois que nous avons confirmé que la personne est l'artiste ou agit en son nom.",
       ] },
       { h: "6. Messages et contacts", p: [
         "- Utilisez les messages pour de vraies discussions de réservation. Pas de pourriel, de publicité, d'envois massifs ni de harcèlement.",
@@ -149,6 +151,7 @@ export const privacy: Record<"en" | "fr", LegalDoc> = {
         "- Messages: conversations between members, which we store so they can be read in your inbox. Phone numbers and emails typed in messages may be hidden automatically.",
         "- Contact form: what you write to us and the details you choose to add (name, email, phone, company, etc.).",
         "- Venue claims: when you claim a venue page, your name, role at the venue, email and phone number, used only to confirm the claim.",
+        "- Performer claims: when you claim a performer page, your name, your role (artist, band member, manager or agent), email and phone number, used only to confirm the claim.",
         "- Venues listed before their owner joins: public business information about the venue (name, address, public phone number, website), taken from OpenStreetMap and the venue's own pages. It is about the business, not about a person.",
         "- Technical: a login session cookie needed to keep you signed in, your language choice saved in your browser, and the basic connection logs (IP address, browser, time) that our hosting providers keep for security.",
         "- Site statistics (Google Analytics): how the site is used (pages viewed, approximate location from your IP address, device and browser, how you arrived). We use it to see which pages help people and to improve ShowIci, not for advertising. Google Analytics cookies are only set if you accept them. If you don't, Google only receives anonymous measurements without cookies, which can't recognize you from one visit to the next. You can change your choice anytime with \"Cookie settings\" at the bottom of every page.",

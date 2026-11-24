@@ -14,6 +14,7 @@ export const kbust: Story = {
   video: true,
   article: {
     artist: "K-Bust",
+    performerId: "6b2f3c1e-4a8d-4e7b-9c15-0d2e8f7a51b4",
     videos: [
       { url: "https://www.youtube.com/watch?v=YCU8VjSnCTI", en: "Live at Le Petit Campus, Montréal", fr: "En spectacle au Petit Campus, Montréal" },
       { url: "https://www.youtube.com/watch?v=K4yJki0OSxk", en: "Live at the ShowPlace Theater, Buffalo, NY", fr: "En spectacle au ShowPlace Theater, Buffalo (NY)" },

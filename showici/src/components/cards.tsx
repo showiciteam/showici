@@ -37,7 +37,7 @@ export function PerformerCard({ p }: { p: Performer }) {
       </div>
       <div className="mt-1 flex gap-2.5">
         <Button href={`/performers/${p.id}`} variant="secondary" className="flex-1 text-sm">Watch samples</Button>
-        <Button href={`/messages?to=${p.id}`} className="flex-1 text-sm">Contact</Button>
+        {p.claimed === false ? null : <Button href={`/messages?to=${p.id}`} className="flex-1 text-sm">Contact</Button>}
       </div>
     </article>
   );
@@ -55,11 +55,11 @@ export function PerformerRow({ p }: { p: Performer }) {
           {p.verified && <span className="text-xs font-bold text-brass-dark">✓ Verified</span>}
         </span>
         <span className="text-[15px] text-slate">{p.actType} · {p.repertoire} · {p.genres.join(", ")}</span>
-        <span className="text-sm text-muted">{p.base} · {p.distanceKm} km away · travels up to {p.travelKm} km · <Stars rating={p.rating} /> {p.rating}</span>
+        <span className="text-sm text-muted">{p.base} · {p.distanceKm} km away{p.claimed === false ? " · Listed by ShowIci" : <> · travels up to {p.travelKm} km · <Stars rating={p.rating} /> {p.rating}</>}</span>
       </div>
       <div className="flex flex-wrap gap-2.5">
         <Button href={`/performers/${p.id}`} variant="secondary" className="text-sm">View profile</Button>
-        <Button href={`/messages?to=${p.id}`} className="text-sm">Send message</Button>
+        {p.claimed === false ? null : <Button href={`/messages?to=${p.id}`} className="text-sm">Send message</Button>}
       </div>
     </article>
   );

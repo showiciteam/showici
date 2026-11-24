@@ -75,6 +75,9 @@ export function SpotlightArticleView({ s, more }: { s: Story; more: Story[] }) {
           <span className="flex h-16 w-16 flex-none items-center justify-center rounded-full bg-navy font-display font-extrabold text-brass">{art.artist[0]}</span>
           <span className="flex-[1_1_220px] text-base"><strong className="text-lg">{fr ? `Suivez ${art.artist}` : `Follow ${art.artist}`}</strong><br /><span className="text-muted">{fr ? "Synth-pop · Auteure-compositrice-interprète · Montréal" : "Synth-pop · Singer-songwriter · Montréal"}</span></span>
           <span className="flex flex-wrap gap-2">
+            {art.performerId && (
+              <Link href={`/performers/${art.performerId}`} className="rounded-[10px] bg-brass px-4 py-2.5 text-[15px] font-bold text-navy no-underline hover:text-navy">{fr ? "Profil ShowIci" : "ShowIci profile"}</Link>
+            )}
             {art.links.map((l) => (
               <a key={l.url} href={l.url} target="_blank" rel="noopener noreferrer" className="rounded-[10px] bg-navy px-4 py-2.5 text-[15px] font-bold text-white no-underline hover:text-white">{l.label}</a>
             ))}

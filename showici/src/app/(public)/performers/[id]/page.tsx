@@ -30,6 +30,7 @@ export default async function PerformerProfile({ params }: { params: Promise<{ i
   const others = p.videos.filter((v) => v !== featured);
   const photos = p.photos ?? [];
   const isMe = Boolean(user && p.ownerId && user.id === p.ownerId);
+  const unclaimed = p.claimed === false;
   const header = p.cover ?? photos[0];
   const family = actFamily(p.actType);
 
@@ -65,9 +66,10 @@ export default async function PerformerProfile({ params }: { params: Promise<{ i
               {p.verified && <span className="inline-flex items-center gap-1 rounded-full bg-ph-3 px-2.5 py-1 text-[13px] font-bold text-[#1B4F80]">✓ Verified</span>}
               {!p.available && <span className="rounded-full bg-line px-2.5 py-1 text-[13px] font-bold text-muted">Not taking gigs right now</span>}
             </div>
-            <span className="text-[17px] text-slate">{p.actType} · {p.genres.join(", ")} · {p.base} · travels up to {p.travelKm} km</span>
+            <span className="text-[17px] text-slate">{p.actType} · {p.genres.join(", ")} · {p.base}{unclaimed ? "" : ` · travels up to ${p.travelKm} km`}</span>
+            {unclaimed && <span className="w-fit rounded-full border border-line-strong bg-white px-3 py-1 text-[13px] font-bold text-slate">Listed by ShowIci · Not claimed yet</span>}
             <span className="flex items-center gap-1.5">
-              {p.reviewCount > 0 ? <><Stars rating={p.rating} /><strong>{p.rating}</strong><a href="#reviews">{p.reviewCount} reviews</a></> : <span className="hint">No reviews yet</span>}
+              {unclaimed ? null : p.reviewCount > 0 ? <><Stars rating={p.rating} /><strong>{p.rating}</strong><a href="#reviews">{p.reviewCount} reviews</a></> : <span className="hint">No reviews yet</span>}
             </span>
           </div>
           <div className="flex flex-wrap gap-2.5 pb-1.5">
@@ -77,9 +79,19 @@ export default async function PerformerProfile({ params }: { params: Promise<{ i
               <SaveButton kind="performer" id={p.id} initial={saved} signedIn={Boolean(user)} />
             )}
             <ShareMenu title={`${p.name} on ShowIci`} caption={`${p.name} on ShowIci: ${p.actType}, ${p.genres.slice(0, 2).join(", ")}. Book local talent.`} />
-            {!isMe && <Button href={`/messages?to=${p.id}`} className="px-6">Send message</Button>}
+            {unclaimed ? <Button href={`/performers/${p.id}/claim`} className="px-6">Is this you? Claim it</Button> : !isMe && <Button href={`/messages?to=${p.id}`} className="px-6">Send message</Button>}
           </div>
         </div>
+
+        {unclaimed && (
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-[18px] border border-[#CDBDFF] bg-brass-tint px-5 py-4">
+            <div className="flex max-w-[680px] flex-col gap-1">
+              <strong className="text-[17px]">Are you {p.name}?</strong>
+              <span className="text-ink-2">We created this page from our interview and your public pages so venues and event planners can find you. Claim it to edit your profile, add photos and videos, and get booking messages. It&apos;s free.</span>
+            </div>
+            <Button href={`/performers/${p.id}/claim`}>Claim this profile</Button>
+          </div>
+        )}
 
         <div className="mb-8 mt-[22px] flex flex-wrap gap-2">
           {[...p.eventTypes, p.languages.length > 1 ? p.languages.map((l) => l.slice(0, 2).toUpperCase()).join(" + ") : p.languages[0]].filter(Boolean).map((t) => <Tag key={t}>{t}</Tag>)}
@@ -125,7 +137,7 @@ export default async function PerformerProfile({ params }: { params: Promise<{ i
                 </Link>
               ))}
             </section>
-            <section id="reviews" className="flex flex-col gap-3.5">
+            {!unclaimed && <section id="reviews" className="flex flex-col gap-3.5">
               <h2 className="h-display text-[28px]">Reviews from bookers</h2>
               {supabaseEnabled ? (
                 reviews.length === 0 ? (
@@ -149,7 +161,7 @@ export default async function PerformerProfile({ params }: { params: Promise<{ i
                   </article>
                 ))
               )}
-            </section>
+            </section>}
           </div>
 
           <aside className="flex max-w-[380px] flex-[1_1_300px] flex-col gap-4">
@@ -165,7 +177,14 @@ export default async function PerformerProfile({ params }: { params: Promise<{ i
                 <div className="flex flex-wrap gap-2">{p.links!.map((l) => <a key={l.url} href={l.url} target="_blank" rel="noopener noreferrer" className="rounded-full border border-line-strong bg-white px-3 py-1 text-[13px] text-ink-2 no-underline">{l.label} ↗</a>)}</div>
               </div>
             )}
-            {!isMe && (
+            {unclaimed && (
+              <div className="flex flex-col gap-3 rounded-2xl bg-parchment p-[22px]">
+                <strong className="text-[17px]">Want to book {p.name}?</strong>
+                <span className="text-[15px] text-slate">{p.name} isn&apos;t on ShowIci yet, so messages can&apos;t reach them here. Contact them through their official links above.</span>
+                <p className="text-[13px] leading-relaxed text-muted">Details come from our interview and the artist&apos;s public pages, and may be out of date. Something wrong, or want this page removed? Use Contact at the bottom of the page.</p>
+              </div>
+            )}
+            {!isMe && !unclaimed && (
               <div className="flex flex-col gap-3 rounded-2xl bg-parchment p-[22px]">
                 <strong className="text-[17px]">Planning a show or party?</strong>
                 <span className="text-[15px] text-slate">Message {p.name} through ShowIci. Contact details stay private, and you agree on payment directly.</span>

@@ -63,7 +63,7 @@ export async function resolveRecipient(id: string): Promise<{ id: string; name: 
   const direct = await getProfileName(id);
   if (direct) return { id, ...direct };
   const { data: perf } = await sb.from("performers_view").select("owner, name, act_type").eq("id", id).maybeSingle();
-  if (perf) return { id: perf.owner, name: perf.name, role: `Performer · ${perf.act_type}` };
+  if (perf) return perf.owner ? { id: perf.owner, name: perf.name, role: `Performer · ${perf.act_type}` } : null;
   const { data: venue } = await sb.from("venues_view").select("owner, name, type").eq("id", id).maybeSingle();
   if (venue) return { id: venue.owner, name: venue.name, role: `Venue · ${venue.type}` };
   return null;
@@ -460,6 +460,34 @@ export async function getAdminContact(status: "new" | "answered" | "closed" | "a
     status: r.status as string,
     when: timeAgo(r.created_at),
     page: (r.page ?? "") as string,
+  }));
+}
+
+// ───────────── Admin: performer claims ─────────────
+
+export async function getAdminPerformerClaims(status: "pending" | "approved" | "rejected" | "all") {
+  const sb = await getServerSupabase();
+  if (!sb) return [];
+  let q = sb.from("performer_claims").select("*, performer:performers(id, name, act_type, base_city, website, instagram, facebook)").order("created_at", { ascending: false }).limit(200);
+  if (status !== "all") q = q.eq("status", status);
+  const { data } = await q;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data ?? []).map((c: any) => ({
+    id: c.id as string,
+    status: c.status as string,
+    auto: Boolean(c.auto_approved),
+    name: c.name as string,
+    role: c.role as string,
+    email: c.email as string,
+    phone: (c.phone ?? "") as string,
+    message: (c.message ?? "") as string,
+    when: timeAgo(c.created_at),
+    performer: {
+      id: (c.performer?.id ?? "") as string,
+      name: (c.performer?.name ?? "Deleted profile") as string,
+      detail: [c.performer?.act_type, c.performer?.base_city].filter(Boolean).join(" · "),
+      links: [["Website", c.performer?.website], ["Instagram", c.performer?.instagram], ["Facebook", c.performer?.facebook]].filter(([, u]) => u) as [string, string][],
+    },
   }));
 }
 

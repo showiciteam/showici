@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { setContactStatus, setFreeDailyContacts, setPerformerVerified, setPlanLimits, setReportStatus, setRequestStatus, setShowStatus, setUserRole, setVenuePublished, unpublishPerformer, type Result, decideVenueClaim } from "@/lib/actions";
+import { setContactStatus, setFreeDailyContacts, setPerformerVerified, setPlanLimits, setReportStatus, setRequestStatus, setShowStatus, setUserRole, setVenuePublished, unpublishPerformer, type Result, decideVenueClaim, decidePerformerClaim } from "@/lib/actions";
 
 type Action = { label: string; done: string; run: () => Promise<Result> };
 
@@ -186,12 +186,13 @@ export function ContactActions({ id, status }: { id: string; status: string }) {
   );
 }
 
-export function ClaimActions({ id }: { id: string }) {
+export function ClaimActions({ id, kind = "venue" }: { id: string; kind?: "venue" | "performer" }) {
+  const decide = kind === "performer" ? decidePerformerClaim : decideVenueClaim;
   return (
     <ActionButtons
       actions={[
-        { label: "Reject", done: "Rejected", run: () => decideVenueClaim(id, false) },
-        { label: "Approve: hand over the venue", done: "Approved", run: () => decideVenueClaim(id, true) },
+        { label: "Reject", done: "Rejected", run: () => decide(id, false) },
+        { label: kind === "performer" ? "Approve: hand over the profile" : "Approve: hand over the venue", done: "Approved", run: () => decide(id, true) },
       ]}
     />
   );
