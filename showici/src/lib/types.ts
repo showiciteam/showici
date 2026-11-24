@@ -61,6 +61,8 @@ export interface Venue {
   ownerId?: string;
   street?: string;
   postalCode?: string;
+  /** Readable address of the venue page: /venues/{slug}. Missing in demo mode (the id is used). */
+  slug?: string;
   photos?: string[];
   links?: { label: string; url: string }[];
   /** False for venues ShowIci listed from public sources that no owner has claimed yet. */
@@ -128,6 +130,9 @@ export interface BigEvent {
   startDate?: string;
   /** How many other dates the same show has at the same venue. */
   moreDates?: number;
+  /** Raw start time ("20:00:00") and lowest price, for formatting in French. */
+  localTime?: string;
+  priceMin?: number;
 }
 
 export interface EventRequest {

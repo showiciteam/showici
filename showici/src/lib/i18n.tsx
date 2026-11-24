@@ -1,8 +1,9 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext } from "react";
+import { LANG_COOKIE, isPrivatePath, localePath, splitLang, switchLang, tr, type Lang } from "./locale";
 
-export type Lang = "en" | "fr";
+export type { Lang };
 
 const dict = {
   en: {
@@ -15,7 +16,7 @@ const dict = {
     "nav.news": "News",
     "nav.contact": "Contact",
     "nav.login": "Log in",
-    "nav.signup": "Sign up free",
+    "nav.signup": "Sign up",
     "hero.eyebrow": "Live entertainment · Across Québec · Starting in Montréal",
     "hero.title1": "Book local talent",
     "hero.title2": "for every stage.",
@@ -42,7 +43,7 @@ const dict = {
     "nav.news": "Nouvelles",
     "nav.contact": "Contact",
     "nav.login": "Connexion",
-    "nav.signup": "Inscription gratuite",
+    "nav.signup": "Inscription",
     "hero.eyebrow": "Divertissement en direct · Partout au Québec · À commencer par Montréal",
     "hero.title1": "Réservez les talents d'ici",
     "hero.title2": "pour toutes les scènes.",
@@ -63,32 +64,32 @@ const dict = {
 
 export type DictKey = keyof (typeof dict)["en"];
 
-const LangContext = createContext<{ lang: Lang; setLang: (l: Lang) => void; t: (k: DictKey) => string }>({
+type Ctx = { lang: Lang; setLang: (l: Lang) => void; t: (k: DictKey) => string; tr: (en: string, fr: string) => string; href: (path: string) => string };
+
+const LangContext = createContext<Ctx>({
   lang: "en",
   setLang: () => {},
   t: (k) => dict.en[k],
+  tr: tr("en"),
+  href: (p) => p,
 });
 
-export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLangState] = useState<Lang>("en");
-
-  useEffect(() => {
-    try {
-      const saved = window.localStorage.getItem("showici-lang");
-      if (saved === "fr" || saved === "en") setLangState(saved);
-    } catch {}
-  }, []);
-
+/**
+ * The page language comes from the URL (/fr/… is French), read by the middleware and passed down from
+ * the root layout. Switching language goes to the same page in the other language and remembers the choice.
+ */
+export function LanguageProvider({ lang, children }: { lang: Lang; children: React.ReactNode }) {
   const setLang = (l: Lang) => {
-    setLangState(l);
-    try {
-      window.localStorage.setItem("showici-lang", l);
-    } catch {}
-    document.documentElement.lang = l;
+    if (l === lang) return;
+    document.cookie = `${LANG_COOKIE}=${l}; path=/; max-age=31536000; samesite=lax`;
+    const { path } = splitLang(window.location.pathname);
+    // Private pages keep their address; public pages move to their /fr (or English) version.
+    const next = isPrivatePath(path) ? path : switchLang(window.location.pathname, l);
+    window.location.assign(next + window.location.search + window.location.hash);
   };
 
   return (
-    <LangContext.Provider value={{ lang, setLang, t: (k) => dict[lang][k] }}>{children}</LangContext.Provider>
+    <LangContext.Provider value={{ lang, setLang, t: (k) => dict[lang][k], tr: tr(lang), href: (p) => localePath(lang, p) }}>{children}</LangContext.Provider>
   );
 }
 

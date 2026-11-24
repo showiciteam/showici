@@ -4,6 +4,8 @@ import { getServerSupabase } from "./supabase/server";
 import { mediaUrl } from "./media";
 import type { BigEvent, EventRequest, Performer, Review, Show, Tone, Venue } from "./types";
 import { getTicketmasterEvents } from "./ticketmaster";
+import { getLang } from "./lang";
+import type { Lang } from "./locale";
 
 const TONES: Tone[] = ["ph-1", "ph-2", "ph-3", "ph-4", "ph-5"];
 export const toneFor = (id: string) => TONES[[...id].reduce((a, c) => a + c.charCodeAt(0), 0) % TONES.length];
@@ -19,14 +21,30 @@ export function mapPosition(lat?: number | null, lng?: number | null) {
 }
 
 /** "3 h ago", "yesterday", "4 days ago"… */
-export function timeAgo(iso: string) {
+export function timeAgo(iso: string, lang: Lang = "en") {
+  const fr = lang === "fr";
   const mins = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
-  if (mins < 1) return "just now";
-  if (mins < 60) return `${mins} min ago`;
+  if (mins < 1) return fr ? "à l'instant" : "just now";
+  if (mins < 60) return fr ? `il y a ${mins} min` : `${mins} min ago`;
   const hours = Math.round(mins / 60);
-  if (hours < 24) return `${hours} h ago`;
+  if (hours < 24) return fr ? `il y a ${hours} h` : `${hours} h ago`;
   const days = Math.round(hours / 24);
-  return days === 1 ? "yesterday" : `${days} days ago`;
+  return days === 1 ? (fr ? "hier" : "yesterday") : fr ? `il y a ${days} jours` : `${days} days ago`;
+}
+
+/**
+ * Descriptions written by ShowIci are stored as "English\n\nFrench". Returns the part for the page language;
+ * text written by an owner in one language is shown as is.
+ */
+const UNCONFIRMED = /\s*Live shows not confirmed\.\s*\/\s*Spectacles à confirmer\.\s*$/;
+export function pickBilingual(text: string, lang: Lang, bilingual: boolean) {
+  if (!bilingual || !text.includes("\n\n")) return text;
+  // Some listings end with a two-language note that live shows aren't confirmed: keep it, in the page language.
+  const unconfirmed = UNCONFIRMED.test(text);
+  const [en, ...rest] = text.replace(UNCONFIRMED, "").split("\n\n");
+  const fr = rest.join("\n\n").trim();
+  const body = lang === "fr" && fr ? fr : en.trim();
+  return unconfirmed ? `${body} ${lang === "fr" ? "Spectacles à confirmer." : "Live shows not confirmed."}` : body;
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -71,7 +89,9 @@ function toPerformer(r: any): Performer {
   };
 }
 
-function toVenue(r: any): Venue {
+function toVenue(r: any, lang: Lang = "en"): Venue {
+  // Listings ShowIci added (not yet claimed) carry an English and a French description.
+  const bilingual = !r.owner && /^(showici|osm):/.test(r.source_ref ?? "");
   return {
     id: r.id,
     name: r.name,
@@ -88,7 +108,8 @@ function toVenue(r: any): Venue {
     equipment: r.equipment ?? [],
     openToNewActs: !!r.open_to_new_acts,
     rating: Number(r.rating ?? 0),
-    description: r.description ?? "",
+    description: pickBilingual(r.description ?? "", lang, bilingual),
+    slug: r.slug ?? undefined,
     tone: toneFor(r.id),
     map: mapPosition(r.lat, r.lng),
     lat: r.lat ?? undefined,
@@ -165,43 +186,56 @@ export async function getVenues(opts: NearOpts = {}): Promise<Venue[]> {
     p_radius_km: opts.radiusKm ?? QUEBEC_WIDE_KM,
   });
   if (error) console.error("getVenues", error.message);
-  return (data ?? []).map(toVenue);
+  const lang = await getLang();
+  return (data ?? []).map((r: unknown) => toVenue(r, lang));
 }
 
-export async function getVenue(id: string): Promise<Venue | undefined> {
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** A venue by its readable address (e.g. "bar-de-courcelle-montreal") or, for old links, its id. */
+export async function getVenue(idOrSlug: string): Promise<Venue | undefined> {
   const sb = await getServerSupabase();
-  if (!sb) return mock.venues.find((v) => v.id === id) ?? mock.venues[0];
-  const { data } = await sb.from("venues_view").select("*, venue_photos(*), venue_videos(*)").eq("id", id).maybeSingle();
-  return data ? toVenue(data) : undefined;
+  if (!sb) return mock.venues.find((v) => v.id === idOrSlug) ?? mock.venues[0];
+  const { data } = await sb
+    .from("venues_view")
+    .select("*, venue_photos(*), venue_videos(*)")
+    .eq(UUID.test(idOrSlug) ? "id" : "slug", idOrSlug)
+    .maybeSingle();
+  return data ? toVenue(data, await getLang()) : undefined;
 }
 
 const SHOW_TZ = "America/Toronto"; // show times are displayed in Eastern time (Montréal, Québec City)
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-function toShow(r: any): Show {
+/** Entry labels picked on the post-a-show form, in French. Anything else the venue typed is shown as is. */
+const ENTRY_FR: Record<string, string> = { "Free entry": "Entrée libre", Free: "Gratuit", "Cover charge": "Droit d'entrée", "Tickets": "Billets", "Pay what you can": "Contribution volontaire" };
+export const entryLabel = (entry: string, lang: Lang) => (lang === "fr" ? ENTRY_FR[entry] ?? entry : entry);
+
+function toShow(r: any, lang: Lang = "en"): Show {
   const d = new Date(r.starts_at);
+  const loc = lang === "fr" ? "fr-CA" : "en-CA";
   // A ShowIci act only appears once they accept the booking; until then the show says "Artist TBA".
   const tba = Boolean(r.performer_id) && (r.performer_status ?? "accepted") !== "accepted";
   const ownTitle = r.title && r.title !== r.performer_name ? r.title : "";
-  const long = d.toLocaleDateString("en-CA", { weekday: "long", month: "long", day: "numeric", timeZone: SHOW_TZ });
-  const clock = (x: Date) => x.toLocaleTimeString("en-CA", { hour: "numeric", minute: "2-digit", timeZone: SHOW_TZ });
+  const long = d.toLocaleDateString(loc, { weekday: "long", month: "long", day: "numeric", timeZone: SHOW_TZ });
+  const clock = (x: Date) => x.toLocaleTimeString(loc, { hour: "numeric", minute: "2-digit", timeZone: SHOW_TZ });
   return {
     id: r.id,
     performerId: tba ? "" : r.performer_id ?? "",
     venueId: r.venue_id,
-    title: tba ? ownTitle || "Artist TBA" : r.title || r.performer_name,
+    title: tba ? ownTitle || (lang === "fr" ? "Artiste à confirmer" : "Artist TBA") : r.title || r.performer_name,
     artistTba: tba,
     genre: r.genre ?? "",
-    dayLabel: long,
-    day: d.toLocaleDateString("en-CA", { weekday: "short", timeZone: SHOW_TZ }).replace(".", "").toUpperCase(),
-    date: d.toLocaleDateString("en-CA", { day: "numeric", timeZone: SHOW_TZ }),
+    dayLabel: long.charAt(0).toUpperCase() + long.slice(1),
+    day: d.toLocaleDateString(loc, { weekday: "short", timeZone: SHOW_TZ }).replace(".", "").toUpperCase(),
+    date: d.toLocaleDateString(loc, { day: "numeric", timeZone: SHOW_TZ }),
     longDate: long,
     doors: r.doors_at ? clock(new Date(r.doors_at)) : "",
     time: clock(d),
-    entry: r.entry ?? "Free entry",
+    entry: entryLabel(r.entry ?? "Free entry", lang),
     tone: toneFor(r.id),
     ticketUrl: r.ticket_url ?? undefined,
-    description: r.description_en || r.description_fr || "",
+    description: (lang === "fr" ? r.description_fr || r.description_en : r.description_en || r.description_fr) || "",
     startsAt: r.starts_at,
   };
 }
@@ -218,14 +252,15 @@ export async function getShows(): Promise<Show[]> {
     .order("starts_at")
     .limit(50);
   if (error) console.error("getShows", error.message);
-  return (data ?? []).map(toShow);
+  const lang = await getLang();
+  return (data ?? []).map((r: unknown) => toShow(r, lang));
 }
 
 export async function getShow(id: string): Promise<Show | undefined> {
   const sb = await getServerSupabase();
   if (!sb) return mock.shows.find((s) => s.id === id) ?? mock.shows[0];
   const { data } = await sb.from("shows").select("*").eq("id", id).eq("status", "live").maybeSingle();
-  return data ? toShow(data) : undefined;
+  return data ? toShow(data, await getLang()) : undefined;
 }
 
 /** Open private-event requests, soonest first. Only signed-in performers (and the planner) can read them. */
@@ -262,17 +297,21 @@ export async function getReviewsFor(profileId?: string): Promise<Review[]> {
     .eq("subject_id", profileId)
     .order("created_at", { ascending: false })
     .limit(20);
-  const roleLabel: Record<string, string> = { venue: "Venue", performer: "Performer", planner: "Private event", admin: "ShowIci" };
+  const lang = await getLang();
+  const fr = lang === "fr";
+  const roleLabel: Record<string, string> = fr
+    ? { venue: "Salle", performer: "Artiste", planner: "Événement privé", admin: "ShowIci" }
+    : { venue: "Venue", performer: "Performer", planner: "Private event", admin: "ShowIci" };
   return (data ?? []).map((r: any) => {
     const who = Array.isArray(r.reviewer) ? r.reviewer[0] : r.reviewer;
     return {
       id: r.id,
-      author: who?.display_name || "ShowIci member",
+      author: who?.display_name || (fr ? "Membre ShowIci" : "ShowIci member"),
       context: roleLabel[who?.role] ?? "",
       rating: r.rating,
       body: r.body ?? "",
       tags: r.tags ?? [],
-      date: new Date(r.created_at).toLocaleDateString("en-CA", { month: "short", year: "numeric" }),
+      date: new Date(r.created_at).toLocaleDateString(fr ? "fr-CA" : "en-CA", { month: "short", year: "numeric" }),
     };
   });
 }
@@ -285,14 +324,29 @@ export async function getReviewsFor(profileId?: string): Promise<Review[]> {
  */
 export async function getBigEvents(): Promise<BigEvent[]> {
   const key = process.env.TICKETMASTER_API_KEY;
+  const lang = await getLang();
   if (!key) return mock.bigEvents;
   try {
-    return await getTicketmasterEvents(key);
+    return (await getTicketmasterEvents(key)).map((e) => localizeEvent(e, lang));
   } catch (e) {
     console.error("getBigEvents", e);
     return [];
   }
 }
+/** Ticketmaster cards in French: day, month, time and price. The category stays English (it is the filter key). */
+function localizeEvent(e: BigEvent, lang: Lang): BigEvent {
+  if (lang !== "fr" || !e.startDate) return e;
+  const d = new Date(`${e.startDate}T12:00:00`);
+  const time = e.localTime ? e.localTime.slice(0, 5).replace(/^0/, "").replace(":", " h ") : "";
+  return {
+    ...e,
+    day: d.toLocaleDateString("fr-CA", { weekday: "short" }).replace(".", "").toUpperCase(),
+    month: d.toLocaleDateString("fr-CA", { month: "short" }).replace(".", ""),
+    time: e.localTime ? time : e.time === "Time TBA" ? "Heure à confirmer" : e.time,
+    price: e.priceMin ? `À partir de ${e.priceMin} $` : "",
+  };
+}
+
 export const getStories = async () => mock.stories;
 export const getNews = async () => mock.news;
 export const getThreads = async () => mock.threads; // Sample threads for demo mode. Live inboxes use getInbox() in dashboard.ts.

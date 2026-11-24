@@ -75,6 +75,8 @@ function toEvent(e: any, i: number): BigEvent | null {
     startDate: localDate,
     time: e.dates?.start?.timeTBA || e.dates?.start?.noSpecificTime ? "Time TBA" : clock(e.dates?.start?.localTime),
     price: typeof min === "number" && min > 0 ? `From $${Math.round(min)}` : "",
+    priceMin: typeof min === "number" && min > 0 ? Math.round(min) : undefined,
+    localTime: e.dates?.start?.timeTBA || e.dates?.start?.noSpecificTime ? undefined : e.dates?.start?.localTime,
     tone: TONES[i % TONES.length],
     url: e.url,
     image: bestImage(e.images),
