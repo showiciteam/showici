@@ -20,13 +20,20 @@ export default async function SpotlightPage() {
             <div className="flex flex-wrap gap-2.5"><Button href="#latest" variant="brass">Read the latest</Button><Button href="#nominate" variant="ghost-dark">Nominate someone</Button></div>
           </div>
           <Link href={`/spotlight/${featured.slug}`} className="flex flex-[1_1_460px] flex-col gap-3.5 text-white no-underline hover:text-white">
-            <div className="relative flex aspect-[16/10] flex-col items-center justify-center gap-3 rounded-[18px] bg-navy-soft">
-              <span className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-brass"><PlayIcon size={30} color="#14213D" /></span>
-              <span className="text-sm text-on-navy">[Interview video · 12 min]</span>
+            <div className="relative flex aspect-[16/10] flex-col items-center justify-center gap-3 overflow-hidden rounded-[18px] bg-navy-soft">
+              {featured.article && featured.photo.startsWith("/") ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={featured.photo} alt={`${featured.article.artist} live`} className="absolute inset-0 h-full w-full object-cover" />
+              ) : (
+                <>
+                  <span className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-brass"><PlayIcon size={30} color="#14213D" /></span>
+                  <span className="text-sm text-on-navy">[Interview video · 12 min]</span>
+                </>
+              )}
               <span className="absolute left-4 top-4 rounded-full bg-brass px-2.5 py-1 text-xs font-bold text-navy">Featured interview</span>
             </div>
             <span className="eyebrow text-brass">{featured.category} · {featured.city}</span>
-            <span className="font-display text-[28px] font-extrabold leading-tight">&ldquo;[A short pull quote from the featured interview.]&rdquo;</span>
+            <span className="font-display text-[28px] font-extrabold leading-tight">&ldquo;{featured.article ? featured.article.en.quote : "[A short pull quote from the featured interview.]"}&rdquo;</span>
             <span className="text-on-navy">{featured.title}</span>
           </Link>
         </div>

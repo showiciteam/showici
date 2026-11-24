@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { createClient } from "@supabase/supabase-js";
 import { SITE_URL } from "@/lib/site";
+import { stories } from "@/lib/mock";
 
 export const revalidate = 3600; // rebuild the sitemap at most once an hour
 
@@ -41,5 +42,8 @@ async function dynamicPages(): Promise<MetadataRoute.Sitemap> {
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   const fixed = PUBLIC_PAGES.map((p) => ({ url: `${SITE_URL}${p.path === "/" ? "" : p.path}`, lastModified: now, changeFrequency: p.changeFrequency, priority: p.priority }));
-  return [...fixed, ...(await dynamicPages())];
+  const articles = stories
+    .filter((s) => s.article && !s.draft)
+    .map((s) => ({ url: `${SITE_URL}/spotlight/${s.slug}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.7 }));
+  return [...fixed, ...articles, ...(await dynamicPages())];
 }

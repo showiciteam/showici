@@ -119,7 +119,12 @@ export function StoryCard({ s }: { s: Story }) {
   return (
     <Link href={`/spotlight/${s.slug}`} className="card flex flex-col overflow-hidden text-navy no-underline hover:text-navy hover:shadow-md">
       <div className="relative">
-        <Placeholder tone={s.tone} label={s.photo} className="aspect-[16/10] items-end justify-start p-3.5" />
+        {s.article && s.photo.startsWith("/") ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={s.photo} alt={`${s.article.artist} live`} className="aspect-[16/10] w-full object-cover" />
+        ) : (
+          <Placeholder tone={s.tone} label={s.photo} className="aspect-[16/10] items-end justify-start p-3.5" />
+        )}
         {s.video && <span className="absolute right-3.5 top-3.5 rounded-full bg-navy px-2.5 py-1 text-xs font-bold text-white">▶ Video</span>}
       </div>
       <div className="flex flex-col gap-2 p-5">

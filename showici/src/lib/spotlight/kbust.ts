@@ -1,6 +1,6 @@
 import type { Story } from "../types";
 
-/** ShowIci Spotlight #1: K-Bust. PRE-DRAFT: waiting for the artist's approval, do not publish. */
+/** ShowIci Spotlight #1: K-Bust. Approved by the artist on 2026-11-24. */
 export const kbust: Story = {
   slug: "k-bust-rebirth",
   category: "Performer",
@@ -12,7 +12,6 @@ export const kbust: Story = {
   photo: "/spotlight/kbust-whisky-a-go-go.webp",
   tone: "ph-1",
   video: true,
-  draft: true,
   article: {
     artist: "K-Bust",
     videos: [
