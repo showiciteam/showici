@@ -1,10 +1,11 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/LocalLink";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { signOutAction } from "@/lib/auth-actions";
 import { useLang, type DictKey } from "@/lib/i18n";
+import { splitLang } from "@/lib/locale";
 import { ContactButton } from "./ContactDialog";
 import { Logo } from "./Logo";
 
@@ -55,7 +56,7 @@ export function LogoutButton({ className = "" }: { className?: string }) {
 }
 
 export function Header({ user }: { user?: { name: string; home: string } | null }) {
-  const path = usePathname();
+  const path = splitLang(usePathname()).path;
   const { t } = useLang();
   const [open, setOpen] = useState(false);
 

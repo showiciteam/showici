@@ -4,9 +4,10 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useLang } from "@/lib/i18n";
 import { ALL_QUEBEC, REGIONS } from "@/lib/regions";
+import { label } from "@/lib/labels";
 
 export function Hero() {
-  const { t, lang } = useLang();
+  const { t, lang, tr, href } = useLang();
   const router = useRouter();
   const [what, setWhat] = useState("/performers");
   const [type, setType] = useState("");
@@ -55,27 +56,23 @@ export function Hero() {
         onSubmit={(e) => {
           e.preventDefault();
           const q = new URLSearchParams({ region, ...(region === ALL_QUEBEC ? {} : { radius }), ...(type ? { type } : {}) });
-          router.push(`${what}?${q}`);
+          router.push(href(`${what}?${q}`));
         }}
         className="mt-8 grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] items-end gap-3 rounded-[18px] border border-line bg-parchment p-3.5"
       >
         <label className="flex flex-col gap-1.5 px-2 py-1.5 text-xs font-bold uppercase tracking-[0.06em] text-muted">
           {t("search.lookingFor")}
           <select className="input normal-case tracking-normal" value={what} onChange={(e) => setWhat(e.target.value)}>
-            <option value="/performers">Performers</option>
-            <option value="/venues">Venues</option>
-            <option value="/shows">Upcoming shows</option>
+            <option value="/performers">{tr("Performers", "Artistes")}</option>
+            <option value="/venues">{tr("Venues", "Salles")}</option>
+            <option value="/shows">{tr("Upcoming shows", "Spectacles à venir")}</option>
           </select>
         </label>
         <label className="flex flex-col gap-1.5 px-2 py-1.5 text-xs font-bold uppercase tracking-[0.06em] text-muted">
           {t("search.type")}
           <select className="input normal-case tracking-normal" value={type} onChange={(e) => setType(e.target.value)}>
-            <option value="">All acts</option>
-            <option>Band</option>
-            <option>DJ</option>
-            <option>Stand-up comedy</option>
-            <option>Magician</option>
-            <option>Duo</option>
+            <option value="">{tr("All acts", "Tous les numéros")}</option>
+            {["Band", "DJ", "Stand-up comedy", "Magician", "Duo"].map((a) => <option key={a} value={a}>{label(lang, a)}</option>)}
           </select>
         </label>
         <label className="flex flex-col gap-1.5 px-2 py-1.5 text-xs font-bold uppercase tracking-[0.06em] text-muted">

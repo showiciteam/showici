@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/LocalLink";
 
 /** Shown on public listings while nothing has been published yet. */
 export function EmptyState(p: { title: string; body: string; cta?: { href: string; label: string }; secondary?: { href: string; label: string } }) {

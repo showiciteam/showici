@@ -4,13 +4,15 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toggleSaved } from "@/lib/actions";
 import { Button } from "./ui";
+import { useLang } from "@/lib/i18n";
 
 /** ♡ Save (performers) or Follow (venues). Sends signed-out visitors to log in. */
 export function SaveButton({ kind, id, initial, signedIn }: { kind: "performer" | "venue"; id: string; initial: boolean; signedIn: boolean }) {
   const router = useRouter();
   const [saved, setSaved] = useState(initial);
   const [busy, setBusy] = useState(false);
-  const labels = kind === "performer" ? ["♡ Save", "♥ Saved"] : ["Follow", "✓ Following"];
+  const { tr } = useLang();
+  const labels = kind === "performer" ? [tr("♡ Save", "♡ Enregistrer"), tr("♥ Saved", "♥ Enregistré")] : [tr("Follow", "Suivre"), tr("✓ Following", "✓ Abonné")];
 
   async function click() {
     if (!signedIn) return router.push(`/login?next=${encodeURIComponent(window.location.pathname)}`);
@@ -26,7 +28,8 @@ export function SaveButton({ kind, id, initial, signedIn }: { kind: "performer" 
 }
 
 /** Uses the phone's share sheet when available, otherwise copies the link. */
-export function ShareButton({ title, label = "Share" }: { title: string; label?: string }) {
+export function ShareButton({ title, label }: { title: string; label?: string }) {
+  const { tr } = useLang();
   const [copied, setCopied] = useState(false);
   async function share() {
     const url = window.location.href;
@@ -42,5 +45,5 @@ export function ShareButton({ title, label = "Share" }: { title: string; label?:
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
-  return <Button variant="secondary" onClick={share}>{copied ? "Link copied ✓" : label}</Button>;
+  return <Button variant="secondary" onClick={share}>{copied ? tr("Link copied ✓", "Lien copié ✓") : label ?? tr("Share", "Partager")}</Button>;
 }

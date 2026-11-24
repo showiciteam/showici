@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/LocalLink";
 import { useLang } from "@/lib/i18n";
 import { ContactButton } from "./ContactDialog";
 import { openCookieSettings } from "./Analytics";

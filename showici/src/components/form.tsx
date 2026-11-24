@@ -3,13 +3,15 @@
 import { Chip } from "./ui";
 
 /** Multi-select chips bound to a string array. */
-export function ChipGroup({ legend, hint, options, value, onChange, single }: {
+export function ChipGroup({ legend, hint, options, value, onChange, single, labelOf }: {
   legend: string;
   hint?: string;
   options: string[];
   value: string[];
   onChange: (v: string[]) => void;
   single?: boolean;
+  /** Text shown on a chip when it differs from the saved value (e.g. a French label). */
+  labelOf?: (o: string) => string;
 }) {
   const toggle = (o: string) =>
     single ? onChange([o]) : onChange(value.includes(o) ? value.filter((x) => x !== o) : [...value, o]);
@@ -17,7 +19,7 @@ export function ChipGroup({ legend, hint, options, value, onChange, single }: {
     <fieldset>
       <legend className="mb-2.5 text-sm font-bold">{legend} {hint && <span className="hint">{hint}</span>}</legend>
       <div className="flex flex-wrap gap-2">
-        {options.map((o) => <Chip key={o} on={value.includes(o)} onClick={() => toggle(o)}>{o}</Chip>)}
+        {options.map((o) => <Chip key={o} on={value.includes(o)} onClick={() => toggle(o)}>{labelOf ? labelOf(o) : o}</Chip>)}
       </div>
     </fieldset>
   );
