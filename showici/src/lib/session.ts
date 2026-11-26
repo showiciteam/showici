@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { localRedirect } from "./lang-server";
 import { cache } from "react";
 import { getServerSupabase } from "./supabase/server";
 
@@ -41,7 +41,7 @@ export async function requireUser(roles?: Role[]): Promise<SessionUser | null> {
   const sb = await getServerSupabase();
   if (!sb) return null;
   const user = await getSessionUser();
-  if (!user) redirect("/login");
-  if (roles && user.role !== "admin" && !roles.includes(user.role)) redirect(homeFor[user.role]);
+  if (!user) return localRedirect("/login");
+  if (roles && user.role !== "admin" && !roles.includes(user.role)) return localRedirect(homeFor[user.role]);
   return user;
 }

@@ -1,36 +1,53 @@
 # ShowIci
 
-> ShowIci (www.showici.com) is a free, bilingual (French and English) website that connects venues, event planners and local performers across the province of Québec, Canada, starting in Greater Montréal. Venues and planners find and contact bands, DJs, comedians, magicians and other live acts; performers find gigs. ShowIci takes no commission on bookings.
+> ShowIci (www.showici.com) is a bilingual website that connects venues, event planners and local artists across the province of Québec, Canada, starting in Greater Montréal. Venues and planners find and contact bands, DJs, comedians, magicians and other live acts; artists find places to play. ShowIci takes no commission on bookings.
 
-Facts as of October 2026:
+> ShowIci (www.showici.com) est un site bilingue qui réunit les salles, les organisateurs d’événements et les artistes d’ici partout au Québec, à commencer par le Grand Montréal. ShowIci ne prend aucune commission sur les contrats.
 
-- Who it's for: venues (pubs, bars, restaurants, breweries, halls), event planners (weddings, birthdays, quinceañeras, office parties) and performers (bands, DJs, solo musicians, mariachis, comedians, magicians, dancers).
-- Where: all of Québec. Greater Montréal (Montréal, Laval, Longueuil and surroundings) is the main launch area; Québec City, Gatineau, Sherbrooke, Trois-Rivières, Saguenay and every other region can be searched too.
-- Price: free during the launch, for every account type. No subscription, no credit card, unlimited contacts. Event planners will always use ShowIci for free. If paid plans are added later, they will be announced at least 30 days in advance.
-- Commission: none. Fees and payment are agreed directly between the venue or planner and the performer.
-- How booking works: a venue or planner sends a booking request for a date; the performer accepts or declines it and both sides continue in ShowIci messages. Phone numbers and emails in messages are hidden until both sides are ready.
-- Languages: French and English.
+## Key facts
+
+- Who it's for: venues (pubs, bars, restaurants, breweries, halls), event planners (weddings, birthdays, quinceañeras, office parties) and artists (bands, DJs, solo musicians, mariachis, comedians, magicians, dancers).
+- Where: all of Québec. Greater Montréal (Montréal, Laval, Longueuil and surroundings) is the main area; Québec City, Gatineau, Sherbrooke, Trois-Rivières, Saguenay and every other region can be searched too.
+- Commission: none. Fees and payment are agreed directly between the venue or planner and the artist.
+- How booking works: a venue or planner sends a request for a date; the artist accepts or declines and both sides continue in ShowIci messages. Phone numbers and emails in messages stay hidden.
+- Private events: a planner describes the event once (type, date, city, guests, kind of act, budget); matching artists nearby reply with videos and a price. Requests are never public.
+- ShowIci Spotlight: interviews with local artists and venue owners, in French and English.
+- Big events: concerts, festivals and shows across Québec, with tickets sold on Ticketmaster.
+- Languages: French (www.showici.com/…) and English (www.showici.com/en/…).
 - Accounts: 18 and older.
 
-## Main pages
+## Main pages (French)
 
-- [Home](https://www.showici.com/): search performers, venues and upcoming shows by region, on a map of Québec
-- [About ShowIci](https://www.showici.com/about): what ShowIci is, who it is for, how it works and why
-- [Pricing and FAQ](https://www.showici.com/pricing): what's free, how bookings and payment work
-- [Find performers](https://www.showici.com/performers): bands, DJs, comedians, magicians and more
-- [Find venues](https://www.showici.com/venues): pubs, bars and halls that book local acts
-- [Upcoming shows](https://www.showici.com/shows): live shows at local venues
-- [Post an event request](https://www.showici.com/request): for private events such as weddings and birthdays
+- [Accueil](https://www.showici.com/): artists, venues and shows by region, on a map of Québec
+- [Spectacles](https://www.showici.com/shows): live shows at local venues
+- [Grands événements](https://www.showici.com/events): big concerts, festivals and tickets
+- [Artistes](https://www.showici.com/performers): bands, DJs, comedians, magicians and more
+- [Salles](https://www.showici.com/venues): pubs, bars and halls that book local acts
+- [Événements privés](https://www.showici.com/request): find an artist for a wedding, birthday or party
+- [ShowIci Spotlight](https://www.showici.com/spotlight): interviews
+- [À propos](https://www.showici.com/about): what ShowIci is and how it works
+
+## Main pages (English)
+
+- [Home](https://www.showici.com/en)
+- [Shows](https://www.showici.com/en/shows)
+- [Big events](https://www.showici.com/en/events)
+- [Artists](https://www.showici.com/en/performers)
+- [Venues](https://www.showici.com/en/venues)
+- [Private events](https://www.showici.com/en/request)
+- [ShowIci Spotlight](https://www.showici.com/en/spotlight)
+- [About](https://www.showici.com/en/about)
 
 ## Policies
 
-- [Terms of use](https://www.showici.com/terms)
-- [Privacy policy](https://www.showici.com/privacy)
+- [Conditions d’utilisation / Terms of use](https://www.showici.com/terms)
+- [Confidentialité / Privacy policy](https://www.showici.com/privacy)
 
 ## Contact
 
 Use the Contact link on any page of www.showici.com. Privacy questions: privacy@showici.com.
 
 ## Social media
+
 - Instagram: https://www.instagram.com/showici_ca/ (@showici_ca)
 - Facebook: https://www.facebook.com/profile.php?id=61595495447629

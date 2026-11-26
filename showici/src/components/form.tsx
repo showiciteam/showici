@@ -33,7 +33,7 @@ export function FormCard({ id, title, children }: { id?: string; title: string; 
 }
 
 export function Notice({ kind, children }: { kind: "ok" | "error" | "info"; children: React.ReactNode }) {
-  const cls = kind === "ok" ? "bg-success text-success-ink" : kind === "error" ? "bg-[#FBE5E2] text-[#8A1F17]" : "bg-brass-tint text-navy";
+  const cls = kind === "ok" ? "bg-success text-success-ink" : kind === "error" ? "bg-[#FBE5E2] text-[#8A1F17]" : "bg-accent-tint text-ink";
   return <div role="status" className={`rounded-xl px-4 py-3 text-sm font-medium ${cls}`}>{children}</div>;
 }
 
@@ -41,15 +41,15 @@ export function Dropzone({ files, onFiles, hint }: { files: File[]; onFiles: (f:
   return (
     <div className="flex flex-col gap-3">
       <label
-        className="flex cursor-pointer flex-col items-center gap-2.5 rounded-2xl border-2 border-dashed border-line-strong bg-ivory p-8 text-center"
+        className="flex cursor-pointer flex-col items-center gap-2.5 rounded-2xl border-2 border-dashed border-line-strong bg-paper p-8 text-center"
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => {
           e.preventDefault();
           onFiles([...files, ...Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith("image/"))].slice(0, 12));
         }}
       >
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6D3CE8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 16V4" /><path d="M7 9l5-5 5 5" /><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" /></svg>
-        <span className="text-[17px] font-bold">Drag photos here, or <span className="text-brass-dark underline">browse your files</span></span>
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#D7141F" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 16V4" /><path d="M7 9l5-5 5 5" /><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" /></svg>
+        <span className="text-[17px] font-bold">Drag photos here, or <span className="text-accent-dark underline">browse your files</span></span>
         <span className="hint">{hint}</span>
         <input
           type="file"
@@ -65,8 +65,8 @@ export function Dropzone({ files, onFiles, hint }: { files: File[]; onFiles: (f:
             <div key={f.name + i} className="relative aspect-[4/3] overflow-hidden rounded-xl bg-ph-1">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={URL.createObjectURL(f)} alt={f.name} className="h-full w-full object-cover" />
-              {i === 0 && <span className="absolute left-2 top-2 rounded-md bg-navy px-2 py-1 text-[11px] font-bold text-white">COVER</span>}
-              <button type="button" aria-label={`Remove ${f.name}`} onClick={() => onFiles(files.filter((_, j) => j !== i))} className="absolute right-1.5 top-1.5 flex h-[30px] w-[30px] items-center justify-center rounded-full bg-white text-navy">✕</button>
+              {i === 0 && <span className="absolute left-2 top-2 rounded-md bg-ink px-2 py-1 text-[11px] font-bold text-white">COVER</span>}
+              <button type="button" aria-label={`Remove ${f.name}`} onClick={() => onFiles(files.filter((_, j) => j !== i))} className="absolute right-1.5 top-1.5 flex h-[30px] w-[30px] items-center justify-center rounded-full bg-white text-ink">✕</button>
             </div>
           ))}
         </div>
@@ -87,14 +87,14 @@ export function SingleImage({ label, hint, url, onFile, onRemove, shape = "wide"
   const box = shape === "round" ? "h-[120px] w-[120px] rounded-full" : "aspect-[3/1] w-full rounded-xl";
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-sm font-bold text-navy">{label}</span>
+      <span className="text-sm font-bold text-ink">{label}</span>
       <div className={`flex flex-wrap items-center gap-4 ${shape === "wide" ? "flex-col items-stretch" : ""}`}>
-        <label className={`relative flex flex-none cursor-pointer items-center justify-center overflow-hidden border-2 border-dashed border-line-strong bg-ivory text-center ${box}`}>
+        <label className={`relative flex flex-none cursor-pointer items-center justify-center overflow-hidden border-2 border-dashed border-line-strong bg-paper text-center ${box}`}>
           {url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={url} alt="" className="absolute inset-0 h-full w-full object-cover" />
           ) : (
-            <span className="px-3 text-sm font-bold text-brass-dark underline">Choose image</span>
+            <span className="px-3 text-sm font-bold text-accent-dark underline">Choose image</span>
           )}
           <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); e.target.value = ""; }} />
         </label>
@@ -102,7 +102,7 @@ export function SingleImage({ label, hint, url, onFile, onRemove, shape = "wide"
           <span className="hint">{hint}</span>
           {url && (
             <span className="flex gap-3 text-sm font-bold">
-              <label className="cursor-pointer text-brass-dark underline">Replace<input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); e.target.value = ""; }} /></label>
+              <label className="cursor-pointer text-accent-dark underline">Replace<input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); e.target.value = ""; }} /></label>
               <button type="button" onClick={onRemove} className="text-red-700 underline">Remove</button>
             </span>
           )}

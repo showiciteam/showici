@@ -127,7 +127,7 @@ export function AddressAutocomplete({ value, onChange, onPick, mode = "address",
               aria-selected={i === active}
               onMouseDown={(e) => { e.preventDefault(); pick(p); }}
               onMouseEnter={() => setActive(i)}
-              className={`cursor-pointer px-3.5 py-2 text-ink-2 ${i === active ? "bg-parchment" : ""}`}
+              className={`cursor-pointer px-3.5 py-2 text-graphite ${i === active ? "bg-sand" : ""}`}
             >
               📍 {p.label}
             </li>

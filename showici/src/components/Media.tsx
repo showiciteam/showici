@@ -29,8 +29,8 @@ function Overlay({ onClose, label, children }: { onClose: () => void; label: str
 
 function PlayBadge({ big }: { big?: boolean }) {
   return (
-    <span className={`flex items-center justify-center rounded-full bg-[rgba(20,33,61,0.85)] shadow-lg ring-2 ring-white/70 transition group-hover:scale-105 group-hover:bg-navy ${big ? "h-[72px] w-[72px]" : "h-12 w-12"}`}>
-      <svg viewBox="0 0 24 24" className={big ? "ml-1 h-8 w-8" : "ml-0.5 h-5 w-5"} fill="#A485FF" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
+    <span className={`flex items-center justify-center rounded-full bg-[rgba(20,33,61,0.85)] shadow-lg ring-2 ring-white/70 transition group-hover:scale-105 group-hover:bg-ink ${big ? "h-[72px] w-[72px]" : "h-12 w-12"}`}>
+      <svg viewBox="0 0 24 24" className={big ? "ml-1 h-8 w-8" : "ml-0.5 h-5 w-5"} fill="#E3262F" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
     </span>
   );
 }
@@ -47,7 +47,7 @@ export function VideoPreview({ url, title, length, big = false }: { url?: string
 
   const caption = (title || length) && (
     <span className="flex items-baseline justify-between gap-2 text-left">
-      {title && <span className={`font-bold text-navy ${big ? "text-[17px]" : "text-[15px]"}`}>{title}</span>}
+      {title && <span className={`font-bold text-ink ${big ? "text-[17px]" : "text-[15px]"}`}>{title}</span>}
       {length && <span className="text-sm text-muted">{length}</span>}
     </span>
   );
@@ -56,7 +56,7 @@ export function VideoPreview({ url, title, length, big = false }: { url?: string
     if (!url) return null;
     return (
       <a href={url} target="_blank" rel="noopener noreferrer" className="group flex flex-col gap-2 no-underline">
-        <span className="relative flex aspect-video items-center justify-center overflow-hidden rounded-xl bg-navy"><PlayBadge big={big} /></span>
+        <span className="relative flex aspect-video items-center justify-center overflow-hidden rounded-xl bg-ink"><PlayBadge big={big} /></span>
         {caption}
       </a>
     );
@@ -66,7 +66,7 @@ export function VideoPreview({ url, title, length, big = false }: { url?: string
   return (
     <>
       <button type="button" onClick={() => setOpen(true)} className="group flex w-full flex-col gap-2 text-left" aria-label={`Play video${title ? `: ${title}` : ""}`}>
-        <span className="relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-xl bg-navy">
+        <span className="relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-xl bg-ink">
           {thumb !== "none" && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -83,7 +83,7 @@ export function VideoPreview({ url, title, length, big = false }: { url?: string
           )}
           <span className="absolute inset-0 bg-gradient-to-t from-[rgba(20,33,61,0.45)] to-transparent" />
           <span className="relative"><PlayBadge big={big} /></span>
-          {length && !big && <span className="absolute bottom-2 right-2 rounded bg-navy px-1.5 py-0.5 text-xs text-white">{length}</span>}
+          {length && !big && <span className="absolute bottom-2 right-2 rounded bg-ink px-1.5 py-0.5 text-xs text-white">{length}</span>}
         </span>
         {caption}
       </button>
@@ -147,7 +147,7 @@ export function Lightbox({ photos, start, onClose, alt }: { photos: string[]; st
       {n > 1 && (
         <div className="mt-3 flex max-w-full gap-2 overflow-x-auto pb-1">
           {photos.map((src, k) => (
-            <button key={src} type="button" onClick={() => setI(k)} aria-label={`Photo ${k + 1}`} className={`h-14 w-20 flex-none overflow-hidden rounded-md ring-2 ${k === i ? "ring-brass" : "ring-transparent opacity-60 hover:opacity-100"}`}>
+            <button key={src} type="button" onClick={() => setI(k)} aria-label={`Photo ${k + 1}`} className={`h-14 w-20 flex-none overflow-hidden rounded-md ring-2 ${k === i ? "ring-accent" : "ring-transparent opacity-60 hover:opacity-100"}`}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={src} alt="" className="h-full w-full object-cover" />
             </button>
@@ -209,7 +209,7 @@ export function PhotoGallery({ photos, alt, layout = "grid" }: { photos: string[
       <div className="relative">
         {body}
         {layout === "hero" && photos.length > 1 && (
-          <button type="button" onClick={() => setOpen(0)} className="absolute bottom-3 right-3 rounded-full bg-white/95 px-3.5 py-1.5 text-sm font-bold text-navy shadow">
+          <button type="button" onClick={() => setOpen(0)} className="absolute bottom-3 right-3 rounded-full bg-white/95 px-3.5 py-1.5 text-sm font-bold text-ink shadow">
             View all {photos.length} photos
           </button>
         )}

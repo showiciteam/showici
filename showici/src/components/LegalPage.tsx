@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/Link";
 import { useLang } from "@/lib/i18n";
 import type { LegalDoc } from "@/lib/legal";
 
@@ -30,7 +30,7 @@ export function LegalPage({ doc, other }: { doc: Record<"en" | "fr", LegalDoc>; 
       <p className="eyebrow mb-1.5 text-[13px]">ShowIci</p>
       <h1 className="h-display text-[38px] sm:text-[44px]">{d.title}</h1>
       <p className="mt-2 text-sm text-muted">{d.updated}</p>
-      <p className="mt-5 text-[17px] leading-relaxed text-ink-2">{d.intro}</p>
+      <p className="mt-5 text-[17px] leading-relaxed text-graphite">{d.intro}</p>
 
       <nav aria-label={lang === "fr" ? "Sommaire" : "Contents"} className="card mt-7 p-5">
         <ol className="grid gap-x-6 gap-y-1.5 text-[15px] sm:grid-cols-2">
@@ -42,7 +42,7 @@ export function LegalPage({ doc, other }: { doc: Record<"en" | "fr", LegalDoc>; 
         {d.sections.map((s, i) => (
           <section key={s.h} id={`s${i + 1}`} className="scroll-mt-6">
             <h2 className="h-display mb-3 text-[24px]">{s.h}</h2>
-            <div className="flex flex-col gap-3 text-[16px] leading-relaxed text-ink-2">{blocks(s.p)}</div>
+            <div className="flex flex-col gap-3 text-[16px] leading-relaxed text-graphite">{blocks(s.p)}</div>
           </section>
         ))}
       </div>

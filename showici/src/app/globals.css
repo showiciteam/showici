@@ -1,49 +1,96 @@
 @import "tailwindcss";
 
+/*
+ * ShowIci colours and type.
+ * ink = black surfaces and main text, accent = ShowIci red, paper/sand = light backgrounds.
+ */
 @theme {
-  --color-navy: #14213D;
-  --color-navy-deep: #0B1426;
-  --color-navy-soft: #2B3A5C;
-  --color-navy-line: #5B6787;
-  --color-brass: #A485FF; /* "brass" tokens now hold the purple from the logo (names kept so classes don't change) */
-  --color-brass-dark: #6D3CE8;
-  --color-brass-tint: #EEE8FF;
-  --color-ivory: #FAF8F4;
-  --color-parchment: #F4F1EA;
-  --color-line: #E6E1D6;
-  --color-line-strong: #D3CCBD;
-  --color-ink-2: #2F3A52;
-  --color-slate: #4A5263;
-  --color-muted: #5F6677;
-  --color-on-navy: #C9CFDC;
-  --color-ph-1: #DCE1EA;
-  --color-ph-2: #E6E0F5;
-  --color-ph-3: #CCD6E6;
-  --color-ph-4: #DDE3D6;
-  --color-ph-5: #E3DDE6;
-  --color-success: #DDE3D6;
+  --color-ink: #0B0B0D;
+  --color-ink-deep: #050506;
+  --color-ink-soft: #161619;
+  --color-ink-line: #3A3A42;
+  --color-on-dark: #C9C9CF;
+
+  --color-accent: #D7141F;
+  --color-accent-dark: #A50F17;
+  --color-accent-bright: #FF4D55;
+  --color-accent-tint: #FCE8E9;
+  --color-accent-line: #F4CACD;
+
+  --color-paper: #FFFFFF;
+  --color-sand: #F5F4F2;
+  --color-line: #E5E3DF;
+  --color-line-strong: #D4D1CC;
+
+  --color-graphite: #2E2E35;
+  --color-slate: #4A4A52;
+  --color-muted: #5C5C66;
+
+  --color-ph-1: #E4E2DE;
+  --color-ph-2: #ECE6E6;
+  --color-ph-3: #DCDAD6;
+  --color-ph-4: #E2E4DC;
+  --color-ph-5: #E8E2E4;
+  --color-success: #E3F2E7;
   --color-success-ink: #1F6B3A;
+
   --font-display: "Plus Jakarta Sans", system-ui, sans-serif;
   --font-sans: "Inter", system-ui, sans-serif;
+  --font-hand: "Permanent Marker", "Plus Jakarta Sans", cursive;
 }
 
 @layer base {
-  html { background: var(--color-ivory); }
+  html { background: var(--color-paper); }
   body {
-    background: var(--color-ivory);
-    color: var(--color-navy);
+    background: var(--color-paper);
+    color: var(--color-ink);
     font-family: var(--font-sans);
   }
-  a { color: var(--color-brass-dark); }
-  a:hover { color: var(--color-navy-deep); }
+  a { color: var(--color-accent); }
+  a:hover { color: var(--color-accent-dark); }
+  :focus-visible { outline: 3px solid var(--color-accent-bright); outline-offset: 2px; }
 }
 
 @layer components {
-  .h-display { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em; color: var(--color-navy); }
-  .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-brass-dark); }
-  .card { background: #fff; border: 1px solid var(--color-line); border-radius: 16px; }
-  .input { background: #fff; color: var(--color-navy); border: 1px solid var(--color-line-strong); border-radius: 10px; padding: 12px; font: 500 16px var(--font-sans); width: 100%; }
-  .label { display: flex; flex-direction: column; gap: 6px; font-weight: 700; font-size: 14px; color: var(--color-navy); }
+  .h-display { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em; color: inherit; }
+  .eyebrow { font-family: var(--font-display); font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-accent); }
+  .card { background: #fff; border: 1px solid var(--color-line); border-radius: 14px; }
+  .input { background: #fff; color: var(--color-ink); border: 1px solid var(--color-line-strong); border-radius: 10px; padding: 12px; font: 500 16px var(--font-sans); width: 100%; }
+  .label { display: flex; flex-direction: column; gap: 6px; font-weight: 700; font-size: 14px; color: var(--color-ink); }
   .hint { font-weight: 400; font-size: 13px; color: var(--color-muted); }
-  .wrap { max-width: 1240px; margin: 0 auto; padding-left: 24px; padding-right: 24px; }
+  .wrap { max-width: 1320px; margin: 0 auto; padding-left: 20px; padding-right: 20px; }
+  @media (min-width: 768px) { .wrap { padding-left: 32px; padding-right: 32px; } }
+
+  /* Dark hero with a photo on the right that fades into black on the left. */
+  .hero-photo {
+    background-color: var(--color-ink-deep);
+    background-image:
+      linear-gradient(90deg, #050506 0%, rgba(5, 5, 6, 0.9) 34%, rgba(5, 5, 6, 0.3) 66%, rgba(5, 5, 6, 0.1) 100%),
+      linear-gradient(0deg, var(--color-ink) 0%, rgba(5, 5, 6, 0) 35%),
+      var(--hero-image);
+    background-size: cover, cover, auto 100%;
+    background-position: center, center, right center;
+    background-repeat: no-repeat;
+  }
+  @media (max-width: 767px) {
+    .hero-photo {
+      background-image:
+        linear-gradient(0deg, var(--color-ink) 8%, rgba(5, 5, 6, 0.75) 55%, rgba(5, 5, 6, 0.45) 100%),
+        var(--hero-image);
+      background-size: cover, cover;
+      background-position: center, 70% center;
+    }
+  }
+
+  /* Red and black band used for calls to action near the bottom of pages. */
+  .band-red {
+    background-color: #2A0306;
+    background-image:
+      radial-gradient(60% 140% at 65% 50%, rgba(215, 20, 31, 0.85), rgba(215, 20, 31, 0) 70%),
+      linear-gradient(90deg, var(--color-ink), #3A0408);
+    color: #fff;
+  }
+
+  /* Brush-stroke underline under hero headlines. */
+  .brush { display: block; height: 14px; max-width: 100%; }
 }

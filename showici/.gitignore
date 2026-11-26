@@ -1,0 +1,13 @@
+# Dependencies and build output
+/node_modules
+/.next
+/out
+
+# Local settings and secrets
+.env*.local
+.env
+
+# System and editor files
+.DS_Store
+*.tsbuildinfo
+next-env.d.ts.bak

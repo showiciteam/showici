@@ -30,8 +30,8 @@ export function SocialIcon({ k, size = 20 }: { k: SocialKey; size?: number }) {
 export function SocialLinks({ tone = "light" }: { tone?: "light" | "dark" }) {
   const cls =
     tone === "dark"
-      ? "border-navy-line text-white hover:bg-navy-soft hover:text-white"
-      : "border-line-strong bg-white text-navy hover:bg-parchment hover:text-navy";
+      ? "border-ink-line text-white hover:bg-ink-soft hover:text-white"
+      : "border-line-strong bg-white text-ink hover:bg-sand hover:text-ink";
   return (
     <div className="flex gap-2">
       {SOCIAL.map((s) => (
@@ -44,7 +44,7 @@ export function SocialLinks({ tone = "light" }: { tone?: "light" | "dark" }) {
 }
 
 /** Labelled buttons: "Instagram", "Facebook". */
-function FollowButtons({ tone }: { tone: "light" | "dark" }) {
+export function FollowButtons({ tone }: { tone: "light" | "dark" }) {
   return (
     <div className="flex flex-wrap gap-2.5">
       {SOCIAL.map((s, i) => (
@@ -55,10 +55,10 @@ function FollowButtons({ tone }: { tone: "light" | "dark" }) {
           rel="noopener noreferrer me"
           className={`inline-flex min-h-11 items-center gap-2 rounded-[10px] px-[18px] py-3 text-[15px] font-bold no-underline transition-colors ${
             i === 0
-              ? "bg-brass text-navy hover:bg-[#C8932F] hover:text-navy"
+              ? "bg-accent text-white hover:bg-accent-dark hover:text-white"
               : tone === "dark"
-                ? "border border-navy-line text-white hover:bg-navy-soft hover:text-white"
-                : "border border-line-strong bg-white text-navy hover:bg-parchment hover:text-navy"
+                ? "border border-ink-line text-white hover:bg-ink-soft hover:text-white"
+                : "border border-line-strong bg-white text-ink hover:bg-sand hover:text-ink"
           }`}
         >
           <SocialIcon k={s.key} size={18} />
@@ -74,17 +74,17 @@ const BAND = {
   fr: { eyebrow: "SUIVEZ LA SCÈNE LOCALE", title: "De nouveaux spectacles et artistes chaque semaine", text: `Des spectacles en direct, des artistes d'ici à découvrir et les salles qui les accueillent, partout au Québec. Suivez ${SOCIAL_HANDLE}.` },
 };
 
-/** Big navy band for the home page. */
+/** Dark "follow us" band. */
 export function FollowBand() {
   const { lang } = useLang();
   const t = BAND[lang];
   return (
     <section className="wrap pt-16">
-      <div className="flex flex-wrap items-center justify-between gap-6 rounded-[22px] bg-navy p-8 text-white">
+      <div className="flex flex-wrap items-center justify-between gap-6 rounded-[22px] bg-ink p-8 text-white">
         <div className="flex max-w-[620px] flex-col gap-1.5">
-          <span className="text-xs font-bold tracking-[0.1em] text-brass">{t.eyebrow}</span>
+          <span className="text-xs font-bold tracking-[0.1em] text-accent">{t.eyebrow}</span>
           <h2 className="font-display text-[30px] font-extrabold leading-tight tracking-tight sm:text-[34px]">{t.title}</h2>
-          <p className="text-[15px] text-on-navy">{t.text}</p>
+          <p className="text-[15px] text-on-dark">{t.text}</p>
         </div>
         <FollowButtons tone="dark" />
       </div>
@@ -117,10 +117,10 @@ export function FollowCard({ context, className = "" }: { context: Context; clas
   const { lang } = useLang();
   const t = CARD[context][lang];
   return (
-    <div className={`flex flex-wrap items-center justify-between gap-4 rounded-[18px] border border-[#CDBDFF] bg-brass-tint px-5 py-4 ${className}`}>
+    <div className={`flex flex-wrap items-center justify-between gap-4 rounded-[18px] border border-accent-line bg-accent-tint px-5 py-4 ${className}`}>
       <div className="flex max-w-[560px] flex-col gap-1">
-        <strong className="text-[17px] text-navy">{t.title}</strong>
-        <span className="text-[15px] text-ink-2">{t.text}</span>
+        <strong className="text-[17px] text-ink">{t.title}</strong>
+        <span className="text-[15px] text-graphite">{t.text}</span>
       </div>
       <FollowButtons tone="light" />
     </div>
@@ -162,11 +162,11 @@ export function ShareMenu({ title, label, caption }: { title: string; label?: st
   };
   const url = () => window.location.href.split("#")[0];
   const igText = () => `${caption ?? title}\n${url()}\n${SOCIAL_HANDLE} #ShowIci #scenelocale #Québec`;
-  const item = "flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-[15px] text-navy no-underline hover:bg-parchment hover:text-navy";
+  const item = "flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-[15px] text-ink no-underline hover:bg-sand hover:text-ink";
 
   return (
     <div className="relative">
-      <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-line-strong bg-white px-[18px] py-3 text-[15px] font-bold text-navy transition-colors hover:bg-parchment">
+      <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-line-strong bg-white px-[18px] py-3 text-[15px] font-bold text-ink transition-colors hover:bg-sand">
         {label ?? T.share} <span aria-hidden="true">▾</span>
       </button>
       {open && <button type="button" aria-label="Close" tabIndex={-1} className="fixed inset-0 z-40 cursor-default" onClick={() => setOpen(false)} />}
@@ -238,7 +238,7 @@ export function PromoteKit({ kind, id, siteUrl }: { kind: "performer" | "venue";
   const badge = `${siteUrl}/badges/showici-badge-${lang}.svg`;
   const url = id ? `${siteUrl}/${kind === "venue" ? "venues" : "performers"}/${id}` : null;
   const html = url ? `<a href="${url}" target="_blank" rel="noopener"><img src="${badge}" alt="${lang === "fr" ? "Trouvez-nous sur ShowIci" : "Find us on ShowIci"}" width="200" height="60"></a>` : "";
-  const small = "inline-flex min-h-10 items-center rounded-[10px] border border-line-strong bg-white px-3.5 py-2 text-sm font-bold text-navy hover:bg-parchment";
+  const small = "inline-flex min-h-10 items-center rounded-[10px] border border-line-strong bg-white px-3.5 py-2 text-sm font-bold text-ink hover:bg-sand";
 
   return (
     <section className="card flex flex-col gap-4 p-[22px]">
@@ -250,7 +250,7 @@ export function PromoteKit({ kind, id, siteUrl }: { kind: "performer" | "venue";
         <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-4">
           <div className="flex flex-col gap-2">
             <span className="text-sm font-bold">{t.linkLabel}</span>
-            <code className="break-all rounded-lg bg-parchment px-3 py-2 text-[13px]">{url}</code>
+            <code className="break-all rounded-lg bg-sand px-3 py-2 text-[13px]">{url}</code>
             <div className="flex flex-wrap gap-2">
               <button type="button" className={small} onClick={() => copy("link", url)}>{copied === "link" ? t.copied : t.copyLink}</button>
               <button type="button" className={small} onClick={() => copy("bio", t.bio(url))}>{copied === "bio" ? t.copied : t.copyBio}</button>
@@ -269,8 +269,8 @@ export function PromoteKit({ kind, id, siteUrl }: { kind: "performer" | "venue";
       ) : (
         <p className="hint">{t.unpublished}</p>
       )}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-brass-tint px-4 py-3">
-        <span className="max-w-[640px] text-[15px] text-ink-2"><strong className="text-navy">{t.tagTitle}.</strong> {kind === "venue" ? t.tagVenue : t.tagPerformer}</span>
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-accent-tint px-4 py-3">
+        <span className="max-w-[640px] text-[15px] text-graphite"><strong className="text-ink">{t.tagTitle}.</strong> {kind === "venue" ? t.tagVenue : t.tagPerformer}</span>
         <SocialLinks />
       </div>
     </section>
@@ -281,7 +281,7 @@ export function PromoteKit({ kind, id, siteUrl }: { kind: "performer" | "venue";
 export function TagUsTip() {
   const { lang } = useLang();
   return (
-    <p className="flex flex-wrap items-center gap-2 rounded-xl bg-brass-tint px-4 py-3 text-[15px] text-ink-2">
+    <p className="flex flex-wrap items-center gap-2 rounded-xl bg-accent-tint px-4 py-3 text-[15px] text-graphite">
       <SocialIcon k="instagram" size={18} />
       {lang === "fr"
         ? `Astuce : quand vous annoncez ce spectacle sur Instagram ou Facebook, identifiez ${SOCIAL_HANDLE} et nous le partagerons.`

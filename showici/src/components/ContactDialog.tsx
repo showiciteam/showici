@@ -108,15 +108,15 @@ export function ContactDialog({ onClose }: { onClose: () => void }) {
   const input = "input py-2.5";
   return (
     <div role="dialog" aria-modal="true" aria-labelledby="contact-title" className="fixed inset-0 z-[200] flex items-start justify-center overflow-y-auto bg-[rgba(8,14,28,0.7)] p-3 sm:items-center sm:p-6" onClick={onClose}>
-      <div className="relative my-6 w-full max-w-[560px] rounded-[18px] bg-ivory p-6 text-navy shadow-2xl sm:p-7" onClick={(e) => e.stopPropagation()}>
-        <button type="button" onClick={onClose} aria-label={T.close[lang]} className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full text-2xl text-navy hover:bg-parchment">×</button>
+      <div className="relative my-6 w-full max-w-[560px] rounded-[18px] bg-paper p-6 text-ink shadow-2xl sm:p-7" onClick={(e) => e.stopPropagation()}>
+        <button type="button" onClick={onClose} aria-label={T.close[lang]} className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full text-2xl text-ink hover:bg-sand">×</button>
         <h2 id="contact-title" className="h-display pr-10 text-[28px]">{T.title[lang]}</h2>
 
         {sent ? (
           <div className="mt-4 flex flex-col gap-5">
             <p className="rounded-xl bg-success px-4 py-3 font-medium text-success-ink">{T.done[lang]}</p>
             <FollowCard context="thanks" />
-            <button type="button" onClick={onClose} className="self-end rounded-[10px] bg-navy px-5 py-3 font-bold text-white">{T.close[lang]}</button>
+            <button type="button" onClick={onClose} className="self-end rounded-[10px] bg-ink px-5 py-3 font-bold text-white">{T.close[lang]}</button>
           </div>
         ) : (
           <form onSubmit={submit} className="mt-2 flex flex-col gap-4">
@@ -127,7 +127,7 @@ export function ContactDialog({ onClose }: { onClose: () => void }) {
               <div className="flex flex-wrap gap-2">
                 {ROLES.map((x) => (
                   <button key={x.key} type="button" aria-pressed={role === x.key} onClick={() => { setRole(x.key); setTopic(""); }}
-                    className={`min-h-10 rounded-full border px-3.5 text-sm ${role === x.key ? "border-navy bg-brass-tint font-bold" : "border-line-strong bg-white"}`}>
+                    className={`min-h-10 rounded-full border px-3.5 text-sm ${role === x.key ? "border-ink bg-accent-tint font-bold" : "border-line-strong bg-white"}`}>
                     {x[lang]}
                   </button>
                 ))}
@@ -164,7 +164,7 @@ export function ContactDialog({ onClose }: { onClose: () => void }) {
                 <input tabIndex={-1} aria-hidden="true" autoComplete="off" value={f.website2} onChange={(e) => setF({ ...f, website2: e.target.value })} className="absolute left-[-9999px] h-0 w-0 opacity-0" name="website2" />
 
                 {error && <p role="alert" className="rounded-xl bg-[#FBE5E2] px-4 py-3 text-sm font-medium text-[#8A1F17]">{error}</p>}
-                <button type="submit" disabled={busy} className="self-end rounded-[10px] bg-navy px-6 py-3 font-bold text-white disabled:opacity-60">{busy ? T.sending[lang] : T.send[lang]}</button>
+                <button type="submit" disabled={busy} className="self-end rounded-[10px] bg-ink px-6 py-3 font-bold text-white disabled:opacity-60">{busy ? T.sending[lang] : T.send[lang]}</button>
               </>
             )}
           </form>
