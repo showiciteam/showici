@@ -104,7 +104,7 @@ export async function getTicketmasterEvents(apiKey: string): Promise<BigEvent[]>
       page: String(page),
       locale: "*",
     });
-    const res = await fetch(`${API}?${q}`, { next: { revalidate: 3600, tags: ["ticketmaster"] } });
+    const res = await fetch(`${API}?${q}`, { cache: "no-store" }); // the finished list is cached in data.ts
     if (!res.ok) {
       console.error("Ticketmaster", res.status, (await res.text()).slice(0, 200));
       break;

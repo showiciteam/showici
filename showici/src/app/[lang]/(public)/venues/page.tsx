@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { PillLink } from "@/components/sections";
-import { getVenues } from "@/lib/data";
+import { getVenues, venueListing } from "@/lib/data";
 import { isLang, type Lang } from "@/lib/lang";
 import { pageMetadata } from "@/lib/seo";
 import { VenueSearch } from "./VenueSearch";
+
+/** Served from cache and rebuilt in the background every 5 minutes, so new listings show up without a deploy. */
+export const revalidate = 300;
 
 const copy = {
   fr: {
@@ -54,7 +57,7 @@ export default async function VenuesPage({ params, searchParams }: { params: Pro
 
   return (
     <>
-      <VenueSearch venues={venues} initialRadius={Number(sp.radius) || undefined} initialRegion={sp.region} initialArea={sp.area} />
+      <VenueSearch venues={venues.map(venueListing)} initialRadius={Number(sp.radius) || undefined} initialRegion={sp.region} initialArea={sp.area} />
 
       <section className="band-red">
         <div className="wrap grid gap-10 py-12 md:grid-cols-2">

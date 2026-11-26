@@ -3,10 +3,13 @@ import { BigEventCard } from "@/components/cards";
 import { EmptyState } from "@/components/EmptyState";
 import { PageHero, PillLink, RedBand, SectionHead } from "@/components/sections";
 import { FollowButtons } from "@/components/Social";
-import { getBigEvents, getShows, getVenues } from "@/lib/data";
+import { getBigEvents, getShows, getVenues, venueListing } from "@/lib/data";
 import { isLang, type Lang } from "@/lib/lang";
 import { pageMetadata } from "@/lib/seo";
 import { ShowsBrowser } from "./ShowsBrowser";
+
+/** Served from cache and rebuilt in the background every minute, so new listings show up without a deploy. */
+export const revalidate = 60;
 
 const copy = {
   fr: {
@@ -72,7 +75,7 @@ export default async function ShowsPage({ params }: { params: Promise<{ lang: st
       <section className="wrap py-14">
         <SectionHead title={c.local} />
         {shows.length > 0 ? (
-          <ShowsBrowser shows={shows} venues={venues} />
+          <ShowsBrowser shows={shows} venues={venues.map(venueListing)} />
         ) : (
           <EmptyState title={c.emptyTitle} body={c.emptyBody} cta={{ href: "/signup?role=venue", label: c.emptyCta }} secondary={{ href: "/events", label: c.emptyMore }} />
         )}

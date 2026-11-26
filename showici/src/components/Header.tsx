@@ -9,6 +9,7 @@ import { useLang, type DictKey } from "@/lib/i18n";
 import { switchLang } from "@/lib/lang";
 import { ContactButton } from "./ContactDialog";
 import { Logo } from "./Logo";
+import { useSessionUser, type HeaderUser } from "@/lib/useSessionUser";
 
 // "Spectacles" opens a small menu with local shows and big events, so the whole menu fits on one line.
 const showLinks: { href: string; key: DictKey }[] = [
@@ -117,7 +118,8 @@ export function LogoutButton({ className = "" }: { className?: string }) {
   );
 }
 
-export function Header({ user }: { user?: { name: string; home: string } | null }) {
+export function Header() {
+  const user: HeaderUser | null = useSessionUser();
   const path = useBarePath();
   const { t } = useLang();
   const [open, setOpen] = useState(false);

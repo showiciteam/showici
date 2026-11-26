@@ -22,7 +22,7 @@ function splitLang(pathname: string): { lang: Lang; path: string } {
  * 2. Session: refreshes the Supabase auth cookie and sends signed-out visitors from private pages to the login page.
  */
 export async function middleware(request: NextRequest) {
-  const { pathname, search } = request.nextUrl;
+  const { pathname } = request.nextUrl;
   if (PASS_THROUGH.some((p) => pathname.startsWith(p)) || isFile(pathname) || SHARE_IMAGE.test(pathname)) return NextResponse.next();
 
   // Older shared links used ?lang=en / ?lang=fr: send them to the page in that language.
@@ -55,6 +55,10 @@ export async function middleware(request: NextRequest) {
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !key) return pass(); // Demo mode: no accounts.
 
+  // Most visitors have no account: without a sign-in cookie there is no session to refresh, so skip the call to Supabase.
+  const signedIn = request.cookies.getAll().some((c) => c.name.startsWith("sb-") && c.name.includes("-auth-token"));
+  if (!signedIn) return isProtected(path) ? toLogin(request, lang) : pass();
+
   let response = pass();
   const supabase = createServerClient(url, key, {
     cookies: {
@@ -72,13 +76,18 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user && PROTECTED.some((p) => path === p || path.startsWith(`${p}/`))) {
-    const login = request.nextUrl.clone();
-    login.pathname = lang === "en" ? "/en/login" : "/login";
-    login.search = `?next=${encodeURIComponent(pathname + search)}`;
-    return NextResponse.redirect(login);
-  }
+  if (!user && isProtected(path)) return toLogin(request, lang);
   return response;
+}
+
+const isProtected = (path: string) => PROTECTED.some((p) => path === p || path.startsWith(`${p}/`));
+
+/** Sends a signed-out visitor to the login page, then back to where they were going. */
+function toLogin(request: NextRequest, lang: Lang) {
+  const login = request.nextUrl.clone();
+  login.pathname = lang === "en" ? "/en/login" : "/login";
+  login.search = `?next=${encodeURIComponent(request.nextUrl.pathname + request.nextUrl.search)}`;
+  return NextResponse.redirect(login);
 }
 
 export const config = {

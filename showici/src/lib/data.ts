@@ -1,6 +1,8 @@
 // Data access. Reads from Supabase when it is configured. The sample data in mock.ts is only used in demo mode (no Supabase env vars).
 import * as mock from "./mock";
+import { unstable_cache } from "next/cache";
 import { getServerSupabase } from "./supabase/server";
+import { getPublicSupabase } from "./supabase/public";
 import { mediaUrl } from "./media";
 import type { BigEvent, EventRequest, Performer, Review, Show, Tone, Venue } from "./types";
 import { getTicketmasterEvents } from "./ticketmaster";
@@ -137,7 +139,24 @@ const MONTREAL = { lat: 45.5019, lng: -73.5674 };
 /** Default reach: all of Québec (and nearby border towns). Distances are still measured from Montréal. */
 const QUEBEC_WIDE_KM = 2000;
 
+/** How long the Québec-wide venue and artist lists are reused before asking the database again. */
+const LISTING_SECONDS = 300;
+
+/** Every published artist in Québec, shared by all visitors for a few minutes. */
+const allPerformers = unstable_cache(
+  async () => {
+    const sb = getPublicSupabase();
+    if (!sb) return mock.performers;
+    const { data, error } = await sb.rpc("performers_nearby", { p_lat: MONTREAL.lat, p_lng: MONTREAL.lng, p_radius_km: QUEBEC_WIDE_KM });
+    if (error) console.error("getPerformers", error.message);
+    return (data ?? []).map(toPerformer);
+  },
+  ["performers-quebec"],
+  { revalidate: LISTING_SECONDS, tags: ["performers"] },
+);
+
 export async function getPerformers(opts: NearOpts = {}): Promise<Performer[]> {
+  if (opts.lat == null && opts.lng == null && opts.radiusKm == null) return allPerformers();
   const sb = await getServerSupabase();
   if (!sb) return mock.performers;
   const { data, error } = await sb.rpc("performers_nearby", {
@@ -156,7 +175,36 @@ export async function getPerformer(id: string): Promise<Performer | undefined> {
   return data ? toPerformer(data) : undefined;
 }
 
+/** Every published venue in Québec, shared by all visitors for a few minutes. */
+const allVenues = unstable_cache(
+  async () => {
+    const sb = getPublicSupabase();
+    if (!sb) return mock.venues;
+    const { data, error } = await sb.rpc("venues_nearby", { p_lat: MONTREAL.lat, p_lng: MONTREAL.lng, p_radius_km: QUEBEC_WIDE_KM });
+    if (error) console.error("getVenues", error.message);
+    return (data ?? []).map(toVenue);
+  },
+  ["venues-quebec"],
+  { revalidate: LISTING_SECONDS, tags: ["venues"] },
+);
+
+/** The part of a venue that cards, the map and the directory need. Keeps pages light when hundreds of venues are listed. */
+export const venueListing = (v: Venue): Venue => ({
+  ...v,
+  description: "",
+  equipment: [],
+  books: [],
+  photos: v.photos?.slice(0, 1),
+  links: undefined,
+  videos: undefined,
+  street: undefined,
+  phone: undefined,
+  sourceRef: undefined,
+  ownerId: undefined,
+});
+
 export async function getVenues(opts: NearOpts = {}): Promise<Venue[]> {
+  if (opts.lat == null && opts.lng == null && opts.radiusKm == null) return allVenues();
   const sb = await getServerSupabase();
   if (!sb) return mock.venues;
   const { data, error } = await sb.rpc("venues_nearby", {
@@ -207,19 +255,24 @@ function toShow(r: any): Show {
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
-export async function getShows(): Promise<Show[]> {
-  const sb = await getServerSupabase();
-  if (!sb) return mock.shows;
-  const { data, error } = await sb
-    .from("shows")
-    .select("*")
-    .eq("status", "live")
-    .gte("starts_at", new Date().toISOString())
-    .order("starts_at")
-    .limit(50);
-  if (error) console.error("getShows", error.message);
-  return (data ?? []).map(toShow);
-}
+/** Upcoming published shows, shared by all visitors and refreshed every minute so new posts appear quickly. */
+export const getShows = unstable_cache(
+  async (): Promise<Show[]> => {
+    const sb = getPublicSupabase();
+    if (!sb) return mock.shows;
+    const { data, error } = await sb
+      .from("shows")
+      .select("*")
+      .eq("status", "live")
+      .gte("starts_at", new Date().toISOString())
+      .order("starts_at")
+      .limit(50);
+    if (error) console.error("getShows", error.message);
+    return (data ?? []).map(toShow);
+  },
+  ["shows-upcoming"],
+  { revalidate: 60, tags: ["shows"] },
+);
 
 export async function getShow(id: string): Promise<Show | undefined> {
   const sb = await getServerSupabase();
@@ -283,11 +336,22 @@ export async function getReviewsFor(profileId?: string): Promise<Review[]> {
  * Big events (concerts, comedy, theatre, festivals; no sports) sold on Ticketmaster in Québec.
  * Without a TICKETMASTER_API_KEY the site shows the sample cards from mock.ts.
  */
+/**
+ * Big events from Ticketmaster, rebuilt at most once an hour and shared by every page and visitor.
+ * (Ticketmaster's raw answers are too large for Next's fetch cache, so the finished list is cached instead.)
+ */
+const ticketmasterEvents = unstable_cache(
+  async (key: string) => getTicketmasterEvents(key),
+  ["ticketmaster-events"],
+  { revalidate: 3600, tags: ["ticketmaster"] },
+);
+
 export async function getBigEvents(): Promise<BigEvent[]> {
   const key = process.env.TICKETMASTER_API_KEY;
   if (!key) return mock.bigEvents;
   try {
-    return await getTicketmasterEvents(key);
+    const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Toronto" });
+    return (await ticketmasterEvents(key)).filter((e) => !e.startDate || e.startDate >= today);
   } catch (e) {
     console.error("getBigEvents", e);
     return [];
