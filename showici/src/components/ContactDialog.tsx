@@ -107,7 +107,7 @@ export function ContactDialog({ onClose }: { onClose: () => void }) {
 
   const input = "input py-2.5";
   return (
-    <div role="dialog" aria-modal="true" aria-labelledby="contact-title" className="fixed inset-0 z-[200] flex items-start justify-center overflow-y-auto bg-black/75 p-3 sm:items-center sm:p-6" onClick={onClose}>
+    <div role="dialog" aria-modal="true" aria-labelledby="contact-title" className="fixed inset-0 z-[200] flex items-start justify-center overflow-y-auto whitespace-normal bg-black/75 p-3 sm:items-center sm:p-6" onClick={onClose}>
       <div className="relative my-6 w-full max-w-[580px] overflow-hidden rounded-2xl bg-paper text-ink shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="band-red px-6 pb-5 pt-6 sm:px-7">
           <button type="button" onClick={onClose} aria-label={T.close[lang]} className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full text-2xl text-white hover:bg-white/10">×</button>

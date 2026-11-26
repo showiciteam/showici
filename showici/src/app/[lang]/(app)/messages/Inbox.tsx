@@ -140,7 +140,7 @@ export function Inbox({ live, meId, threads, activeId, messages: initial, starte
         <div className="flex flex-col gap-2.5 border-b border-line p-[18px]">
           <h1 className="h-display text-[26px]">{tr("Messages")}</h1>
           <span className="rounded-[10px] bg-accent-tint px-3 py-2 text-[13px] font-bold text-ink-deep">
-            {contactsLeft == null ? "Unlimited new contacts during launch" : `${contactsLeft} of 2 new contacts left today`}
+            {contactsLeft == null ? tr("Unlimited new contacts") : fill(tr("{count} of 2 new contacts left today"), { count: contactsLeft })}
           </span>
           {live && (
             <label className="flex items-center gap-2 text-[13px] text-slate">
@@ -195,7 +195,7 @@ export function Inbox({ live, meId, threads, activeId, messages: initial, starte
         )}
         <div className="flex flex-1 flex-col gap-3.5 bg-paper p-5" aria-live="polite">
           {live && header && (
-            <div className="max-w-[80%] self-center rounded-xl bg-sand px-3.5 py-2.5 text-center text-[13px] text-graphite">{notice.text}</div>
+            <div className="max-w-[80%] self-center rounded-xl bg-sand px-3.5 py-2.5 text-center text-[13px] text-graphite">{tr(notice.text)}</div>
           )}
           {newTo && <div className="self-center text-sm text-muted">{fill(tr("Write your first message to {name}."), { name: newTo.name })}</div>}
           {messages.map((m) =>
@@ -249,7 +249,7 @@ export function Inbox({ live, meId, threads, activeId, messages: initial, starte
         ) : (
           <>
             {[["Started", "Oct 5"], ["Their fee", "$300 – $600"], ["Travels", "Up to 50 km"]].map(([k, v]) => (
-              <div key={k} className="flex justify-between text-sm"><span className="text-muted">{k}</span><span>{v}</span></div>
+              <div key={k} className="flex justify-between text-sm"><span className="text-muted">{tr(k)}</span><span>{tr(v)}</span></div>
             ))}
             <div className="flex aspect-video items-center justify-center rounded-[10px] bg-ink"><PlayIcon color="#E3262F" /></div>
             <span className="hint">{tr("Their featured video")}</span>
