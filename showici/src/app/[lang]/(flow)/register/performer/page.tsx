@@ -1,0 +1,294 @@
+"use client";
+
+import { useTr } from "@/lib/i18n";
+import { useRouter } from "@/lib/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { ChipGroup, Dropzone, FormCard, Notice, SingleImage } from "@/components/form";
+import { Button } from "@/components/ui";
+import { ACT_TYPES, LANGUAGES, actFamily, joinOther, splitOther } from "@/lib/acts";
+import { savePerformer, type Geo } from "@/lib/actions";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
+import { VideoEditor, type EditableVideo } from "@/components/VideoEditor";
+import { mediaUrl } from "@/lib/media";
+import { getBrowserSupabase } from "@/lib/supabase/client";
+
+const steps = [
+  ["basics", "About your act"], ["style", "Your style"], ["photos", "Photos"], ["videos", "Videos and links"],
+  ["where", "Where you play"], ["events", "Events and availability"], ["publish", "Review and publish"],
+];
+
+
+const EMPTY = {
+  name: "", members: "4", contact: "", phone: "", rep: "Covers", bio: "", setLength: "2 × 45 min", fee: "$300 – $600",
+  ownSound: false, base: "Montréal, QC", instagram: "", facebook: "", tiktok: "", music: "", website: "",
+};
+
+export default function RegisterPerformer() {
+  const tr = useTr();
+  const router = useRouter();
+  const [existingId, setExistingId] = useState<string | undefined>();
+  const [loading, setLoading] = useState(true);
+  const [f, setF] = useState(EMPTY);
+  const set = <K extends keyof typeof EMPTY>(k: K, v: (typeof EMPTY)[K]) => setF((x) => ({ ...x, [k]: v }));
+  const [actType, setActType] = useState(["Band"]);
+  const [languages, setLanguages] = useState(["Français", "English"]);
+  const [genres, setGenres] = useState(["Rock", "Pop"]);
+  const [eventTypes, setEventTypes] = useState(["Pubs and bars", "Private parties"]);
+  const [days, setDays] = useState(["Fri", "Sat"]);
+  const [photos, setPhotos] = useState<File[]>([]);
+  const [savedPhotos, setSavedPhotos] = useState<string[]>([]);
+  const [removedPhotos, setRemovedPhotos] = useState<string[]>([]);
+  const [videos, setVideos] = useState<EditableVideo[]>([]);
+  const [radius, setRadius] = useState(50);
+  const [available, setAvailable] = useState(true);
+  const [published, setPublished] = useState(false);
+  const [status, setStatus] = useState<{ kind: "ok" | "error"; msg: string } | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [geo, setGeo] = useState<Geo | null | undefined>(undefined);
+  const [languageOther, setLanguageOther] = useState("");
+  const [styleOther, setStyleOther] = useState("");
+  // Header photo and logo: a saved storage path, or a newly picked file (shown as a local preview).
+  const [coverPath, setCoverPath] = useState<string | null>(null);
+  const [logoPath, setLogoPath] = useState<string | null>(null);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const coverUrl = useMemo(() => (coverFile ? URL.createObjectURL(coverFile) : coverPath ? mediaUrl(coverPath) : undefined), [coverFile, coverPath]);
+  const logoUrl = useMemo(() => (logoFile ? URL.createObjectURL(logoFile) : logoPath ? mediaUrl(logoPath) : undefined), [logoFile, logoPath]);
+  const family = actFamily(actType[0]);
+
+  // Editing: load the signed-in performer's existing profile so saving updates it instead of creating a copy.
+  useEffect(() => {
+    (async () => {
+      const sb = getBrowserSupabase();
+      const uid = sb ? (await sb.auth.getUser()).data.user?.id : undefined;
+      if (!sb || !uid) return setLoading(false);
+      const [{ data: p }, { data: contact }] = await Promise.all([
+        sb.from("performers").select("*, performer_videos(*), performer_photos(*)").eq("owner", uid).order("created_at").limit(1).maybeSingle(),
+        sb.from("private_contacts").select("phone").eq("profile_id", uid).maybeSingle(),
+      ]);
+      if (p) {
+        setExistingId(p.id);
+        setF({
+          name: p.name ?? "", members: String(Math.min(p.members ?? 1, 6)), contact: p.contact_name ?? "", phone: contact?.phone ?? "",
+          rep: p.repertoire ?? "Covers", bio: p.bio ?? "", setLength: p.set_length ?? "2 × 45 min", fee: p.fee_range ?? "Prefer not to say",
+          ownSound: !!p.own_sound, base: p.base_city ?? "Montréal, QC", instagram: p.instagram ?? "", facebook: p.facebook ?? "",
+          tiktok: p.tiktok ?? "", music: p.music_url ?? "", website: p.website ?? "",
+        });
+        setActType([p.act_type]);
+        const langs = splitOther(p.languages ?? [], LANGUAGES);
+        setLanguages(langs.known);
+        setLanguageOther(langs.other);
+        const styles = splitOther(p.genres ?? [], actFamily(p.act_type).styles);
+        setGenres(styles.known);
+        setStyleOther(styles.other);
+        setCoverPath(p.cover_path ?? null);
+        setLogoPath(p.logo_path ?? null);
+        setEventTypes(p.event_types ?? []);
+        setDays(p.available_days ?? []);
+        setRadius(p.travel_km ?? 50);
+        setAvailable(p.available ?? true);
+        setPublished(!!p.published);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const sortByPos = (a: any, b: any) => (a.position ?? 0) - (b.position ?? 0);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        setVideos((p.performer_videos ?? []).sort(sortByPos).map((v: any) => ({ youtube_url: v.youtube_url, title: v.title ?? "", featured: !!v.featured })));
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        setSavedPhotos((p.performer_photos ?? []).sort(sortByPos).map((x: any) => x.storage_path));
+      } else if (contact?.phone) {
+        set("phone", contact.phone);
+      }
+      setLoading(false);
+    })();
+  }, []);
+
+  const photoCount = savedPhotos.length + photos.length;
+  const strength = Math.min(100, 30 + (photoCount ? 20 : 0) + Math.min(videos.length, 3) * 10 + (f.bio.length > 40 ? 20 : 0));
+  const circle = 40 + radius * 1.6;
+
+  // Switching act type swaps the style list and the repertoire question.
+  function changeActType(next: string[]) {
+    const fam = actFamily(next[0]);
+    setActType(next);
+    setGenres((g) => g.filter((x) => x === "Other" || fam.styles.includes(x)));
+    if (!fam.repertoire.includes(f.rep)) set("rep", fam.repertoire[fam.repertoire.length - 1]);
+    if (!fam.ownSound) set("ownSound", false);
+  }
+
+  async function save(publish: boolean) {
+    setBusy(true);
+    setStatus(null);
+    const res = await savePerformer(
+      {
+        name: f.name, act_type: actType[0], members: Number(f.members || 1),
+        languages: joinOther(languages, languageOther), genres: joinOther(genres, styleOther),
+        repertoire: f.rep, bio: f.bio, set_length: f.setLength, fee_range: f.fee,
+        own_sound: f.ownSound, base_city: f.base || "Montréal", travel_km: radius,
+        event_types: eventTypes, available_days: days, available, contact_name: f.contact,
+        instagram: f.instagram, facebook: f.facebook, tiktok: f.tiktok, music_url: f.music, website: f.website,
+        videos: videos.map((v, i) => ({ ...v, title: v.title.trim() || `Video ${i + 1}` })), photos, removedPhotos, phone: f.phone, publish, geo,
+        cover: { file: coverFile, path: coverPath }, logo: { file: logoFile, path: logoPath },
+      },
+      existingId,
+    );
+    setBusy(false);
+    if (!res.ok) return setStatus({ kind: "error", msg: res.error });
+    if (res.demo) return setStatus({ kind: "ok", msg: "Demo mode: everything looks good. Connect Supabase to save profiles for real." });
+    router.push("/dashboard/performer");
+    router.refresh();
+  }
+
+  if (loading) return <div className="wrap py-16 text-slate">{tr("Loading your profile…")}</div>;
+
+  return (
+    <div className="wrap pb-[72px] pt-9">
+      <p className="eyebrow mb-1.5 text-[13px]">{existingId ? tr("Edit your profile") : tr("Performer registration")}</p>
+      <h1 className="h-display text-[44px]">{existingId ? tr("Update your performer profile") : tr("Build your performer profile")}</h1>
+      <p className="mb-8 mt-2.5 max-w-[720px] text-lg text-slate">{tr("Bands, solo musicians, DJs, comedians, magicians: this page is your showcase. The more complete it is, the more venues and event planners find you.")}</p>
+
+      <div className="flex flex-wrap items-start gap-7">
+        <aside className="flex max-w-[280px] flex-[1_1_240px] flex-col gap-4 lg:sticky lg:top-6">
+          <div className="card p-5">
+            <div className="mb-2.5 flex justify-between text-sm font-bold"><span>{tr("Profile strength")}</span><span className="text-accent-dark">{strength}%</span></div>
+            <div className="h-2 overflow-hidden rounded-full bg-line"><div className="h-full bg-ink transition-all" style={{ width: `${strength}%` }} /></div>
+            <p className="hint mt-2.5">{tr("Videos and a bio make the biggest difference.")}</p>
+          </div>
+          <nav aria-label={tr("Registration steps")} className="card flex flex-col p-2.5">
+            {steps.map(([id, label], i) => (
+              <a key={id} href={`#${id}`} className="flex items-center gap-3 rounded-[10px] p-3 font-medium text-ink no-underline hover:bg-sand">
+                <span className="flex h-[26px] w-[26px] flex-none items-center justify-center rounded-full border-2 border-line-strong text-[13px] font-bold text-muted">{i + 1}</span>{tr(label)}
+              </a>
+            ))}
+          </nav>
+        </aside>
+
+        <form onSubmit={(e) => { e.preventDefault(); save(true); }} className="flex min-w-0 flex-[999_1_600px] flex-col gap-5">
+          <FormCard id="basics" title={tr("1. About your act")}>
+            <label className="label">{tr("Act or stage name")}<input required value={f.name} onChange={(e) => set("name", e.target.value)} className="input" placeholder={tr("e.g. The Night Owls")} /></label>
+            <ChipGroup legend={tr("What kind of act are you?")} single options={[...ACT_TYPES]} value={actType} onChange={changeActType} />
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] items-start gap-3.5">
+              <label className="label">{tr("Number of performers")}<select value={f.members} onChange={(e) => set("members", e.target.value)} className="input"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option value="6">6+</option></select></label>
+              <label className="label">{tr("Contact person")}<input value={f.contact} onChange={(e) => set("contact", e.target.value)} className="input" /></label>
+              <label className="label">{tr("Phone")}<input type="tel" value={f.phone} onChange={(e) => set("phone", e.target.value)} className="input" placeholder="514-555-0123" /><span className="hint">{tr("Private. Never shown on your profile.")}</span></label>
+            </div>
+            <ChipGroup legend={tr("Languages you perform in")} options={[...LANGUAGES, "Other"]} value={languages} onChange={setLanguages} />
+            {languages.includes("Other") && (
+              <label className="label -mt-2">{tr("Other languages")}<input value={languageOther} onChange={(e) => setLanguageOther(e.target.value)} className="input" placeholder={tr("e.g. Português, Italiano")} /><span className="hint">{tr("Separate several with commas.")}</span></label>
+            )}
+          </FormCard>
+
+          <FormCard id="style" title={tr("2. Your style")}>
+            <ChipGroup legend={tr("Style")} hint={tr("Pick up to 5")} options={[...family.styles, "Other"]} value={genres} onChange={(g) => setGenres(g.slice(0, 5))} />
+            {genres.includes("Other") && (
+              <label className="label -mt-2">{tr("Your style")}<input value={styleOther} onChange={(e) => setStyleOther(e.target.value)} className="input" placeholder={actType[0] === "Other" ? tr("Describe your act, e.g. Fire juggling") : tr("Type your style")} /><span className="hint">{tr("Separate several with commas.")}</span></label>
+            )}
+            <fieldset>
+              <legend className="mb-2.5 text-sm font-bold">{tr(family.repertoireLabel)}</legend>
+              <div className="flex flex-wrap gap-[18px]">
+                {family.repertoire.map((r) => (
+                  <label key={r} className="flex items-center gap-2"><input type="radio" name="rep" value={r} checked={f.rep === r} onChange={() => set("rep", r)} className="h-[18px] w-[18px] accent-accent" />{tr(r)}</label>
+                ))}
+              </div>
+            </fieldset>
+            <label className="label">{tr("Short bio")} <span className="hint">{tr("What makes your show great? 500 characters max.")}</span>
+              <textarea rows={4} maxLength={500} value={f.bio} onChange={(e) => set("bio", e.target.value)} className="input" placeholder={tr("Tell bookers about your act: who you are, the vibe of your show, the crowds you love performing for.")} />
+              <span className="hint text-right">{f.bio.length} / 500</span>
+            </label>
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] items-start gap-3.5">
+              <label className="label">{tr("Typical set length")}<select value={f.setLength} onChange={(e) => set("setLength", e.target.value)} className="input"><option value="15 min">{tr("15 min")}</option><option value="30 min">{tr("30 min")}</option><option value="45 min">{tr("45 min")}</option><option value="1 hour">{tr("1 hour")}</option><option value="2 × 45 min">{tr("2 × 45 min")}</option><option value="3 hours +">{tr("3 hours +")}</option></select></label>
+              <label className="label">{tr("Typical fee")}<select value={f.fee} onChange={(e) => set("fee", e.target.value)} className="input"><option value="Prefer not to say">{tr("Prefer not to say")}</option><option value="Under $300">{tr("Under $300")}</option><option>$300 – $600</option><option>$600 – $1,000</option><option>$1,000+</option></select><span className="hint">{tr("Optional. Only shown as a range.")}</span></label>
+            </div>
+            {family.ownSound && <label className="flex items-center gap-2.5 font-medium"><input type="checkbox" checked={f.ownSound} onChange={(e) => set("ownSound", e.target.checked)} className="h-[18px] w-[18px] accent-ink" />{tr("We bring our own sound system")}</label>}
+          </FormCard>
+
+          <FormCard id="photos" title={tr("3. Photos")}>
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] items-start gap-5">
+              <SingleImage label={tr("Header image")} hint={tr("The wide banner at the top of your profile. Landscape, at least 1600 px wide.")} url={coverUrl} onFile={setCoverFile} onRemove={() => { setCoverFile(null); setCoverPath(null); }} />
+              <SingleImage label={tr("Logo")} shape="round" hint={tr("Shown in the circle next to your name. Square works best.")} url={logoUrl} onFile={setLogoFile} onRemove={() => { setLogoFile(null); setLogoPath(null); }} />
+            </div>
+            <h3 className="mt-1 text-[17px] font-bold">{tr("Gallery")}</h3>
+            {savedPhotos.length > 0 && (
+              <div className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-3">
+                {savedPhotos.map((path, i) => (
+                  <div key={path} className="relative aspect-[4/3] overflow-hidden rounded-xl bg-ph-1">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={mediaUrl(path)} alt="" className="h-full w-full object-cover" />
+                    {i === 0 && !coverUrl && <span className="absolute left-2 top-2 rounded-md bg-ink px-2 py-1 text-[11px] font-bold text-white">{tr("HEADER")}</span>}
+                    <button type="button" aria-label={tr("Remove photo")} onClick={() => { setSavedPhotos(savedPhotos.filter((p) => p !== path)); setRemovedPhotos([...removedPhotos, path]); }} className="absolute right-1.5 top-1.5 flex h-[30px] w-[30px] items-center justify-center rounded-full bg-white text-ink">✕</button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <Dropzone files={photos} onFiles={(fs) => setPhotos(fs.slice(0, Math.max(0, 12 - savedPhotos.length)))} hint={tr("JPG or PNG, up to 10 MB each. Up to 12 photos. Live shots work best. These appear in the Photos section of your profile.")} />
+          </FormCard>
+
+          <FormCard id="videos" title={tr("4. Videos and links")}>
+            <VideoEditor
+              videos={videos}
+              onChange={setVideos}
+              intro={tr("Paste YouTube links of your live performances. Bookers decide mostly from videos, so show them your best 3 to 5.")}
+              previewLabel={tr("PREVIEW: how your videos appear on your profile")}
+            />
+            <h3 className="mt-2 text-[17px] font-bold">{tr("Other links")}</h3>
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] items-start gap-3.5">
+              <label className="label">Instagram<input type="url" value={f.instagram} onChange={(e) => set("instagram", e.target.value)} className="input" placeholder="https://instagram.com/…" /></label>
+              <label className="label">Facebook<input type="url" value={f.facebook} onChange={(e) => set("facebook", e.target.value)} className="input" placeholder="https://facebook.com/…" /></label>
+              <label className="label">TikTok<input type="url" value={f.tiktok} onChange={(e) => set("tiktok", e.target.value)} className="input" placeholder="https://tiktok.com/@…" /></label>
+              <label className="label">{tr("Spotify or SoundCloud")}<input type="url" value={f.music} onChange={(e) => set("music", e.target.value)} className="input" placeholder={tr("Link to your music")} /></label>
+              <label className="label">{tr("Website")}<input type="url" value={f.website} onChange={(e) => set("website", e.target.value)} className="input" placeholder="https://" /></label>
+            </div>
+          </FormCard>
+
+          <FormCard id="where" title={tr("5. Where you play")}>
+            <label className="label">Home base
+              <AddressAutocomplete
+                mode="city"
+                value={f.base}
+                placeholder={tr("Montréal, QC")}
+                onChange={(v) => { set("base", v); setGeo(null); }}
+                onPick={(p) => { set("base", [p.city, p.province].filter(Boolean).join(", ")); setGeo({ lat: p.lat, lng: p.lng }); }}
+              />
+              <span className="hint">{tr("Start typing your city and pick it from the list. Only your city is shown publicly.")}</span>
+            </label>
+            <label className="label">{tr("How far will you travel?")} <span className="font-display text-[28px] text-ink">{radius} km</span>
+              <input type="range" min={5} max={150} step={5} value={radius} onChange={(e) => setRadius(Number(e.target.value))} className="w-full accent-ink" />
+            </label>
+            <div className="relative h-[280px] overflow-hidden rounded-2xl border border-line bg-[#E9EDE6]" aria-hidden="true">
+              <div className="absolute inset-x-0 top-[46%] h-2.5 bg-white" />
+              <div className="absolute inset-y-0 left-[38%] w-2.5 bg-white" />
+              <div className="absolute left-1/2 top-1/2 rounded-full border-2 border-ink bg-ink/10 transition-all" style={{ width: circle, height: circle, marginLeft: -circle / 2, marginTop: -circle / 2 }} />
+              <div className="absolute left-1/2 top-1/2 -ml-[9px] -mt-[9px] h-[18px] w-[18px] rounded-full border-[3px] border-white bg-ink" />
+            </div>
+          </FormCard>
+
+          <FormCard id="events" title={tr("6. Events and availability")}>
+            <ChipGroup legend={tr("Which events do you play?")} options={["Pubs and bars", "Restaurants", "Private parties", "Quinceañeras", "Weddings", "Corporate events", "Festivals", "Kids' parties"]} value={eventTypes} onChange={setEventTypes} />
+            <ChipGroup legend={tr("Days you're usually available")} options={["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]} value={days} onChange={setDays} />
+            <div className="flex items-center justify-between gap-4 rounded-xl bg-sand p-4">
+              <div className="flex flex-col gap-1"><span className="font-bold">{tr("Show me as available for gigs")}</span><span className="hint">{tr("You appear in searches and receive matching event requests.")}</span></div>
+              <button type="button" role="switch" aria-checked={available} aria-label={tr("Available for gigs")} onClick={() => setAvailable(!available)} className={`relative h-[30px] w-[52px] flex-none rounded-full transition-colors ${available ? "bg-ink" : "bg-line-strong"}`}>
+                <span className={`absolute top-[3px] h-6 w-6 rounded-full bg-white transition-all ${available ? "right-[3px]" : "left-[3px]"}`} />
+              </button>
+            </div>
+          </FormCard>
+
+          <FormCard id="publish" title={tr("7. Review and publish")}>
+            <div className="flex flex-wrap items-center gap-4 rounded-[14px] border border-line p-4">
+              <div className="flex h-16 w-16 flex-none items-center justify-center overflow-hidden rounded-full bg-ph-1 font-extrabold">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                {logoUrl ? <img src={logoUrl} alt="" className="h-full w-full object-cover" /> : f.name ? f.name[0] : "?"}
+              </div>
+              <div className="flex flex-[1_1_200px] flex-col gap-1"><span className="h-display text-xl">{f.name || tr("Your act name")}</span><span className="hint">{tr(actType[0])} · {joinOther(genres, styleOther).map(tr).join(", ")} · {radius} km · {videos.length} {tr("videos")} · {photoCount} {tr("photos")}</span></div>
+              {existingId && <span className={`rounded-full px-3 py-1 text-sm font-bold ${published ? "bg-success text-success-ink" : "bg-line"}`}>{published ? tr("Published") : tr("Draft")}</span>}
+            </div>
+            <label className="flex items-start gap-2.5 text-sm text-slate"><input type="checkbox" required className="mt-0.5 h-[18px] w-[18px] flex-none accent-ink" />{tr("I confirm I have the rights to the photos and videos, and I agree to the")} <a href="/terms" target="_blank" rel="noopener">{tr("Terms")}</a>.</label>
+            {status && <Notice kind={status.kind}>{status.msg}</Notice>}
+            <div className="flex flex-wrap justify-end gap-2.5">
+              <Button variant="secondary" disabled={busy || !f.name} onClick={() => save(false)}>{tr("Save as draft")}</Button>
+              <Button type="submit" disabled={busy} className="px-7 text-base">{busy ? tr("Saving…") : existingId ? tr("Save and publish") : tr("Publish my profile")}</Button>
+            </div>
+          </FormCard>
+        </form>
+      </div>
+    </div>
+  );
+}

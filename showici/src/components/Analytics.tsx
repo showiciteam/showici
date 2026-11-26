@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/Link";
 import { useEffect, useState } from "react";
 import { useLang } from "@/lib/i18n";
 import { CONSENT_KEY as KEY } from "@/lib/analytics";
@@ -80,12 +80,12 @@ export function Analytics() {
     <>
       {ready && open && (
         <div role="dialog" aria-live="polite" aria-label={lang === "fr" ? "Témoins" : "Cookies"} className="fixed inset-x-3 bottom-3 z-[300] mx-auto flex max-w-[760px] flex-wrap items-center gap-4 rounded-[16px] border border-line bg-white p-4 shadow-2xl sm:inset-x-6 sm:bottom-6 sm:p-5">
-          <p className="min-w-0 flex-[1_1_320px] text-[15px] text-ink-2">
+          <p className="min-w-0 flex-[1_1_320px] text-[15px] text-graphite">
             {t.text} <Link href="/privacy" className="font-bold">{t.more}</Link>
           </p>
           <div className="flex flex-none gap-2.5">
-            <button type="button" onClick={() => decide("denied")} className="min-h-11 rounded-[10px] border border-line-strong bg-white px-[18px] py-2.5 text-[15px] font-bold text-navy hover:bg-parchment">{t.decline}</button>
-            <button type="button" onClick={() => decide("granted")} className="min-h-11 rounded-[10px] bg-navy px-[18px] py-2.5 text-[15px] font-bold text-white hover:bg-navy-deep">{t.accept}</button>
+            <button type="button" onClick={() => decide("denied")} className="min-h-11 rounded-[10px] border border-line-strong bg-white px-[18px] py-2.5 text-[15px] font-bold text-ink hover:bg-sand">{t.decline}</button>
+            <button type="button" onClick={() => decide("granted")} className="min-h-11 rounded-[10px] bg-ink px-[18px] py-2.5 text-[15px] font-bold text-white hover:bg-ink-deep">{t.accept}</button>
           </div>
         </div>
       )}

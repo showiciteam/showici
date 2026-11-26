@@ -51,17 +51,30 @@ Your current WHC/cPanel hosting can stay for WordPress (News and Spotlight Time,
 ## 5. What's where
 
 ```
-src/app/(public)/     Public pages: home, shows, big events, performers, venues, pricing, Spotlight Time, news, event request
-src/app/(auth)/       Log in, sign up
-src/app/(flow)/       Full performer and venue registration
-src/app/(app)/        Dashboards, post a show, event requests, messages, reviews, admin
-src/app/api/big-events  Ticketmaster Discovery API feed (uses sample events until a key is added)
-src/components/       Header, footer, cards, map, form pieces
-src/lib/data.ts       Reads from Supabase, falls back to sample data (src/lib/mock.ts)
-src/lib/actions.ts    Sign-up, login, saving forms, messages (with phone/email masking)
-src/lib/i18n.tsx      French / English text for the menu and homepage
-supabase/schema.sql   The full database
+src/app/[lang]/(public)/  Public pages: home, shows, big events, artists, venues, private events, Spotlight, news, about
+src/app/[lang]/(auth)/    Log in, sign up, password reset
+src/app/[lang]/(flow)/    Full artist and venue registration
+src/app/[lang]/(app)/     Dashboards, post a show, event requests, messages, reviews, admin
+src/app/api/big-events    Ticketmaster Discovery API feed (uses sample events until a key is added)
+src/app/sitemap.ts        Sitemap with the French and English address of every page
+src/middleware.ts         Languages (French at /, English at /en) and login checks
+src/components/           Header, footer, cards, page sections, map, form pieces
+src/lib/lang.ts           Languages and URL helpers; src/lib/i18n.tsx has the words shared by the header and footer
+src/lib/labels.ts         French names for act types, styles and venue types stored in English in the database
+src/lib/seo.ts            Title, description, canonical and French/English alternates for each page
+src/lib/data.ts           Reads from Supabase, falls back to sample data (src/lib/mock.ts)
+src/lib/actions.ts        Sign-up, login, saving forms, messages (with phone/email masking)
+src/app/globals.css       Colours (ink, accent red, paper) and shared styles
+public/images/            Stage photos used in page headers: replace with your own photos, same file names
+public/llms.txt           Short description of ShowIci for AI assistants and search tools
+supabase/schema.sql       The full database
 ```
+
+### Languages
+
+French is the main language and lives at the root (showici.com/salles…). English lives under /en.
+Each page keeps its text in a small `copy = { fr: {…}, en: {…} }` object at the top of its file, so wording changes happen in one place.
+Links use `@/components/Link`, which keeps visitors in their language automatically.
 
 ## 6. Built in
 
@@ -73,11 +86,11 @@ supabase/schema.sql   The full database
 - YouTube video showcase on performer profiles and photo uploads
 - Reviews, verification badges and an admin page
 - Big events page ready for the Ticketmaster Discovery API and affiliate links
-- French/English toggle (menu, homepage and footer so far)
+- French and English versions of every public page, each with its own address for search engines
 
 ## 7. Next steps for a developer
 
-- Finish French translations for the remaining pages (add keys in `src/lib/i18n.tsx`)
+- Translate the dashboards, registration forms and admin pages (still in English)
 - Replace the city lookup in `src/lib/geo.ts` with a geocoding API (Mapbox or Google) and the illustrated maps with a real map
 - Connect dashboards and the inbox to live Supabase data (the database and write functions are ready)
 - Add Stripe for the v2 subscriptions

@@ -1,11 +1,14 @@
 import type { MetadataRoute } from "next";
 import { createClient } from "@supabase/supabase-js";
-import { SITE_URL } from "@/lib/site";
 import { stories } from "@/lib/mock";
+import { LANGS, localize } from "@/lib/lang";
+import { SITE_URL } from "@/lib/site";
 
 export const revalidate = 3600; // rebuild the sitemap at most once an hour
 
-const PUBLIC_PAGES: { path: string; priority: number; changeFrequency: "daily" | "weekly" | "monthly" }[] = [
+type Freq = "daily" | "weekly" | "monthly";
+
+const PUBLIC_PAGES: { path: string; priority: number; changeFrequency: Freq }[] = [
   { path: "/", priority: 1, changeFrequency: "daily" },
   { path: "/shows", priority: 0.9, changeFrequency: "daily" },
   { path: "/performers", priority: 0.9, changeFrequency: "daily" },
@@ -18,6 +21,12 @@ const PUBLIC_PAGES: { path: string; priority: number; changeFrequency: "daily" |
   { path: "/terms", priority: 0.2, changeFrequency: "monthly" },
   { path: "/privacy", priority: 0.2, changeFrequency: "monthly" },
 ];
+
+/** One sitemap entry per page, in French, with its English version listed as an alternate. */
+function entry(path: string, lastModified: Date, changeFrequency: Freq, priority: number): MetadataRoute.Sitemap[number] {
+  const languages = Object.fromEntries(LANGS.map((l) => [`${l}-CA`, `${SITE_URL}${localize(path, l)}`]));
+  return { url: `${SITE_URL}${path === "/" ? "" : path}`, lastModified, changeFrequency, priority, alternates: { languages } };
+}
 
 /** Published performer, venue and show pages, read with the public key (no session needed). */
 async function dynamicPages(): Promise<MetadataRoute.Sitemap> {
@@ -32,7 +41,7 @@ async function dynamicPages(): Promise<MetadataRoute.Sitemap> {
       sb.from("shows").select("id, created_at").eq("status", "live").gte("starts_at", new Date().toISOString()).limit(5000),
     ]);
     const rows = (prefix: string, data: { id: string; created_at: string }[] | null, priority: number) =>
-      (data ?? []).map((r) => ({ url: `${SITE_URL}${prefix}/${r.id}`, lastModified: new Date(r.created_at), changeFrequency: "weekly" as const, priority }));
+      (data ?? []).map((r) => entry(`${prefix}/${r.id}`, new Date(r.created_at), "weekly", priority));
     return [...rows("/performers", performers.data, 0.8), ...rows("/venues", venues.data, 0.8), ...rows("/shows", shows.data, 0.7)];
   } catch {
     return [];
@@ -41,9 +50,7 @@ async function dynamicPages(): Promise<MetadataRoute.Sitemap> {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  const fixed = PUBLIC_PAGES.map((p) => ({ url: `${SITE_URL}${p.path === "/" ? "" : p.path}`, lastModified: now, changeFrequency: p.changeFrequency, priority: p.priority }));
-  const articles = stories
-    .filter((s) => s.article && !s.draft)
-    .map((s) => ({ url: `${SITE_URL}/spotlight/${s.slug}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.7 }));
+  const fixed = PUBLIC_PAGES.map((p) => entry(p.path, now, p.changeFrequency, p.priority));
+  const articles = stories.filter((s) => s.article && !s.draft).map((s) => entry(`/spotlight/${s.slug}`, now, "monthly", 0.7));
   return [...fixed, ...articles, ...(await dynamicPages())];
 }

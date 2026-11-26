@@ -1,10 +1,10 @@
-import Link from "next/link";
+import Link from "@/components/Link";
 import type { Tone } from "@/lib/types";
 
 type BtnProps = {
   href?: string;
   children: React.ReactNode;
-  variant?: "primary" | "secondary" | "brass" | "ghost-dark";
+  variant?: "primary" | "secondary" | "accent" | "ghost-dark";
   className?: string;
   type?: "button" | "submit";
   onClick?: () => void;
@@ -13,10 +13,10 @@ type BtnProps = {
 };
 
 const variants = {
-  primary: "bg-navy text-white hover:bg-navy-deep hover:text-white",
-  secondary: "bg-white text-navy border border-line-strong hover:bg-parchment hover:text-navy",
-  brass: "bg-brass text-navy hover:bg-[#C8932F] hover:text-navy",
-  "ghost-dark": "bg-transparent text-white border border-navy-line hover:bg-navy-soft hover:text-white",
+  primary: "bg-ink text-white hover:bg-ink-deep hover:text-white",
+  secondary: "bg-white text-ink border border-line-strong hover:bg-sand hover:text-ink",
+  accent: "bg-accent text-white hover:bg-accent-dark hover:text-white",
+  "ghost-dark": "bg-transparent text-white border border-ink-line hover:bg-ink-soft hover:text-white",
 };
 
 export function Button({ href, children, variant = "primary", className = "", type = "button", onClick, disabled, external }: BtnProps) {
@@ -35,7 +35,7 @@ export function Chip({ on, children, onClick }: { on?: boolean; children: React.
       onClick={onClick}
       aria-pressed={on}
       className={`inline-flex min-h-10 items-center gap-1.5 rounded-full px-3.5 py-2 text-sm transition-colors ${
-        on ? "border border-navy bg-brass-tint font-bold text-navy-deep" : "border border-line-strong bg-white text-ink-2 hover:bg-parchment"
+        on ? "border border-ink bg-accent-tint font-bold text-ink-deep" : "border border-line-strong bg-white text-graphite hover:bg-sand"
       }`}
     >
       {children}
@@ -44,7 +44,7 @@ export function Chip({ on, children, onClick }: { on?: boolean; children: React.
 }
 
 export function Tag({ children }: { children: React.ReactNode }) {
-  return <span className="inline-flex items-center rounded-full border border-line-strong bg-white px-3 py-1 text-[13px] text-ink-2">{children}</span>;
+  return <span className="inline-flex items-center rounded-full border border-line-strong bg-white px-3 py-1 text-[13px] text-graphite">{children}</span>;
 }
 
 export const toneClass: Record<Tone, string> = {
@@ -86,9 +86,9 @@ export function VideoBox({ url, title, className = "", big }: { url?: string; ti
       />
     );
   return (
-    <div className={`flex aspect-video flex-col items-center justify-center gap-3 rounded-2xl bg-navy text-white ${className}`}>
-      <span className={`flex items-center justify-center rounded-full bg-brass ${big ? "h-20 w-20" : "h-14 w-14"}`}>
-        <PlayIcon size={big ? 34 : 24} color="#14213D" />
+    <div className={`flex aspect-video flex-col items-center justify-center gap-3 rounded-2xl bg-ink text-white ${className}`}>
+      <span className={`flex items-center justify-center rounded-full bg-accent ${big ? "h-20 w-20" : "h-14 w-14"}`}>
+        <PlayIcon size={big ? 34 : 24} color="#FFFFFF" />
       </span>
       <span className="px-4 text-center font-bold">{title}</span>
     </div>
@@ -98,7 +98,7 @@ export function VideoBox({ url, title, className = "", big }: { url?: string; ti
 export function Stars({ rating }: { rating: number }) {
   const full = Math.round(rating);
   return (
-    <span className="tracking-[2px] text-brass-dark" aria-label={`${rating} out of 5`}>
+    <span className="tracking-[2px] text-accent-dark" aria-label={`${rating} out of 5`}>
       {"★★★★★".slice(0, full)}
       <span className="text-line-strong">{"★★★★★".slice(full)}</span>
     </span>
@@ -107,7 +107,7 @@ export function Stars({ rating }: { rating: number }) {
 
 export function DateBadge({ day, date, dark }: { day: string; date: string; dark?: boolean }) {
   return (
-    <span className={`inline-block rounded-[10px] px-2.5 py-1.5 text-center text-[12px] font-bold leading-tight ${dark ? "bg-navy text-white" : "bg-brass-tint text-navy-deep"}`}>
+    <span className={`inline-block rounded-[10px] px-2.5 py-1.5 text-center text-[12px] font-bold leading-tight ${dark ? "bg-ink text-white" : "bg-accent-tint text-ink-deep"}`}>
       {day}
       <br />
       <span className="font-display text-xl">{date}</span>
@@ -127,17 +127,5 @@ export function Section({ title, eyebrow, action, children, className = "" }: { 
       </div>
       {children}
     </section>
-  );
-}
-
-/** Launch-offer banner for the search pages. Not shown for now; add <FreePlanBanner /> back at the top of a page to use it. */
-export function FreePlanBanner() {
-  return (
-    <div className="mb-7 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#CDBDFF] bg-brass-tint px-4 py-3.5">
-      <span>
-        <strong className="text-brass-dark">Launch offer:</strong> everything on ShowIci is free. Unlimited contacts, every filter, zero commission.
-      </span>
-      <Link href="/pricing" className="font-bold no-underline">Learn more →</Link>
-    </div>
   );
 }
