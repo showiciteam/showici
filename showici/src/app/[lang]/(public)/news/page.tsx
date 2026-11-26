@@ -1,6 +1,6 @@
-import { serverTr } from "@/lib/lang-server";
+import { translator } from "@/lib/tr";
+import { isLang, DEFAULT_LANG } from "@/lib/lang";
 import type { Metadata } from "next";
-import { isLang } from "@/lib/lang";
 import { pageMetadata } from "@/lib/seo";
 import Link from "@/components/Link";
 import { Placeholder } from "@/components/ui";
@@ -18,8 +18,9 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   return pageMetadata({ lang, path: "/news", ...SEO[lang] });
 }
 
-export default async function NewsPage() {
-  const tr = await serverTr();
+export default async function NewsPage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params;
+  const tr = translator(isLang(lang) ? lang : DEFAULT_LANG);
   const posts = await getNews();
   return (
     <div className="wrap flex flex-col gap-7 pb-[72px] pt-11">

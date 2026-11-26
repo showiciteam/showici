@@ -1,4 +1,3 @@
-import { serverTr } from "@/lib/lang-server";
 import { fill } from "@/lib/tr";
 import Link from "@/components/Link";
 import { notFound } from "next/navigation";
@@ -24,7 +23,8 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
 }
 
 export default async function ShowDetail({ params }: { params: Promise<{ lang: string; id: string }> }) {
-  const tr = await serverTr();
+  const { lang } = await params;
+  const tr = translator(isLang(lang) ? lang : "fr");
   const { id } = await params;
   const show = await getShow(id);
   if (!show) notFound();

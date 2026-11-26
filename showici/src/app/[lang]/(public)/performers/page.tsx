@@ -4,6 +4,9 @@ import { isLang, type Lang } from "@/lib/lang";
 import { pageMetadata } from "@/lib/seo";
 import { PerformerSearch } from "./PerformerSearch";
 
+/** Served from cache and rebuilt in the background every 5 minutes, so new listings show up without a deploy. */
+export const revalidate = 300;
+
 const copy = {
   fr: {
     title: "Artistes au Québec : groupes, DJ, humoristes, magiciens · ShowIci",

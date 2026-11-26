@@ -5,12 +5,15 @@ import { EventRow, ShowRow, TileCard } from "@/components/cards";
 import { ComingSoon, PageHero, PillLink, RedBand, SectionHead } from "@/components/sections";
 import { FollowButtons } from "@/components/Social";
 import Link from "@/components/Link";
-import { getBigEvents, getPerformers, getShows, getStories, getVenues } from "@/lib/data";
+import { getBigEvents, getPerformers, getShows, getStories, getVenues, venueListing } from "@/lib/data";
 import { label } from "@/lib/labels";
 import { isLang, type Lang } from "@/lib/lang";
 import { jsonLd, pageMetadata } from "@/lib/seo";
 import { SITE_DESCRIPTION, SITE_TITLE, SITE_URL } from "@/lib/site";
 import { SOCIAL_URLS } from "@/lib/social";
+
+/** Served from cache and rebuilt in the background every minute, so new listings show up without a deploy. */
+export const revalidate = 60;
 
 const copy = {
   fr: {
@@ -116,7 +119,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         )}
       </section>
 
-      <HomeMap venues={venues} performers={performers} />
+      <HomeMap venues={venues.map(venueListing)} performers={performers} />
 
       <section className="bg-ink text-white">
         <div className="wrap flex flex-wrap gap-5 py-14">
