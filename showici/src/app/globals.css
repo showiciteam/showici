@@ -34,9 +34,9 @@
   --color-success: #E3F2E7;
   --color-success-ink: #1F6B3A;
 
-  --font-display: "Plus Jakarta Sans", system-ui, sans-serif;
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-hand: "Permanent Marker", "Plus Jakarta Sans", cursive;
+  --font-display: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-sans: "Inter Variable", "Inter", system-ui, sans-serif;
+  --font-hand: "Permanent Marker", cursive;
 }
 
 @layer base {

@@ -1,5 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
+// Fonts are served from the site itself (no request to Google from visitors).
+import "@fontsource-variable/inter";
+import "@fontsource-variable/plus-jakarta-sans";
+import "@fontsource/permanent-marker";
 import "../globals.css";
 import { Analytics } from "@/components/Analytics";
 import { GA_HEAD_SCRIPT, GA_ID } from "@/lib/analytics";
@@ -36,13 +40,6 @@ export default async function RootLayout({ children, params }: { children: React
         {/* Google tag (gtag.js), in consent mode: cookies stay off until the visitor accepts in the banner. */}
         <script dangerouslySetInnerHTML={{ __html: GA_HEAD_SCRIPT }} />
         <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-        <link
-          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,500;0,600;0,700;0,800;1,800&family=Inter:wght@400;500;600;700&family=Permanent+Marker&display=swap"
-          rel="stylesheet"
-        />
       </head>
       <body className="min-h-screen antialiased">
         <LanguageProvider lang={lang}>
