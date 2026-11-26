@@ -13,7 +13,7 @@ const PRIVACY_EMAIL = "privacy@showici.com";
 export const terms: Record<"en" | "fr", LegalDoc> = {
   en: {
     title: "Terms of use",
-    updated: UPDATED_EN,
+    updated: "Last updated: November 26, 2026",
     intro: "These terms explain how ShowIci works and what we expect from everyone who uses it. By creating an account or using the site, you agree to them. Please read them, along with our Privacy policy.",
     sections: [
       { h: "1. Who we are", p: ["ShowIci (“ShowIci”, “we”) is an online platform based in Montréal, Québec, that helps venues, event planners and performers (bands, DJs, comedians, magicians, dancers and other acts) find each other, and lets the public browse upcoming shows. You can reach us with the Contact link on any page."] },
@@ -33,17 +33,17 @@ export const terms: Record<"en" | "fr", LegalDoc> = {
         "- Shows you post must be real and up to date. Edit or cancel a show as soon as plans change.",
         "- When you add a performer who is on ShowIci to a show, they receive a booking request. Until they accept, the show is listed as “Artist TBA” and their name and profile are not shown. Never list an act publicly that has not agreed to perform.",
         "- Your venue's address, photos and description are public so people can find your shows.",
-        "- To help artists find places to play, ShowIci may list a venue before its owner joins, using public business information (name, address, public phone number, website) from OpenStreetMap and the venue's own pages. These pages are marked as not claimed. The owner can claim the page for free to manage it, or ask us to correct or remove it through Contact. A claim is approved only once we have confirmed that the person manages the venue.",
+        "- To help artists find places to play, ShowIci may list a venue before its owner joins, using public business information (name, address, public phone number, website) from OpenStreetMap and the venue's own pages. These pages are marked as not claimed. The owner can claim the page to manage it, or ask us to correct or remove it through Contact. A claim is approved only once we have confirmed that the person manages the venue.",
       ] },
       { h: "5. Performers", p: [
         "- Your profile must describe your own act. Only post photos, videos and music you have the right to share, and only answer requests you can really fulfil.",
         "- Your phone number stays private: it is never shown on your profile. Only your home city is public; we place you near it on the map, never at an exact address.",
-        "- When we interview an artist (for example for Spotlight), ShowIci may create a performer page for them from the interview and the artist's own public pages (name, bio, city, photos and videos they shared, official links). These pages are marked as not claimed. The artist can claim the page for free to manage it, or ask us to correct or remove it through Contact. A claim is approved only once we have confirmed that the person is the artist or acts for them.",
+        "- When we interview an artist (for example for Spotlight), ShowIci may create a performer page for them from the interview and the artist's own public pages (name, bio, city, photos and videos they shared, official links). These pages are marked as not claimed. The artist can claim the page to manage it, or ask us to correct or remove it through Contact. A claim is approved only once we have confirmed that the person is the artist or acts for them.",
       ] },
       { h: "6. Messages and contacts", p: [
         "- Use messages for real booking conversations. No spam, advertising, mass messages or harassment.",
         "- To keep contact details private until both sides are ready, phone numbers and email addresses typed into messages may be hidden automatically.",
-        "- Free accounts may be limited in how many new conversations they can start per day. Replies in existing conversations are not limited.",
+        "- Accounts may be limited in how many new conversations they can start per day. Replies in existing conversations are not limited.",
         "- We can email you when you get a new message. You can turn these emails off in your inbox.",
       ] },
       { h: "7. Reviews", p: ["Reviews must be honest, based on a real experience and only written after talking with that member on ShowIci. Don't review yourself, someone you're close to or a competitor, and don't offer or accept anything in exchange for a review. We may remove reviews that break these rules."] },
@@ -58,7 +58,7 @@ export const terms: Record<"en" | "fr", LegalDoc> = {
         "- Trying to get around safety features, limits or contact masking, or interfering with how the site works.",
       ] },
       { h: "10. Reports, moderation and suspension", p: ["You can report a conversation or a member. We may review content, hide or remove it, limit features, or suspend or close an account that breaks these terms or puts others at risk. When reasonable, we'll tell you why. You can close your account at any time by contacting us."] },
-      { h: "11. Plans and prices", p: ["ShowIci is free during its launch period. We may introduce paid plans later. We will announce prices and what each plan includes at least 30 days in advance, and you will never be charged unless you choose a paid plan and agree to its price."] },
+      { h: "11. Plans and prices", p: ["ShowIci may offer paid plans. We will announce prices and what each plan includes at least 30 days in advance, and you will never be charged unless you choose a paid plan and agree to its price."] },
       { h: "12. Other services", p: ["ShowIci uses or links to other services, such as YouTube videos, maps from OpenStreetMap and ticketing sites. Their own terms apply, and we are not responsible for their content or availability."] },
       { h: "13. Our responsibility", p: [
         "We work to keep ShowIci available and accurate, but the site is provided “as is” and may have interruptions or errors.",
@@ -74,7 +74,7 @@ export const terms: Record<"en" | "fr", LegalDoc> = {
   },
   fr: {
     title: "Conditions d'utilisation",
-    updated: UPDATED_FR,
+    updated: "Dernière mise à jour : 26 novembre 2026",
     intro: "Ces conditions expliquent le fonctionnement de ShowIci et ce que nous attendons de toutes les personnes qui l'utilisent. En créant un compte ou en utilisant le site, vous les acceptez. Veuillez les lire, ainsi que notre Politique de confidentialité.",
     sections: [
       { h: "1. Qui nous sommes", p: ["ShowIci (« ShowIci », « nous ») est une plateforme en ligne basée à Montréal (Québec) qui aide les salles, les organisateurs d'événements et les artistes (groupes, DJ, humoristes, magiciens, danseurs et autres numéros) à se trouver, et qui permet au public de consulter les spectacles à venir. Vous pouvez nous joindre par le lien Contact au bas de chaque page."] },
@@ -94,17 +94,17 @@ export const terms: Record<"en" | "fr", LegalDoc> = {
         "- Les spectacles que vous publiez doivent être réels et à jour. Modifiez ou annulez un spectacle dès que les plans changent.",
         "- Lorsque vous ajoutez à un spectacle un artiste inscrit sur ShowIci, il reçoit une demande de réservation. Tant qu'il n'a pas accepté, le spectacle est affiché « Artist TBA » (artiste à confirmer) et son nom et son profil ne sont pas montrés. N'annoncez jamais publiquement un artiste qui n'a pas accepté de jouer.",
         "- L'adresse, les photos et la description de votre salle sont publiques pour qu'on puisse trouver vos spectacles.",
-        "- Pour aider les artistes à trouver où jouer, ShowIci peut afficher une salle avant que son propriétaire s'inscrive, à partir de renseignements d'entreprise publics (nom, adresse, numéro de téléphone public, site web) provenant d'OpenStreetMap et des pages de la salle. Ces pages sont indiquées comme non réclamées. Le propriétaire peut réclamer la page gratuitement pour la gérer, ou nous demander de la corriger ou de la retirer par le lien Contact. Une réclamation n'est approuvée qu'après avoir confirmé que la personne gère la salle.",
+        "- Pour aider les artistes à trouver où jouer, ShowIci peut afficher une salle avant que son propriétaire s'inscrive, à partir de renseignements d'entreprise publics (nom, adresse, numéro de téléphone public, site web) provenant d'OpenStreetMap et des pages de la salle. Ces pages sont indiquées comme non réclamées. Le propriétaire peut réclamer la page pour la gérer, ou nous demander de la corriger ou de la retirer par le lien Contact. Une réclamation n'est approuvée qu'après avoir confirmé que la personne gère la salle.",
       ] },
       { h: "5. Artistes", p: [
         "- Votre profil doit présenter votre propre numéro. Ne publiez que des photos, vidéos et pièces musicales que vous avez le droit de partager, et ne répondez qu'aux demandes que vous pouvez réellement honorer.",
         "- Votre numéro de téléphone reste privé : il n'est jamais affiché sur votre profil. Seule votre ville est publique; nous vous plaçons près de celle-ci sur la carte, jamais à une adresse exacte.",
-        "- Lorsque nous interviewons un artiste (par exemple pour Spotlight), ShowIci peut lui créer une page d'artiste à partir de l'entrevue et de ses propres pages publiques (nom, biographie, ville, photos et vidéos qu'il nous a transmises, liens officiels). Ces pages sont indiquées comme non revendiquées. L'artiste peut revendiquer la page gratuitement pour la gérer, ou nous demander de la corriger ou de la retirer par la page Contact. Une revendication n'est approuvée qu'une fois que nous avons confirmé que la personne est l'artiste ou agit en son nom.",
+        "- Lorsque nous interviewons un artiste (par exemple pour Spotlight), ShowIci peut lui créer une page d'artiste à partir de l'entrevue et de ses propres pages publiques (nom, biographie, ville, photos et vidéos qu'il nous a transmises, liens officiels). Ces pages sont indiquées comme non revendiquées. L'artiste peut revendiquer la page pour la gérer, ou nous demander de la corriger ou de la retirer par la page Contact. Une revendication n'est approuvée qu'une fois que nous avons confirmé que la personne est l'artiste ou agit en son nom.",
       ] },
       { h: "6. Messages et contacts", p: [
         "- Utilisez les messages pour de vraies discussions de réservation. Pas de pourriel, de publicité, d'envois massifs ni de harcèlement.",
         "- Pour garder les coordonnées privées jusqu'à ce que les deux parties soient prêtes, les numéros de téléphone et adresses courriel écrits dans les messages peuvent être masqués automatiquement.",
-        "- Les comptes gratuits peuvent être limités dans le nombre de nouvelles conversations par jour. Les réponses dans les conversations existantes ne sont pas limitées.",
+        "- Les comptes peuvent être limités dans le nombre de nouvelles conversations par jour. Les réponses dans les conversations existantes ne sont pas limitées.",
         "- Nous pouvons vous écrire par courriel quand vous recevez un nouveau message. Vous pouvez désactiver ces courriels dans votre boîte de réception.",
       ] },
       { h: "7. Avis", p: ["Les avis doivent être honnêtes, fondés sur une expérience réelle et rédigés seulement après avoir échangé avec ce membre sur ShowIci. N'évaluez pas votre propre compte, un proche ou un concurrent, et n'offrez ni n'acceptez rien en échange d'un avis. Nous pouvons retirer les avis qui ne respectent pas ces règles."] },
@@ -119,7 +119,7 @@ export const terms: Record<"en" | "fr", LegalDoc> = {
         "- Tenter de contourner les mesures de sécurité, les limites ou le masquage des coordonnées, ou nuire au fonctionnement du site.",
       ] },
       { h: "10. Signalements, modération et suspension", p: ["Vous pouvez signaler une conversation ou un membre. Nous pouvons examiner du contenu, le masquer ou le retirer, limiter des fonctions, ou suspendre ou fermer un compte qui enfreint ces conditions ou met d'autres personnes en danger. Lorsque c'est raisonnable, nous vous en expliquerons la raison. Vous pouvez fermer votre compte en tout temps en nous écrivant."] },
-      { h: "11. Forfaits et prix", p: ["ShowIci est gratuit pendant sa période de lancement. Des forfaits payants pourraient être offerts plus tard. Nous annoncerons les prix et le contenu de chaque forfait au moins 30 jours à l'avance, et aucun montant ne vous sera facturé sans que vous ayez choisi un forfait payant et accepté son prix."] },
+      { h: "11. Forfaits et prix", p: ["ShowIci pourrait offrir des forfaits payants. Nous annoncerons les prix et le contenu de chaque forfait au moins 30 jours à l'avance, et aucun montant ne vous sera facturé sans que vous ayez choisi un forfait payant et accepté son prix."] },
       { h: "12. Autres services", p: ["ShowIci utilise ou renvoie vers d'autres services, comme les vidéos YouTube, les cartes d'OpenStreetMap et des sites de billetterie. Leurs propres conditions s'appliquent, et nous ne sommes pas responsables de leur contenu ni de leur disponibilité."] },
       { h: "13. Notre responsabilité", p: [
         "Nous nous efforçons de garder ShowIci disponible et exact, mais le site est offert « tel quel » et peut connaître des interruptions ou des erreurs.",
