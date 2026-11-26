@@ -1,5 +1,6 @@
 "use client";
 
+import { useTr } from "@/lib/i18n";
 import { Chip } from "./ui";
 
 /** Multi-select chips bound to a string array. */
@@ -11,33 +12,37 @@ export function ChipGroup({ legend, hint, options, value, onChange, single }: {
   onChange: (v: string[]) => void;
   single?: boolean;
 }) {
+  const tr = useTr();
   const toggle = (o: string) =>
     single ? onChange([o]) : onChange(value.includes(o) ? value.filter((x) => x !== o) : [...value, o]);
   return (
     <fieldset>
       <legend className="mb-2.5 text-sm font-bold">{legend} {hint && <span className="hint">{hint}</span>}</legend>
       <div className="flex flex-wrap gap-2">
-        {options.map((o) => <Chip key={o} on={value.includes(o)} onClick={() => toggle(o)}>{o}</Chip>)}
+        {options.map((o) => <Chip key={o} on={value.includes(o)} onClick={() => toggle(o)}>{tr(o)}</Chip>)}
       </div>
     </fieldset>
   );
 }
 
 export function FormCard({ id, title, children }: { id?: string; title: string; children: React.ReactNode }) {
+  const tr = useTr();
   return (
     <section id={id} className="card flex scroll-mt-6 flex-col gap-[18px] p-7">
-      <h2 className="h-display text-[26px]">{title}</h2>
+      <h2 className="h-display text-[26px]">{tr(title)}</h2>
       {children}
     </section>
   );
 }
 
 export function Notice({ kind, children }: { kind: "ok" | "error" | "info"; children: React.ReactNode }) {
-  const cls = kind === "ok" ? "bg-success text-success-ink" : kind === "error" ? "bg-[#FBE5E2] text-[#8A1F17]" : "bg-accent-tint text-ink";
-  return <div role="status" className={`rounded-xl px-4 py-3 text-sm font-medium ${cls}`}>{children}</div>;
+  const tr = useTr();
+  const cls = kind === "ok" ? "bg-success text-success-ink" : kind === "error" ? "bg-accent-tint text-accent-dark" : "bg-accent-tint text-ink";
+  return <div role="status" className={`rounded-xl px-4 py-3 text-sm font-medium ${cls}`}>{typeof children === "string" ? tr(children) : children}</div>;
 }
 
 export function Dropzone({ files, onFiles, hint }: { files: File[]; onFiles: (f: File[]) => void; hint: string }) {
+  const tr = useTr();
   return (
     <div className="flex flex-col gap-3">
       <label
@@ -49,7 +54,7 @@ export function Dropzone({ files, onFiles, hint }: { files: File[]; onFiles: (f:
         }}
       >
         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#D7141F" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 16V4" /><path d="M7 9l5-5 5 5" /><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" /></svg>
-        <span className="text-[17px] font-bold">Drag photos here, or <span className="text-accent-dark underline">browse your files</span></span>
+        <span className="text-[17px] font-bold">{tr("Drag photos here, or")} <span className="text-accent-dark underline">{tr("browse your files")}</span></span>
         <span className="hint">{hint}</span>
         <input
           type="file"
@@ -65,7 +70,7 @@ export function Dropzone({ files, onFiles, hint }: { files: File[]; onFiles: (f:
             <div key={f.name + i} className="relative aspect-[4/3] overflow-hidden rounded-xl bg-ph-1">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={URL.createObjectURL(f)} alt={f.name} className="h-full w-full object-cover" />
-              {i === 0 && <span className="absolute left-2 top-2 rounded-md bg-ink px-2 py-1 text-[11px] font-bold text-white">COVER</span>}
+              {i === 0 && <span className="absolute left-2 top-2 rounded-md bg-ink px-2 py-1 text-[11px] font-bold text-white">{tr("COVER")}</span>}
               <button type="button" aria-label={`Remove ${f.name}`} onClick={() => onFiles(files.filter((_, j) => j !== i))} className="absolute right-1.5 top-1.5 flex h-[30px] w-[30px] items-center justify-center rounded-full bg-white text-ink">✕</button>
             </div>
           ))}
@@ -84,6 +89,7 @@ export function SingleImage({ label, hint, url, onFile, onRemove, shape = "wide"
   onRemove: () => void;
   shape?: "wide" | "round";
 }) {
+  const tr = useTr();
   const box = shape === "round" ? "h-[120px] w-[120px] rounded-full" : "aspect-[3/1] w-full rounded-xl";
   return (
     <div className="flex flex-col gap-2">
@@ -94,7 +100,7 @@ export function SingleImage({ label, hint, url, onFile, onRemove, shape = "wide"
             // eslint-disable-next-line @next/next/no-img-element
             <img src={url} alt="" className="absolute inset-0 h-full w-full object-cover" />
           ) : (
-            <span className="px-3 text-sm font-bold text-accent-dark underline">Choose image</span>
+            <span className="px-3 text-sm font-bold text-accent-dark underline">{tr("Choose image")}</span>
           )}
           <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); e.target.value = ""; }} />
         </label>
@@ -102,8 +108,8 @@ export function SingleImage({ label, hint, url, onFile, onRemove, shape = "wide"
           <span className="hint">{hint}</span>
           {url && (
             <span className="flex gap-3 text-sm font-bold">
-              <label className="cursor-pointer text-accent-dark underline">Replace<input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); e.target.value = ""; }} /></label>
-              <button type="button" onClick={onRemove} className="text-red-700 underline">Remove</button>
+              <label className="cursor-pointer text-accent-dark underline">{tr("Replace")}<input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); e.target.value = ""; }} /></label>
+              <button type="button" onClick={onRemove} className="text-red-700 underline">{tr("Remove")}</button>
             </span>
           )}
         </div>

@@ -129,15 +129,3 @@ export function Section({ title, eyebrow, action, children, className = "" }: { 
     </section>
   );
 }
-
-/** Launch-offer banner for the search pages. Not shown for now; add <FreePlanBanner /> back at the top of a page to use it. */
-export function FreePlanBanner() {
-  return (
-    <div className="mb-7 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-accent-line bg-accent-tint px-4 py-3.5">
-      <span>
-        <strong className="text-accent-dark">Launch offer:</strong> everything on ShowIci is free. Unlimited contacts, every filter, zero commission.
-      </span>
-      <Link href="/pricing" className="font-bold no-underline">Learn more →</Link>
-    </div>
-  );
-}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTr } from "@/lib/i18n";
 import Link from "@/components/Link";
 import { useRouter } from "@/lib/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -21,6 +22,7 @@ const EMPTY = {
 };
 
 export default function RegisterVenue() {
+  const tr = useTr();
   const router = useRouter();
   const [existingId, setExistingId] = useState<string | undefined>();
   const [loading, setLoading] = useState(true);
@@ -104,115 +106,115 @@ export default function RegisterVenue() {
     router.refresh();
   }
 
-  if (loading) return <div className="wrap py-16 text-slate">Loading your venue…</div>;
+  if (loading) return <div className="wrap py-16 text-slate">{tr("Loading your venue…")}</div>;
 
   return (
     <div className="wrap pb-[72px] pt-9">
-      <p className="eyebrow mb-1.5 text-[13px]">{existingId ? "Edit your venue" : "Venue registration"}</p>
-      <h1 className="h-display text-[44px]">{existingId ? "Update your venue" : "List your venue"}</h1>
-      <p className="mb-8 mt-2.5 max-w-[720px] text-lg text-slate">Tell performers what your space is like and what you book. Your upcoming shows also appear on ShowIci&apos;s public listings.</p>
+      <p className="eyebrow mb-1.5 text-[13px]">{existingId ? tr("Edit your venue") : tr("Venue registration")}</p>
+      <h1 className="h-display text-[44px]">{existingId ? tr("Update your venue") : tr("List your venue")}</h1>
+      <p className="mb-8 mt-2.5 max-w-[720px] text-lg text-slate">{tr("Tell performers what your space is like and what you book. Your upcoming shows also appear on ShowIci’s public listings.")}</p>
       {!existingId && (
         <p className="-mt-4 mb-8 max-w-[720px] rounded-xl border border-accent-line bg-accent-tint px-4 py-3 text-[15px] text-graphite">
-          Is your venue already on ShowIci? Find it under <Link href="/venues?region=all" className="font-bold">Venues</Link> and click <strong>Claim this venue</strong> instead of creating a new page.
+          {tr("Is your venue already on ShowIci? Find it under")} <Link href="/venues?region=all" className="font-bold">{tr("Venues")}</Link> {tr("and click")} <strong>{tr("Claim this venue")}</strong> {tr("instead of creating a new page.")}
         </p>
       )}
       <div className="flex flex-wrap items-start gap-7">
-        <nav aria-label="Registration steps" className="card flex max-w-[280px] flex-[1_1_240px] flex-col p-2.5 lg:sticky lg:top-6">
+        <nav aria-label={tr("Registration steps")} className="card flex max-w-[280px] flex-[1_1_240px] flex-col p-2.5 lg:sticky lg:top-6">
           {steps.map((s, i) => (
             <a key={s} href={`#v${i + 1}`} className="flex items-center gap-3 rounded-[10px] p-3 font-medium text-ink no-underline hover:bg-sand">
-              <span className="flex h-[26px] w-[26px] flex-none items-center justify-center rounded-full border-2 border-line-strong text-[13px] font-bold text-muted">{i + 1}</span>{s}
+              <span className="flex h-[26px] w-[26px] flex-none items-center justify-center rounded-full border-2 border-line-strong text-[13px] font-bold text-muted">{i + 1}</span>{tr(s)}
             </a>
           ))}
         </nav>
 
         <form onSubmit={(e) => { e.preventDefault(); save(true); }} className="flex min-w-0 flex-[999_1_600px] flex-col gap-5">
-          <FormCard id="v1" title="1. Venue basics">
-            <label className="label">Venue name<input required value={f.name} onChange={(e) => set("name", e.target.value)} className="input" /></label>
-            <ChipGroup legend="Type of venue" single options={["Pub", "Bar", "Restaurant", "Brewery", "Café", "Club", "Event hall", "Other"]} value={type} onChange={setType} />
+          <FormCard id="v1" title={tr("1. Venue basics")}>
+            <label className="label">{tr("Venue name")}<input required value={f.name} onChange={(e) => set("name", e.target.value)} className="input" /></label>
+            <ChipGroup legend={tr("Type of venue")} single options={["Pub", "Bar", "Restaurant", "Brewery", "Café", "Club", "Event hall", "Other"]} value={type} onChange={setType} />
             <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] items-start gap-3.5">
               <label className="label">Street address
                 <AddressAutocomplete
                   value={f.street}
-                  placeholder="123 rue Saint-Denis"
+                  placeholder={tr("123 rue Saint-Denis")}
                   onChange={(v) => { set("street", v); setGeo(null); }}
                   onPick={(p) => { setF((x) => ({ ...x, street: p.street || x.street, city: p.city || x.city, postal: p.postal || x.postal })); setGeo({ lat: p.lat, lng: p.lng }); }}
                 />
-                <span className="hint">Start typing, then pick your address.</span>
+                <span className="hint">{tr("Start typing, then pick your address.")}</span>
               </label>
-              <label className="label">City<input required value={f.city} onChange={(e) => { set("city", e.target.value); setGeo(null); }} className="input" /></label>
-              <label className="label">Postal code<input value={f.postal} onChange={(e) => set("postal", e.target.value)} className="input" placeholder="H2X 1K1" /></label>
+              <label className="label">{tr("City")}<input required value={f.city} onChange={(e) => { set("city", e.target.value); setGeo(null); }} className="input" /></label>
+              <label className="label">{tr("Postal code")}<input value={f.postal} onChange={(e) => set("postal", e.target.value)} className="input" placeholder="H2X 1K1" /></label>
             </div>
-            <label className="label">Short description <span className="hint">The vibe, the crowd, what nights are like.</span><textarea rows={3} value={f.description} onChange={(e) => set("description", e.target.value)} className="input" /></label>
+            <label className="label">{tr("Short description")} <span className="hint">{tr("The vibe, the crowd, what nights are like.")}</span><textarea rows={3} value={f.description} onChange={(e) => set("description", e.target.value)} className="input" /></label>
           </FormCard>
 
-          <FormCard id="v2" title="2. Space and equipment">
+          <FormCard id="v2" title={tr("2. Space and equipment")}>
             <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] items-start gap-3.5">
-              <label className="label">Capacity<select value={f.capacity} onChange={(e) => set("capacity", e.target.value)} className="input"><option>Under 50</option><option>50 – 150</option><option>150 – 300</option><option>300+</option></select></label>
-              <label className="label">Stage<select value={f.stage} onChange={(e) => set("stage", e.target.value)} className="input"><option>No stage (floor area)</option><option>Small stage</option><option>Large stage</option></select></label>
-              <label className="label">Setting<select value={f.setting} onChange={(e) => set("setting", e.target.value)} className="input"><option>Indoor</option><option>Outdoor terrace</option><option>Both</option></select></label>
+              <label className="label">{tr("Capacity")}<select value={f.capacity} onChange={(e) => set("capacity", e.target.value)} className="input"><option value="Under 50">{tr("Under 50")}</option><option>50 – 150</option><option>150 – 300</option><option>300+</option></select></label>
+              <label className="label">{tr("Stage")}<select value={f.stage} onChange={(e) => set("stage", e.target.value)} className="input"><option value="No stage (floor area)">{tr("No stage (floor area)")}</option><option value="Small stage">{tr("Small stage")}</option><option value="Large stage">{tr("Large stage")}</option></select></label>
+              <label className="label">{tr("Setting")}<select value={f.setting} onChange={(e) => set("setting", e.target.value)} className="input"><option value="Indoor">{tr("Indoor")}</option><option value="Outdoor terrace">{tr("Outdoor terrace")}</option><option value="Both">{tr("Both")}</option></select></label>
             </div>
-            <ChipGroup legend="Equipment on site" options={EQUIPMENT} value={equipment} onChange={setEquipment} />
+            <ChipGroup legend={tr("Equipment on site")} options={EQUIPMENT} value={equipment} onChange={setEquipment} />
           </FormCard>
 
-          <FormCard id="v3" title="3. Logo and photos">
-            <SingleImage label="Logo" shape="round" hint="Shown next to your venue's name. Square works best. JPG or PNG." url={logoUrl} onFile={setLogoFile} onRemove={() => { setLogoFile(null); setLogoPath(null); }} />
-            <h3 className="mt-1 text-[17px] font-bold">Photos</h3>
+          <FormCard id="v3" title={tr("3. Logo and photos")}>
+            <SingleImage label={tr("Logo")} shape="round" hint={tr("Shown next to your venue's name. Square works best. JPG or PNG.")} url={logoUrl} onFile={setLogoFile} onRemove={() => { setLogoFile(null); setLogoPath(null); }} />
+            <h3 className="mt-1 text-[17px] font-bold">{tr("Photos")}</h3>
             {savedPhotos.length > 0 && (
               <div className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-3">
                 {savedPhotos.map((path, i) => (
                   <div key={path} className="relative aspect-[4/3] overflow-hidden rounded-xl bg-ph-1">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={mediaUrl(path)} alt="" className="h-full w-full object-cover" />
-                    {i === 0 && <span className="absolute left-2 top-2 rounded-md bg-ink px-2 py-1 text-[11px] font-bold text-white">COVER</span>}
-                    <button type="button" aria-label="Remove photo" onClick={() => { setSavedPhotos(savedPhotos.filter((p) => p !== path)); setRemovedPhotos([...removedPhotos, path]); }} className="absolute right-1.5 top-1.5 flex h-[30px] w-[30px] items-center justify-center rounded-full bg-white text-ink">✕</button>
+                    {i === 0 && <span className="absolute left-2 top-2 rounded-md bg-ink px-2 py-1 text-[11px] font-bold text-white">{tr("COVER")}</span>}
+                    <button type="button" aria-label={tr("Remove photo")} onClick={() => { setSavedPhotos(savedPhotos.filter((p) => p !== path)); setRemovedPhotos([...removedPhotos, path]); }} className="absolute right-1.5 top-1.5 flex h-[30px] w-[30px] items-center justify-center rounded-full bg-white text-ink">✕</button>
                   </div>
                 ))}
               </div>
             )}
-            <Dropzone files={photos} onFiles={(fs) => setPhotos(fs.slice(0, Math.max(0, 12 - savedPhotos.length)))} hint="Show the stage, the room on a busy night, and the outside. JPG or PNG, up to 10 MB, 12 photos max." />
+            <Dropzone files={photos} onFiles={(fs) => setPhotos(fs.slice(0, Math.max(0, 12 - savedPhotos.length)))} hint={tr("Show the stage, the room on a busy night, and the outside. JPG or PNG, up to 10 MB, 12 photos max.")} />
           </FormCard>
 
-          <FormCard id="v4" title="4. Videos">
+          <FormCard id="v4" title={tr("4. Videos")}>
             <VideoEditor
               videos={videos}
               onChange={setVideos}
-              intro="Paste YouTube links that show your room: a night with a band, the stage, the crowd. Performers love seeing where they'd play."
-              previewLabel="PREVIEW: how your videos appear on your venue page"
+              intro={tr("Paste YouTube links that show your room: a night with a band, the stage, the crowd. Performers love seeing where they'd play.")}
+              previewLabel={tr("PREVIEW: how your videos appear on your venue page")}
               titlePlaceholder="e.g. Friday night with a live band"
             />
           </FormCard>
 
-          <FormCard id="v5" title="5. What you book">
-            <ChipGroup legend="Types of acts" options={["Bands", "Solo / duo", "DJs", "Stand-up comedy", "Magicians", "Trivia / karaoke hosts"]} value={books} onChange={setBooks} />
-            <ChipGroup legend="Genres your crowd likes" options={["Rock", "Pop", "Blues", "Jazz", "Folk / trad québécois", "Country", "Latin", "Electronic"]} value={genres} onChange={setGenres} />
-            <ChipGroup legend="Nights with live entertainment" options={["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]} value={nights} onChange={setNights} />
+          <FormCard id="v5" title={tr("5. What you book")}>
+            <ChipGroup legend={tr("Types of acts")} options={["Bands", "Solo / duo", "DJs", "Stand-up comedy", "Magicians", "Trivia / karaoke hosts"]} value={books} onChange={setBooks} />
+            <ChipGroup legend={tr("Genres your crowd likes")} options={["Rock", "Pop", "Blues", "Jazz", "Folk / trad québécois", "Country", "Latin", "Electronic"]} value={genres} onChange={setGenres} />
+            <ChipGroup legend={tr("Nights with live entertainment")} options={["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]} value={nights} onChange={setNights} />
             <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] items-start gap-3.5">
-              <label className="label">Typical fee you pay<select value={f.fee} onChange={(e) => set("fee", e.target.value)} className="input"><option>Prefer not to say</option><option>Door split / tips</option><option>$200 – $500</option><option>$500 – $1,000</option><option>$1,000+</option></select><span className="hint">Optional. Shown as a range.</span></label>
-              <label className="label">How far ahead you book<select value={f.lead} onChange={(e) => set("lead", e.target.value)} className="input"><option>Last minute is fine</option><option>2 – 4 weeks</option><option>1 – 3 months</option></select></label>
+              <label className="label">{tr("Typical fee you pay")}<select value={f.fee} onChange={(e) => set("fee", e.target.value)} className="input"><option value="Prefer not to say">{tr("Prefer not to say")}</option><option value="Door split / tips">{tr("Door split / tips")}</option><option>$200 – $500</option><option>$500 – $1,000</option><option>$1,000+</option></select><span className="hint">{tr("Optional. Shown as a range.")}</span></label>
+              <label className="label">{tr("How far ahead you book")}<select value={f.lead} onChange={(e) => set("lead", e.target.value)} className="input"><option value="Last minute is fine">{tr("Last minute is fine")}</option><option value="2 – 4 weeks">{tr("2 – 4 weeks")}</option><option value="1 – 3 months">{tr("1 – 3 months")}</option></select></label>
             </div>
-            <label className="flex items-center gap-2.5 font-medium"><input type="checkbox" checked={f.open} onChange={(e) => set("open", e.target.checked)} className="h-[18px] w-[18px] accent-ink" />Open to new and emerging acts</label>
+            <label className="flex items-center gap-2.5 font-medium"><input type="checkbox" checked={f.open} onChange={(e) => set("open", e.target.checked)} className="h-[18px] w-[18px] accent-ink" />{tr("Open to new and emerging acts")}</label>
           </FormCard>
 
-          <FormCard id="v6" title="6. Links">
+          <FormCard id="v6" title={tr("6. Links")}>
             <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] items-start gap-3.5">
-              <label className="label">Website<input type="url" value={f.website} onChange={(e) => set("website", e.target.value)} className="input" placeholder="https://" /></label>
+              <label className="label">{tr("Website")}<input type="url" value={f.website} onChange={(e) => set("website", e.target.value)} className="input" placeholder="https://" /></label>
               <label className="label">Instagram<input type="url" value={f.instagram} onChange={(e) => set("instagram", e.target.value)} className="input" placeholder="https://instagram.com/…" /></label>
               <label className="label">Facebook<input type="url" value={f.facebook} onChange={(e) => set("facebook", e.target.value)} className="input" placeholder="https://facebook.com/…" /></label>
             </div>
           </FormCard>
 
-          <FormCard id="v7" title="7. Booking contact and publish">
+          <FormCard id="v7" title={tr("7. Booking contact and publish")}>
             <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] items-start gap-3.5">
-              <label className="label">Booking contact name<input value={f.contact} onChange={(e) => set("contact", e.target.value)} className="input" /></label>
-              <label className="label">Role<select value={f.role} onChange={(e) => set("role", e.target.value)} className="input"><option>Owner</option><option>Manager</option><option>Booker</option></select></label>
-              <label className="label">Phone<input type="tel" value={f.phone} onChange={(e) => set("phone", e.target.value)} className="input" placeholder="514-555-0123" /><span className="hint">Private. Never shown on your page.</span></label>
+              <label className="label">{tr("Booking contact name")}<input value={f.contact} onChange={(e) => set("contact", e.target.value)} className="input" /></label>
+              <label className="label">{tr("Role")}<select value={f.role} onChange={(e) => set("role", e.target.value)} className="input"><option value="Owner">{tr("Owner")}</option><option value="Manager">{tr("Manager")}</option><option value="Booker">{tr("Booker")}</option></select></label>
+              <label className="label">{tr("Phone")}<input type="tel" value={f.phone} onChange={(e) => set("phone", e.target.value)} className="input" placeholder="514-555-0123" /><span className="hint">{tr("Private. Never shown on your page.")}</span></label>
             </div>
-            <label className="flex items-start gap-2.5 text-sm text-slate"><input type="checkbox" required className="mt-0.5 h-[18px] w-[18px] flex-none accent-ink" />I&apos;m authorized to list this venue, and I agree to the <a href="/terms" target="_blank" rel="noopener">Terms</a>.</label>
-            {existingId && <p className="hint text-sm">Currently {published ? "published" : "a draft (hidden from the public)"}.</p>}
+            <label className="flex items-start gap-2.5 text-sm text-slate"><input type="checkbox" required className="mt-0.5 h-[18px] w-[18px] flex-none accent-ink" />{tr("I’m authorized to list this venue, and I agree to the")} <a href="/terms" target="_blank" rel="noopener">{tr("Terms")}</a>.</label>
+            {existingId && <p className="hint text-sm">{tr("Currently")} {published ? tr("published") : tr("a draft (hidden from the public)")}.</p>}
             {status && <Notice kind={status.kind}>{status.msg}</Notice>}
             <div className="flex flex-wrap justify-end gap-2.5">
-              <Button variant="secondary" disabled={busy || !f.name} onClick={() => save(false)}>Save as draft</Button>
-              <Button type="submit" disabled={busy} className="px-7 text-base">{busy ? "Saving…" : existingId ? "Save and publish" : "Publish my venue"}</Button>
+              <Button variant="secondary" disabled={busy || !f.name} onClick={() => save(false)}>{tr("Save as draft")}</Button>
+              <Button type="submit" disabled={busy} className="px-7 text-base">{busy ? "Saving…" : existingId ? tr("Save and publish") : tr("Publish my venue")}</Button>
             </div>
           </FormCard>
         </form>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTr } from "@/lib/i18n";
 import Link from "@/components/Link";
 import { useRouter } from "@/lib/navigation";
 import { useEffect, useState } from "react";
@@ -14,6 +15,7 @@ import { TagUsTip } from "@/components/Social";
 type Me = { name: string; venueId: string | null; venueName: string; area: string };
 
 export default function PostShow() {
+  const tr = useTr();
   const router = useRouter();
   const [me, setMe] = useState<Me | null>(supabaseEnabled ? null : { name: "[Your pub]", venueId: null, venueName: "[Your pub]", area: "Plateau" });
   const [showId, setShowId] = useState<string | undefined>();
@@ -112,56 +114,56 @@ export default function PostShow() {
     router.refresh();
   }
 
-  if (!me) return <><AppHeader role="venue" name="…" /><main className="wrap py-16 text-slate">Loading…</main></>;
+  if (!me) return <><AppHeader role="venue" name="…" /><main className="wrap py-16 text-slate">{tr("Loading…")}</main></>;
 
   return (
     <>
       <AppHeader role="venue" name={me.name} live={supabaseEnabled} />
       <main className="min-h-screen bg-sand">
         <div className="wrap pb-[72px] pt-9">
-          <Link href="/dashboard/venue" className="font-bold no-underline">← My shows</Link>
-          <h1 className="h-display mt-2.5 text-[40px]">{showId ? "Edit show" : "Post an upcoming show"}</h1>
-          <p className="mb-7 mt-2 text-[17px] text-slate">It appears on ShowIci&apos;s public listings and on your venue page. Times are Québec time (Eastern).</p>
+          <Link href="/dashboard/venue" className="font-bold no-underline">{tr("← My shows")}</Link>
+          <h1 className="h-display mt-2.5 text-[40px]">{showId ? tr("Edit show") : tr("Post an upcoming show")}</h1>
+          <p className="mb-7 mt-2 text-[17px] text-slate">{tr("It appears on ShowIci’s public listings and on your venue page. Times are Québec time (Eastern).")}</p>
           {supabaseEnabled && !me.venueId && (
-            <div className="mb-6"><Notice kind="info">You need to add your venue before posting shows. <Link href="/register/venue" className="font-bold">Add my venue →</Link></Notice></div>
+            <div className="mb-6"><Notice kind="info">{tr("You need to add your venue before posting shows.")} <Link href="/register/venue" className="font-bold">{tr("Add my venue →")}</Link></Notice></div>
           )}
           <div className="flex flex-wrap items-start gap-7">
             <form onSubmit={(e) => { e.preventDefault(); save("live"); }} className="card flex min-w-0 flex-[999_1_560px] flex-col gap-5 p-7">
-              <label className="label">Performer <span className="hint">Type the act&apos;s name. If they&apos;re on ShowIci, pick them from the list: they get a booking request, and the show is listed as &ldquo;Artist TBA&rdquo; until they accept.</span>
-                <input required value={performer} onChange={(e) => setPerformer(e.target.value)} className="input" placeholder="Act or band name" list="performers" />
+              <label className="label">{tr("Performer")} <span className="hint">{tr("Type the act’s name. If they’re on ShowIci, pick them from the list: they get a booking request, and the show is listed as “Artist TBA” until they accept.")}</span>
+                <input required value={performer} onChange={(e) => setPerformer(e.target.value)} className="input" placeholder={tr("Act or band name")} list="performers" />
                 <datalist id="performers">{performers.map((p) => <option key={p.id} value={p.name} />)}</datalist>
               </label>
               {(() => {
                 const picked = performers.find((p) => p.name.toLowerCase() === performer.trim().toLowerCase());
-                if (picked) return <Notice kind="info"><strong>{picked.name}</strong> is on ShowIci. Saving sends them a booking request in their inbox. Their name appears publicly once they accept.</Notice>;
-                if (performer.trim().length > 1) return <p className="hint -mt-2.5 text-sm">Not on ShowIci (or not picked from the list): the name is shown as you typed it, with no link to a profile.</p>;
+                if (picked) return <Notice kind="info"><strong>{picked.name}</strong> {tr("is on ShowIci. Saving sends them a booking request in their inbox. Their name appears publicly once they accept.")}</Notice>;
+                if (performer.trim().length > 1) return <p className="hint -mt-2.5 text-sm">{tr("Not on ShowIci (or not picked from the list): the name is shown as you typed it, with no link to a profile.")}</p>;
                 return null;
               })()}
-              <label className="label">Show title <span className="hint">Optional</span><input value={title} onChange={(e) => setTitle(e.target.value)} className="input" placeholder="e.g. 90s Night" /></label>
+              <label className="label">{tr("Show title")} <span className="hint">{tr("Optional")}</span><input value={title} onChange={(e) => setTitle(e.target.value)} className="input" placeholder={tr("e.g. 90s Night")} /></label>
               <div className="grid grid-cols-[repeat(auto-fit,minmax(160px,1fr))] items-start gap-3.5">
-                <label className="label">Date<input type="date" required value={date} onChange={(e) => setDate(e.target.value)} className="input" /></label>
-                <label className="label">Doors<input type="time" value={doors} onChange={(e) => setDoors(e.target.value)} className="input" /></label>
-                <label className="label">Show starts<input type="time" value={time} onChange={(e) => setTime(e.target.value)} className="input" /></label>
+                <label className="label">{tr("Date")}<input type="date" required value={date} onChange={(e) => setDate(e.target.value)} className="input" /></label>
+                <label className="label">{tr("Doors")}<input type="time" value={doors} onChange={(e) => setDoors(e.target.value)} className="input" /></label>
+                <label className="label">{tr("Show starts")}<input type="time" value={time} onChange={(e) => setTime(e.target.value)} className="input" /></label>
               </div>
-              <ChipGroup legend="Entry" single options={["Free", "Cover charge", "Tickets"]} value={entry} onChange={setEntry} />
-              {entry[0] !== "Free" && <label className="label">Price<input value={price} onChange={(e) => setPrice(e.target.value)} className="input" placeholder="e.g. $10 cover" /></label>}
-              {entry[0] === "Tickets" && <label className="label">Ticket link <span className="hint">Eventbrite or any other ticketing page</span><input type="url" value={ticketUrl} onChange={(e) => setTicketUrl(e.target.value)} className="input" placeholder="https://www.eventbrite.ca/e/…" /></label>}
-              <label className="label">Genre<select value={genre} onChange={(e) => setGenre(e.target.value)} className="input"><option>Rock covers</option><option>Pop</option><option>Blues</option><option>Jazz</option><option>Folk / trad</option><option>Latin</option><option>Comedy</option><option>DJ night</option><option>Magic</option><option>Other</option></select></label>
+              <ChipGroup legend={tr("Entry")} single options={["Free", "Cover charge", "Tickets"]} value={entry} onChange={setEntry} />
+              {entry[0] !== "Free" && <label className="label">{tr("Price")}<input value={price} onChange={(e) => setPrice(e.target.value)} className="input" placeholder={tr("e.g. $10 cover")} /></label>}
+              {entry[0] === "Tickets" && <label className="label">{tr("Ticket link")} <span className="hint">{tr("Eventbrite or any other ticketing page")}</span><input type="url" value={ticketUrl} onChange={(e) => setTicketUrl(e.target.value)} className="input" placeholder="https://www.eventbrite.ca/e/…" /></label>}
+              <label className="label">{tr("Genre")}<select value={genre} onChange={(e) => setGenre(e.target.value)} className="input"><option value="Rock covers">{tr("Rock covers")}</option><option value="Pop">{tr("Pop")}</option><option value="Blues">{tr("Blues")}</option><option value="Jazz">{tr("Jazz")}</option><option value="Folk / trad">{tr("Folk / trad")}</option><option value="Latin">{tr("Latin")}</option><option value="Comedy">{tr("Comedy")}</option><option value="DJ night">{tr("DJ night")}</option><option value="Magic">{tr("Magic")}</option><option value="Other">{tr("Other")}</option></select></label>
               <div className="flex flex-col gap-2">
-                <ChipGroup legend="Description" hint="Write it in both languages" single options={["Français", "English"]} value={lang} onChange={setLang} />
-                <textarea rows={3} value={descFr} onChange={(e) => setDescFr(e.target.value)} className={`input ${lang[0] === "Français" ? "" : "hidden"}`} placeholder="Description du spectacle en français." />
-                <textarea rows={3} value={descEn} onChange={(e) => setDescEn(e.target.value)} className={`input ${lang[0] === "English" ? "" : "hidden"}`} placeholder="Show description in English." />
+                <ChipGroup legend={tr("Description")} hint={tr("Write it in both languages")} single options={["Français", "English"]} value={lang} onChange={setLang} />
+                <textarea rows={3} value={descFr} onChange={(e) => setDescFr(e.target.value)} className={`input ${lang[0] === "Français" ? "" : tr("hidden")}`} placeholder={tr("Description du spectacle en français.")} />
+                <textarea rows={3} value={descEn} onChange={(e) => setDescEn(e.target.value)} className={`input ${lang[0] === "English" ? "" : tr("hidden")}`} placeholder={tr("Show description in English.")} />
               </div>
               {status && <Notice kind={status.kind}>{status.msg}</Notice>}
               <TagUsTip />
               <div className="flex flex-wrap items-center justify-end gap-2.5">
-                {showId && currentStatus !== "cancelled" && <button type="button" disabled={busy} onClick={cancelShow} className="mr-auto text-sm font-bold text-red-700 underline">Cancel this show</button>}
-                <Button variant="secondary" disabled={busy} onClick={() => save("draft")}>Save draft</Button>
-                <Button type="submit" disabled={busy} className="px-7">{busy ? "Saving…" : showId ? "Save and publish" : "Publish show"}</Button>
+                {showId && currentStatus !== "cancelled" && <button type="button" disabled={busy} onClick={cancelShow} className="mr-auto text-sm font-bold text-red-700 underline">{tr("Cancel this show")}</button>}
+                <Button variant="secondary" disabled={busy} onClick={() => save("draft")}>{tr("Save draft")}</Button>
+                <Button type="submit" disabled={busy} className="px-7">{busy ? "Saving…" : showId ? tr("Save and publish") : tr("Publish show")}</Button>
               </div>
             </form>
             <aside className="flex max-w-[360px] flex-[1_1_280px] flex-col gap-3">
-              <span className="text-[13px] font-bold tracking-[0.06em] text-muted">PREVIEW</span>
+              <span className="text-[13px] font-bold tracking-[0.06em] text-muted">{tr("PREVIEW")}</span>
               <article className="card overflow-hidden">
                 <div className="relative"><Placeholder tone="ph-1" className="h-[170px]" /><span className="absolute bottom-3.5 left-3.5"><DateBadge day={d ? d.toLocaleDateString("en-CA", { weekday: "short" }).replace(".", "").toUpperCase() : "FRI"} date={d ? String(d.getDate()) : "16"} dark /></span></div>
                 <div className="flex flex-col gap-1.5 p-[18px]">

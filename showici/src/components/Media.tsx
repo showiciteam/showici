@@ -1,10 +1,13 @@
 "use client";
+import { fill } from "@/lib/tr";
 
+import { useTr } from "@/lib/i18n";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { youTubeId } from "@/lib/youtube";
 
 /** Full-screen overlay with a close button; Esc, the button or a click outside closes it. */
 function Overlay({ onClose, label, children }: { onClose: () => void; label: string; children: React.ReactNode }) {
+  const tr = useTr();
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -16,8 +19,8 @@ function Overlay({ onClose, label, children }: { onClose: () => void; label: str
     };
   }, [onClose]);
   return (
-    <div role="dialog" aria-modal="true" aria-label={label} className="fixed inset-0 z-[100] flex items-center justify-center bg-[rgba(8,14,28,0.92)] p-3 sm:p-8" onClick={onClose}>
-      <button type="button" onClick={onClose} aria-label="Close" className="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-2xl text-white hover:bg-white/20 sm:right-6 sm:top-6">
+    <div role="dialog" aria-modal="true" aria-label={label} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-3 sm:p-8" onClick={onClose}>
+      <button type="button" onClick={onClose} aria-label={tr("Close")} className="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-2xl text-white hover:bg-white/20 sm:right-6 sm:top-6">
         ×
       </button>
       <div className="relative flex max-h-full w-full max-w-[1200px] flex-col items-center" onClick={(e) => e.stopPropagation()}>
@@ -107,6 +110,7 @@ export function VideoPreview({ url, title, length, big = false }: { url?: string
 
 /** Full-screen photo viewer: arrows, keyboard, swipe and a thumbnail strip. */
 export function Lightbox({ photos, start, onClose, alt }: { photos: string[]; start: number; onClose: () => void; alt: string }) {
+  const tr = useTr();
   const [i, setI] = useState(start);
   const touchX = useRef<number | null>(null);
   const n = photos.length;
@@ -138,8 +142,8 @@ export function Lightbox({ photos, start, onClose, alt }: { photos: string[]; st
         <img src={photos[i]} alt={`${alt}, photo ${i + 1} of ${n}`} className="max-h-[78vh] max-w-full select-none rounded-lg object-contain shadow-2xl" draggable={false} />
         {n > 1 && (
           <>
-            <button type="button" onClick={() => go(-1)} aria-label="Previous photo" className={`${arrow} left-0 sm:-left-2`}>‹</button>
-            <button type="button" onClick={() => go(1)} aria-label="Next photo" className={`${arrow} right-0 sm:-right-2`}>›</button>
+            <button type="button" onClick={() => go(-1)} aria-label={tr("Previous photo")} className={`${arrow} left-0 sm:-left-2`}>‹</button>
+            <button type="button" onClick={() => go(1)} aria-label={tr("Next photo")} className={`${arrow} right-0 sm:-right-2`}>›</button>
           </>
         )}
       </div>
@@ -163,6 +167,7 @@ export function Lightbox({ photos, start, onClose, alt }: { photos: string[]; st
  * "hero" is the venue header collage (adapts to how many photos there are); "grid" is a plain grid.
  */
 export function PhotoGallery({ photos, alt, layout = "grid" }: { photos: string[]; alt: string; layout?: "hero" | "grid" }) {
+  const tr = useTr();
   const [open, setOpen] = useState<number | null>(null);
   if (!photos.length) return null;
 
@@ -197,7 +202,7 @@ export function PhotoGallery({ photos, alt, layout = "grid" }: { photos: string[
             s,
             j + 1,
             `hidden h-full w-full sm:block ${small.length === 2 ? "sm:row-span-2" : ""} ${small.length === 3 && j === 2 ? "sm:col-span-1" : ""}`,
-            j === small.length - 1 && extra > 0 ? <span className="absolute inset-0 flex items-center justify-center bg-[rgba(20,33,61,0.55)] text-lg font-bold text-white">+{extra} photos</span> : undefined,
+            j === small.length - 1 && extra > 0 ? <span className="absolute inset-0 flex items-center justify-center bg-black/55 text-lg font-bold text-white">+{extra} {tr("photos")}</span> : undefined,
           ),
         )}
       </div>
@@ -210,7 +215,7 @@ export function PhotoGallery({ photos, alt, layout = "grid" }: { photos: string[
         {body}
         {layout === "hero" && photos.length > 1 && (
           <button type="button" onClick={() => setOpen(0)} className="absolute bottom-3 right-3 rounded-full bg-white/95 px-3.5 py-1.5 text-sm font-bold text-ink shadow">
-            View all {photos.length} photos
+            {fill(tr("View all {count} photos"), { count: photos.length })}
           </button>
         )}
       </div>

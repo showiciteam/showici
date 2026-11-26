@@ -4,18 +4,15 @@ import Link from "@/components/Link";
 import { about } from "@/lib/about";
 import { useLang } from "@/lib/i18n";
 import { FollowCard } from "@/components/Social";
+import { PageHero, RedBand } from "@/components/sections";
 
 /** About page body: follows the FR / EN switch in the header. */
 export function AboutView() {
   const { lang: raw } = useLang();
   const t = about[raw === "fr" ? "fr" : "en"];
   return (
-    <div className="pb-[72px]">
-      <header className="wrap max-w-[860px] pt-12 text-center">
-        <p className="eyebrow mb-2">{t.eyebrow}</p>
-        <h1 className="h-display text-[40px] sm:text-[52px]">{t.title}</h1>
-        <p className="mx-auto mt-5 max-w-[720px] text-lg leading-relaxed text-slate">{t.lede}</p>
-      </header>
+    <div className="pb-0">
+      <PageHero image="/images/stage-band.webp" title={t.eyebrow} accent={t.title} lead={t.lede} />
 
       <section className="wrap mt-14 max-w-[860px]">
         <h2 className="h-display mb-4 text-[30px]">{t.missionTitle}</h2>
@@ -29,7 +26,7 @@ export function AboutView() {
         <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-[18px]">
           {t.who.map((w) => (
             <div key={w.h} className="card flex flex-col gap-2 p-6">
-              <h3 className="text-xl font-bold">{w.h}</h3>
+              <h3 className="text-xl font-bold"><span className="mr-2 text-accent">●</span>{w.h}</h3>
               <p className="leading-relaxed text-slate">{w.p}</p>
             </div>
           ))}
@@ -46,7 +43,7 @@ export function AboutView() {
                 <ol className="flex flex-col gap-3">
                   {g.steps.map((s, i) => (
                     <li key={s} className="flex gap-3 leading-relaxed text-graphite">
-                      <span className="flex h-7 w-7 flex-none items-center justify-center rounded-full bg-accent-tint text-sm font-bold text-ink">{i + 1}</span>
+                      <span className="flex h-7 w-7 flex-none items-center justify-center rounded-full bg-accent text-sm font-bold text-white">{i + 1}</span>
                       <span>{s}</span>
                     </li>
                   ))}
@@ -88,18 +85,21 @@ export function AboutView() {
         <FollowCard context="about" />
       </section>
 
-      <section className="wrap mt-14">
-        <div className="flex flex-col items-center gap-5 rounded-3xl bg-ink px-8 py-12 text-center text-white">
-          <h2 className="font-display text-[34px] font-extrabold tracking-tight">{t.ctaTitle}</h2>
-          <div className="flex flex-wrap justify-center gap-3">
+      <div className="mt-14">
+        <RedBand title={t.ctaTitle}>
+          <div className="flex flex-wrap gap-3">
             {t.cta.map((c, i) => (
-              <Link key={c.href} href={c.href} className={`rounded-xl px-6 py-3.5 text-[16px] font-bold no-underline ${i === 0 ? "bg-accent text-white hover:text-white" : "bg-white text-white hover:text-white"}`}>
+              <Link
+                key={c.href}
+                href={c.href}
+                className={`rounded-full px-6 py-3 text-[16px] font-bold no-underline ${i === 0 ? "bg-white text-accent-dark hover:text-accent-dark" : "border-2 border-white text-white hover:text-white"}`}
+              >
                 {c.label}
               </Link>
             ))}
           </div>
-        </div>
-      </section>
+        </RedBand>
+      </div>
     </div>
   );
 }

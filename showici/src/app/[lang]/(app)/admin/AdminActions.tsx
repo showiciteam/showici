@@ -75,7 +75,7 @@ export function LimitsSwitch({ initial = false }: { initial?: boolean }) {
       <span className="flex-[1_1_300px]">
         <strong>Plan limits</strong>
         <br />
-        <span className="hint text-sm">Daily contact cap (2/day) and paid filters. Off during the free launch. In Supabase this is the &ldquo;plan_limits_enabled&rdquo; setting.</span>
+        <span className="hint text-sm">Daily contact cap (2/day) and paid filters. Off during the launch. In Supabase this is the &ldquo;plan_limits_enabled&rdquo; setting.</span>
         {error && <><br /><span className="text-sm text-red-700">{error}</span></>}
       </span>
       <button type="button" role="switch" aria-checked={on} aria-label="Enable plan limits" onClick={toggle} className={`relative h-[30px] w-[52px] rounded-full ${on ? "bg-ink" : "bg-line-strong"}`}>

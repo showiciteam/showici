@@ -2,7 +2,7 @@
 
 import Link from "@/components/Link";
 import { useLang } from "@/lib/i18n";
-import { dayLabel, label, monthLabel } from "@/lib/labels";
+import { dayLabel, label, monthLabel, whenLabel } from "@/lib/labels";
 import { placeLabel } from "@/lib/regions";
 import type { BigEvent, Performer, Show, Story, Venue } from "@/lib/types";
 import { youTubeId } from "@/lib/youtube";
@@ -141,7 +141,7 @@ export function ShowCard({ show, venue }: { show: Show; venue?: Venue }) {
       <span className="flex flex-col gap-1 p-4">
         <span className="font-display text-[17px] font-extrabold">{show.title}</span>
         {venue && <span className="text-sm text-slate">{venue.name} · {venue.city}</span>}
-        <span className="text-sm text-muted">{show.time} · {show.entry}</span>
+        <span className="text-sm text-muted">{whenLabel(show.time, lang)} · {label(show.entry, lang)}</span>
       </span>
     </Link>
   );

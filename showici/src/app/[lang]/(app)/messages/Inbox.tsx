@@ -1,5 +1,7 @@
 "use client";
+import { fill } from "@/lib/tr";
 
+import { useTr } from "@/lib/i18n";
 import Link from "@/components/Link";
 import { useRouter } from "@/lib/navigation";
 import { useEffect, useState } from "react";
@@ -38,6 +40,7 @@ interface Props {
 }
 
 export function Inbox({ live, meId, threads, activeId, messages: initial, startedAt, contactsLeft, emailOnMessage = true, newTo }: Props) {
+  const tr = useTr();
   const router = useRouter();
   const [demoActive, setDemoActive] = useState(threads[0]);
   const [messages, setMessages] = useState<Message[]>(live ? initial : demoMessages);
@@ -135,7 +138,7 @@ export function Inbox({ live, meId, threads, activeId, messages: initial, starte
     <div className="flex min-h-[720px] flex-wrap overflow-hidden rounded-[18px] border border-line bg-white">
       <aside className="flex max-w-[340px] flex-[1_1_280px] flex-col border-r border-line">
         <div className="flex flex-col gap-2.5 border-b border-line p-[18px]">
-          <h1 className="h-display text-[26px]">Messages</h1>
+          <h1 className="h-display text-[26px]">{tr("Messages")}</h1>
           <span className="rounded-[10px] bg-accent-tint px-3 py-2 text-[13px] font-bold text-ink-deep">
             {contactsLeft == null ? "Unlimited new contacts during launch" : `${contactsLeft} of 2 new contacts left today`}
           </span>
@@ -153,13 +156,13 @@ export function Inbox({ live, meId, threads, activeId, messages: initial, starte
                     setError(res.error);
                   }
                 }}
-                className="h-4 w-4 accent-ink"
+                className="h-4 w-4 accent-accent"
               />
-              Email me when I get a new message
+              {tr("Email me when I get a new message")}
             </label>
           )}
         </div>
-        {threads.length === 0 && !newTo && <p className="p-[18px] text-sm text-slate">No conversations yet. Contact a performer, venue or event request to start one.</p>}
+        {threads.length === 0 && !newTo && <p className="p-[18px] text-sm text-slate">{tr("No conversations yet. Contact a performer, venue or event request to start one.")}</p>}
         {threads.map((t) => {
           const isActive = live ? t.id === activeId && !newTo : demoActive?.id === t.id;
           return (
@@ -168,7 +171,7 @@ export function Inbox({ live, meId, threads, activeId, messages: initial, starte
               <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <span className="flex justify-between gap-2">
                   <strong className="flex items-center gap-1.5">
-                    {t.unread && !isActive && <span className="h-2.5 w-2.5 flex-none rounded-full bg-accent" aria-label="New message" />}
+                    {t.unread && !isActive && <span className="h-2.5 w-2.5 flex-none rounded-full bg-accent" aria-label={tr("New message")} />}
                     {t.name}
                   </strong>
                   <span className="hint">{t.when}</span>
@@ -185,23 +188,23 @@ export function Inbox({ live, meId, threads, activeId, messages: initial, starte
           <div className="flex items-center gap-3 border-b border-line px-5 py-4">
             <span className={`flex h-11 w-11 items-center justify-center rounded-full font-extrabold ${toneClass[header.tone]}`}>{header.initials}</span>
             <span className="flex-1"><strong>{header.name}</strong><br /><span className="hint">{header.subtitle}</span></span>
-            {!live && <Button href="/performers/p1" variant="secondary" className="text-sm">View profile</Button>}
+            {!live && <Button href="/performers/p1" variant="secondary" className="text-sm">{tr("View profile")}</Button>}
           </div>
         ) : (
-          <div className="border-b border-line px-5 py-4 text-slate">Select a conversation</div>
+          <div className="border-b border-line px-5 py-4 text-slate">{tr("Select a conversation")}</div>
         )}
         <div className="flex flex-1 flex-col gap-3.5 bg-paper p-5" aria-live="polite">
           {live && header && (
             <div className="max-w-[80%] self-center rounded-xl bg-sand px-3.5 py-2.5 text-center text-[13px] text-graphite">{notice.text}</div>
           )}
-          {newTo && <div className="self-center text-sm text-muted">Write your first message to {newTo.name}.</div>}
+          {newTo && <div className="self-center text-sm text-muted">{fill(tr("Write your first message to {name}."), { name: newTo.name })}</div>}
           {messages.map((m) =>
             m.kind === "notice" ? (
               <div key={m.id} className="max-w-[80%] self-center rounded-xl bg-sand px-3.5 py-2.5 text-center text-[13px] text-graphite">{m.text}</div>
             ) : m.kind === "proposal" ? (
               <div key={m.id} className={`flex max-w-[70%] flex-col gap-2 rounded-2xl border-2 border-ink bg-white px-4 py-3.5 ${m.fromMe ? "self-end" : "self-start"}`}>
-                <strong className="text-accent-dark">Gig proposal</strong><span>{m.text}</span>
-                {m.fromMe && header && <span className="hint text-sm">Waiting for {header.name} to confirm</span>}
+                <strong className="text-accent-dark">{tr("Gig proposal")}</strong><span>{m.text}</span>
+                {m.fromMe && header && <span className="hint text-sm">{fill(tr("Waiting for {name} to confirm"), { name: header.name })}</span>}
               </div>
             ) : (
               <div key={m.id} className={`max-w-[70%] px-4 py-3 leading-normal ${m.fromMe ? "self-end rounded-[16px_16px_4px_16px] bg-ink text-white" : "self-start rounded-[16px_16px_16px_4px] border border-line bg-white"}`}>{m.text}</div>
@@ -219,29 +222,29 @@ export function Inbox({ live, meId, threads, activeId, messages: initial, starte
             }}
             className="flex flex-wrap items-end gap-2.5 border-t border-line bg-sand px-4 py-3"
           >
-            <label className="label">Date<input name="date" type="date" required className="input" /></label>
-            <label className="label">Start<input name="start" type="time" defaultValue="21:00" className="input" /></label>
-            <label className="label">End<input name="end" type="time" defaultValue="23:00" className="input" /></label>
-            <Button type="submit">Send proposal</Button>
-            <Button variant="secondary" onClick={() => setProposing(false)}>Cancel</Button>
+            <label className="label">{tr("Date")}<input name="date" type="date" required className="input" /></label>
+            <label className="label">{tr("Start")}<input name="start" type="time" defaultValue="21:00" className="input" /></label>
+            <label className="label">{tr("End")}<input name="end" type="time" defaultValue="23:00" className="input" /></label>
+            <Button type="submit">{tr("Send proposal")}</Button>
+            <Button variant="secondary" onClick={() => setProposing(false)}>{tr("Cancel")}</Button>
           </form>
         )}
         {header && (
           <form onSubmit={(e) => { e.preventDefault(); send(draft); }} className="flex flex-wrap items-end gap-2.5 border-t border-line px-4 py-3.5">
-            {!newTo && <Button variant="secondary" onClick={() => setProposing(true)} className="text-sm">📅 Propose date</Button>}
-            <textarea aria-label="Message" rows={1} value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(draft); } }} placeholder="Write a message…" className="input min-h-11 flex-[1_1_240px] resize-none" />
-            <Button type="submit" disabled={busy}>{busy ? "Sending…" : "Send"}</Button>
+            {!newTo && <Button variant="secondary" onClick={() => setProposing(true)} className="text-sm">{tr("📅 Propose date")}</Button>}
+            <textarea aria-label={tr("Message")} rows={1} value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(draft); } }} placeholder={tr("Write a message…")} className="input min-h-11 flex-[1_1_240px] resize-none" />
+            <Button type="submit" disabled={busy}>{busy ? tr("Sending…") : tr("Send")}</Button>
           </form>
         )}
       </section>
 
       <aside className="flex max-w-[300px] flex-[1_1_240px] flex-col gap-3.5 border-l border-line p-5">
-        <strong>About this conversation</strong>
+        <strong>{tr("About this conversation")}</strong>
         {live ? (
           <>
-            {started && <div className="flex justify-between text-sm"><span className="text-muted">Started</span><span>{started}</span></div>}
-            {header?.subtitle && <div className="flex justify-between gap-3 text-sm"><span className="text-muted">With</span><span className="text-right">{header.subtitle}</span></div>}
-            <p className="hint text-sm">Agree on the date, set times and fee here. ShowIci takes no commission.</p>
+            {started && <div className="flex justify-between text-sm"><span className="text-muted">{tr("Started")}</span><span>{started}</span></div>}
+            {header?.subtitle && <div className="flex justify-between gap-3 text-sm"><span className="text-muted">{tr("With")}</span><span className="text-right">{header.subtitle}</span></div>}
+            <p className="hint text-sm">{tr("Agree on the date, set times and fee here. ShowIci takes no commission.")}</p>
           </>
         ) : (
           <>
@@ -249,33 +252,33 @@ export function Inbox({ live, meId, threads, activeId, messages: initial, starte
               <div key={k} className="flex justify-between text-sm"><span className="text-muted">{k}</span><span>{v}</span></div>
             ))}
             <div className="flex aspect-video items-center justify-center rounded-[10px] bg-ink"><PlayIcon color="#E3262F" /></div>
-            <span className="hint">Their featured video</span>
+            <span className="hint">{tr("Their featured video")}</span>
           </>
         )}
         {(!live || (activeId && !newTo)) && (
-          <Button href={live ? `/review?c=${activeId}` : "/review"} variant="secondary" className="text-sm">Leave a review after the gig</Button>
+          <Button href={live ? `/review?c=${activeId}` : "/review"} variant="secondary" className="text-sm">{tr("Leave a review after the gig")}</Button>
         )}
         {live && activeId && !newTo && (
           reported ? (
-            <span className="text-sm text-success-ink">Thanks, the ShowIci team will look at it.</span>
+            <span className="text-sm text-success-ink">{tr("Thanks, the ShowIci team will look at it.")}</span>
           ) : reporting ? (
             <form onSubmit={submitReport} className="flex flex-col gap-2 rounded-xl border border-line p-3">
               <label className="label text-sm">What happened?
                 <select name="kind" className="input min-h-9 py-1 text-sm" defaultValue="message">
-                  <option value="message">Inappropriate or spam messages</option>
-                  <option value="profile">Fake or misleading profile</option>
-                  <option value="no_show">Didn&apos;t show up</option>
-                  <option value="other">Something else</option>
+                  <option value="message">{tr("Inappropriate or spam messages")}</option>
+                  <option value="profile">{tr("Fake or misleading profile")}</option>
+                  <option value="no_show">{tr("Didn’t show up")}</option>
+                  <option value="other">{tr("Something else")}</option>
                 </select>
               </label>
-              <textarea name="reason" rows={3} className="input text-sm" placeholder="Tell us briefly what happened." />
-              <div className="flex gap-2"><button type="submit" className="min-h-9 rounded-lg bg-ink px-3 text-sm font-bold text-white">Send report</button><button type="button" onClick={() => setReporting(false)} className="text-sm text-muted">Cancel</button></div>
+              <textarea name="reason" rows={3} className="input text-sm" placeholder={tr("Tell us briefly what happened.")} />
+              <div className="flex gap-2"><button type="submit" className="min-h-9 rounded-lg bg-ink px-3 text-sm font-bold text-white">{tr("Send report")}</button><button type="button" onClick={() => setReporting(false)} className="text-sm text-muted">{tr("Cancel")}</button></div>
             </form>
           ) : (
-            <button type="button" onClick={() => setReporting(true)} className="self-start text-sm text-muted underline">Report this conversation</button>
+            <button type="button" onClick={() => setReporting(true)} className="self-start text-sm text-muted underline">{tr("Report this conversation")}</button>
           )
         )}
-        {!live && <Link href="#" className="text-sm text-muted">Report this conversation</Link>}
+        {!live && <Link href="#" className="text-sm text-muted">{tr("Report this conversation")}</Link>}
       </aside>
     </div>
   );

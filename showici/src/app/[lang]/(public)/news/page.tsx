@@ -1,3 +1,4 @@
+import { serverTr } from "@/lib/lang-server";
 import type { Metadata } from "next";
 import { isLang } from "@/lib/lang";
 import { pageMetadata } from "@/lib/seo";
@@ -18,21 +19,22 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
 }
 
 export default async function NewsPage() {
+  const tr = await serverTr();
   const posts = await getNews();
   return (
     <div className="wrap flex flex-col gap-7 pb-[72px] pt-11">
       <div className="flex flex-col gap-2.5">
-        <h1 className="h-display text-[48px]">News</h1>
-        <p className="max-w-[680px] text-lg text-slate">Platform updates, new cities, events and what&apos;s happening on the local live scene.</p>
+        <h1 className="h-display text-[48px]">{tr("News")}</h1>
+        <p className="max-w-[680px] text-lg text-slate">{tr("Platform updates, new cities, events and what’s happening on the local live scene.")}</p>
       </div>
 
       <article className="card flex flex-wrap items-center gap-7 overflow-hidden">
-        <Placeholder tone="ph-1" label="[Launch photo]" className="min-h-[340px] flex-[1_1_480px] self-stretch" />
+        <Placeholder tone="ph-1" label={tr("[Launch photo]")} className="min-h-[340px] flex-[1_1_480px] self-stretch" />
         <div className="flex flex-[1_1_380px] flex-col gap-3 py-7 pl-1 pr-8">
-          <span className="eyebrow">New cities · Featured</span>
-          <span className="h-display text-4xl leading-tight">ShowIci opens across Québec, starting in Montréal</span>
-          <span className="text-[17px] leading-relaxed text-slate">[Launch announcement: venues, performers and event planners can join free during the launch. What&apos;s live today and what&apos;s coming next.]</span>
-          <span className="text-sm text-muted">[Launch date] · 3 min read</span>
+          <span className="eyebrow">{tr("New cities · Featured")}</span>
+          <span className="h-display text-4xl leading-tight">{tr("ShowIci opens across Québec, starting in Montréal")}</span>
+          <span className="text-[17px] leading-relaxed text-slate">{tr("[Launch announcement: venues, performers and event planners can now join. What’s live today and what’s coming next.]")}</span>
+          <span className="text-sm text-muted">{tr("[Launch date] · 3 min read")}</span>
         </div>
       </article>
 
@@ -53,8 +55,8 @@ export default async function NewsPage() {
         <aside className="flex max-w-[360px] flex-[1_1_280px] flex-col gap-4">
           <NewsSidebar />
           <Link href="/spotlight" className="flex flex-col gap-1.5 rounded-[18px] border border-line bg-sand p-[22px] text-ink no-underline hover:text-ink">
-            <span className="eyebrow">Spotlight Time</span>
-            <strong className="text-[17px]">Read our interviews with local performers and venue owners →</strong>
+            <span className="eyebrow">{tr("Spotlight Time")}</span>
+            <strong className="text-[17px]">{tr("Read our interviews with local performers and venue owners →")}</strong>
           </Link>
         </aside>
       </div>

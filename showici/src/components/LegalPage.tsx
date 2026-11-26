@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "@/components/Link";
+import { Brush } from "@/components/sections";
 import { useLang } from "@/lib/i18n";
 import type { LegalDoc } from "@/lib/legal";
 
@@ -26,13 +27,19 @@ export function LegalPage({ doc, other }: { doc: Record<"en" | "fr", LegalDoc>; 
   const lang = raw === "fr" ? "fr" : "en";
   const d = doc[lang];
   return (
+    <>
+    <header className="bg-ink text-white">
+      <div className="wrap max-w-[820px] pb-12 pt-12">
+        <p className="mb-2 text-[13px] font-bold uppercase tracking-[0.14em] text-accent-bright">ShowIci</p>
+        <h1 className="font-display text-[38px] font-extrabold leading-tight tracking-[-0.02em] sm:text-[48px]">{d.title}</h1>
+        <Brush width={220} className="mt-2" />
+        <p className="mt-3 text-sm text-on-dark">{d.updated}</p>
+      </div>
+    </header>
     <div className="wrap max-w-[820px] pb-[72px] pt-10">
-      <p className="eyebrow mb-1.5 text-[13px]">ShowIci</p>
-      <h1 className="h-display text-[38px] sm:text-[44px]">{d.title}</h1>
-      <p className="mt-2 text-sm text-muted">{d.updated}</p>
-      <p className="mt-5 text-[17px] leading-relaxed text-graphite">{d.intro}</p>
+      <p className="text-[17px] leading-relaxed text-graphite">{d.intro}</p>
 
-      <nav aria-label={lang === "fr" ? "Sommaire" : "Contents"} className="card mt-7 p-5">
+      <nav aria-label={lang === "fr" ? "Sommaire" : "Contents"} className="card mt-7 border-t-4 border-t-accent p-5">
         <ol className="grid gap-x-6 gap-y-1.5 text-[15px] sm:grid-cols-2">
           {d.sections.map((s, i) => <li key={s.h}><a href={`#s${i + 1}`} className="no-underline">{s.h}</a></li>)}
         </ol>
@@ -41,7 +48,7 @@ export function LegalPage({ doc, other }: { doc: Record<"en" | "fr", LegalDoc>; 
       <div className="mt-8 flex flex-col gap-8">
         {d.sections.map((s, i) => (
           <section key={s.h} id={`s${i + 1}`} className="scroll-mt-6">
-            <h2 className="h-display mb-3 text-[24px]">{s.h}</h2>
+            <h2 className="h-display mb-3 border-l-4 border-accent pl-3 text-[24px]">{s.h}</h2>
             <div className="flex flex-col gap-3 text-[16px] leading-relaxed text-graphite">{blocks(s.p)}</div>
           </section>
         ))}
@@ -51,5 +58,6 @@ export function LegalPage({ doc, other }: { doc: Record<"en" | "fr", LegalDoc>; 
         <Link href={other.href}>{other[lang]} →</Link>
       </p>
     </div>
+    </>
   );
 }

@@ -98,12 +98,6 @@ export const eventRequests: EventRequest[] = [
 
 export const stories: Story[] = [
   kbust,
-  { slug: "twenty-years-of-friday-nights", category: "Performer", city: "Montréal", title: "[Band name]: twenty years of Friday nights", dek: "[How a cover band became a neighbourhood institution.]", date: "Oct 2", read: "6 min read", photo: "[Band photo]", tone: "ph-1", video: true },
-  { slug: "why-pub-books-live-music", category: "Venue owner", city: "Verdun", title: "Why [Pub name] books live music every week", dek: "[A pub owner on what live shows do for a room and a business.]", date: "Sep 25", read: "5 min read", photo: "[Pub interior]", tone: "ph-2", video: false },
-  { slug: "magician-parties-and-bars", category: "Performer", city: "Laval", title: "The magician who works birthday parties and bars", dek: "[Close-up magic, quinceañeras and learning to read a crowd.]", date: "Sep 18", read: "4 min read", photo: "[Magician portrait]", tone: "ph-3", video: true },
-  { slug: "planning-a-quinceanera", category: "Event planner", city: "Brossard", title: "Planning a quinceañera with live entertainment", dek: "[A family shares what they looked for and what made the night.]", date: "Sep 11", read: "7 min read", photo: "[Party photo]", tone: "ph-5", video: false },
-  { slug: "a-night-with-the-sound-tech", category: "Behind the scenes", city: "Montréal", title: "A night with the sound tech", dek: "[What happens before the first song, from load-in to line check.]", date: "Sep 4", read: "5 min read", photo: "[Mixing desk]", tone: "ph-4", video: true },
-  { slug: "stand-up-in-two-languages", category: "Performer", city: "Rosemont", title: "Stand-up in two languages", dek: "[A comedian on writing jokes that land in French and English.]", date: "Aug 28", read: "6 min read", photo: "[Comedian on stage]", tone: "ph-1", video: true },
 ];
 
 export const news: NewsPost[] = [

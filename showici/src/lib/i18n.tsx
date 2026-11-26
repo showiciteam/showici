@@ -2,6 +2,7 @@
 
 import { createContext, useContext } from "react";
 import { DEFAULT_LANG, localize, type Lang } from "./lang";
+import { translator } from "./tr";
 
 export type { Lang } from "./lang";
 
@@ -78,3 +79,9 @@ export function LanguageProvider({ lang, children }: { lang: Lang; children: Rea
 }
 
 export const useLang = () => useContext(LangContext);
+
+/** tr("English text") for client components on the signed-in screens. See lib/tr.ts. */
+export function useTr() {
+  const { lang } = useContext(LangContext);
+  return translator(lang);
+}

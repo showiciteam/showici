@@ -11,7 +11,7 @@ import { PhotoGallery, VideoPreview } from "@/components/Media";
 import { youTubeId } from "@/lib/youtube";
 import { ShareMenu } from "@/components/Social";
 import type { Metadata } from "next";
-import { label } from "@/lib/labels";
+import { label, whenLabel } from "@/lib/labels";
 import { isLang, localize, type Lang } from "@/lib/lang";
 import { absoluteUrl, jsonLd, pageMetadata } from "@/lib/seo";
 import type { Venue } from "@/lib/types";
@@ -166,7 +166,7 @@ export default async function VenueProfile({ params }: { params: Params }) {
             {shows.map((s) => (
               <Link key={s.id} href={`/shows/${s.id}`} className="card flex items-center gap-4 p-3.5 text-ink no-underline">
                 <span className="rounded-[10px] bg-accent-tint px-3 py-2 text-center text-xs font-bold leading-tight text-ink-deep">{s.day}<br /><span className="font-display text-[22px]">{s.date}</span></span>
-                <span className="flex flex-1 flex-col"><strong>{s.title}</strong><span className="text-sm text-muted">{[label(s.genre, lang), s.time, s.entry].filter(Boolean).join(" · ")}</span></span>
+                <span className="flex flex-1 flex-col"><strong>{s.title}</strong><span className="text-sm text-muted">{[label(s.genre, lang), whenLabel(s.time, lang), label(s.entry, lang)].filter(Boolean).join(" · ")}</span></span>
                 <span className="font-bold text-accent-dark">→</span>
               </Link>
             ))}

@@ -143,7 +143,7 @@ export function Header({ user }: { user?: { name: string; home: string } | null 
           id="site-menu"
           className={`${open ? "flex" : "hidden"} w-full flex-col gap-5 border-t border-ink-line pb-4 pt-4 lg:flex lg:w-auto lg:flex-1 lg:flex-row lg:items-center lg:border-0 lg:p-0`}
         >
-          <div className="flex flex-col gap-4 font-display text-[17px] font-bold lg:flex-1 lg:flex-row lg:flex-nowrap lg:items-center lg:justify-center lg:gap-x-4 lg:text-[14px] xl:gap-x-6 xl:text-[15px]">
+          <div className="flex flex-col gap-4 font-display text-[17px] font-bold lg:flex-1 lg:flex-row lg:flex-nowrap lg:items-center lg:justify-center lg:gap-x-3.5 lg:whitespace-nowrap lg:text-[14px] xl:gap-x-5 xl:text-[15px]">
             <ShowsMenu path={path} />
             {links.map((l) => {
               const active = isActive(path, l.href);
@@ -160,7 +160,7 @@ export function Header({ user }: { user?: { name: string; home: string } | null 
             })}
             <ContactButton label={t("nav.contact")} className="w-fit border-b-[3px] border-transparent pb-1 text-left font-bold text-white hover:border-ink-line" />
           </div>
-          <div className="flex flex-wrap items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4 lg:flex-nowrap lg:whitespace-nowrap">
             <LangToggle />
             {user ? (
               <>

@@ -10,7 +10,7 @@ import { PhotoGallery, VideoPreview } from "@/components/Media";
 import { actFamily } from "@/lib/acts";
 import { ShareMenu } from "@/components/Social";
 import type { Metadata } from "next";
-import { label } from "@/lib/labels";
+import { label, whenLabel } from "@/lib/labels";
 import { isLang, localize, type Lang } from "@/lib/lang";
 import { absoluteUrl, jsonLd, pageMetadata } from "@/lib/seo";
 import type { Performer } from "@/lib/types";
@@ -199,7 +199,7 @@ export default async function PerformerProfile({ params }: { params: Params }) {
               {upcoming.map((s) => (
                 <Link key={s.id} href={`/shows/${s.id}`} className="card flex items-center gap-4 p-3.5 text-ink no-underline">
                   <span className="rounded-[10px] bg-accent-tint px-3 py-2 text-center text-xs font-bold leading-tight text-ink-deep">{s.day}<br /><span className="font-display text-[22px]">{s.date}</span></span>
-                  <span className="flex flex-1 flex-col"><strong>{venueById[s.venueId]?.name ?? s.title}</strong><span className="text-sm text-muted">{venueById[s.venueId]?.area} · {s.time}</span></span>
+                  <span className="flex flex-1 flex-col"><strong>{venueById[s.venueId]?.name ?? s.title}</strong><span className="text-sm text-muted">{venueById[s.venueId]?.area} · {whenLabel(s.time, lang)}</span></span>
                   <span className="font-bold text-accent-dark">→</span>
                 </Link>
               ))}
