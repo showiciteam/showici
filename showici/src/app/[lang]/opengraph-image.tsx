@@ -32,7 +32,9 @@ async function googleFont(family: string, weight: number, italic = false): Promi
 export default async function OpengraphImage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
   const t = TEXT[lang === "en" ? "en" : "fr"];
-  const logo = `data:image/png;base64,${(await readFile(join(process.cwd(), "public/logo-light.png"))).toString("base64")}`;
+  const logo = await readFile(join(process.cwd(), "public/logo-light.png"))
+    .then((file) => `data:image/png;base64,${file.toString("base64")}`)
+    .catch(() => null); // the image still renders, without the logo
   const [bold, boldItalic, sans] = await Promise.all([googleFont("Plus+Jakarta+Sans", 800), googleFont("Plus+Jakarta+Sans", 800, true), googleFont("Inter", 500)]);
   const fonts = [
     bold && { name: "Plus Jakarta Sans", data: bold, weight: 800 as const, style: "normal" as const },
@@ -56,7 +58,7 @@ export default async function OpengraphImage({ params }: { params: Promise<{ lan
           fontFamily: "Plus Jakarta Sans, sans-serif",
         }}
       >
-        <img src={logo} alt="ShowIci" width={420} height={138} style={{ marginLeft: -8 }} />
+        {logo && <img src={logo} alt="ShowIci" width={420} height={138} style={{ marginLeft: -8 }} />}
 
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
           <div style={{ fontSize: 66, fontWeight: 800, lineHeight: 1.1 }}>{t.title}</div>

@@ -114,11 +114,12 @@ export async function getTicketmasterEvents(apiKey: string): Promise<BigEvent[]>
     if (page + 1 >= totalPages) break;
   }
 
-  // One card per show: group the same name at the same venue.
+  // One card per show: group the same name at the same venue. Skip anything dated before today (Québec time).
+  const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Toronto" });
   const seen = new Map<string, BigEvent>();
   raw.forEach((e, i) => {
     const ev = toEvent(e, i);
-    if (!ev) return;
+    if (!ev || (ev.startDate && ev.startDate < today)) return;
     const key = `${ev.name.toLowerCase()}|${ev.venue.toLowerCase()}`;
     const first = seen.get(key);
     if (first) first.moreDates = (first.moreDates ?? 0) + 1;
