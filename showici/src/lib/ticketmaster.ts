@@ -25,12 +25,13 @@ function category(e: any): string {
   return "Event";
 }
 
-/** Listings that aren't shows: building tours, meal or lounge packages, parking, ticket upgrades. Sports are left out too. */
+/** Listings that aren't shows: building tours, meal or lounge packages, parking, ticket upgrades. Sports and cancelled or postponed shows are left out too. */
 const NOT_A_SHOW = /visites? guid|guided tour|\brepas\b|restaurant|salon des|lounge|parking|stationnement|surclassement|upgrade|forfait|package|gift card|carte-cadeau/i;
 function isShow(e: any) {
   const type = e.classifications?.map((c: any) => `${c.type?.name ?? ""} ${c.subType?.name ?? ""}`).join(" ") ?? "";
   const sports = e.classifications?.some((c: any) => c.segment?.name === "Sports");
-  return !sports && !NOT_A_SHOW.test(e.name ?? "") && !/upsell|parking|add-on|merchandise/i.test(type);
+  const calledOff = /cancel|postpon/i.test(e.dates?.status?.code ?? "") || /(?<!\p{L})(annul[ée]e?|cancell?ed|report[ée]|postponed)(?!\p{L})/iu.test(e.name ?? "");
+  return !sports && !calledOff && !NOT_A_SHOW.test(e.name ?? "") && !/upsell|parking|add-on|merchandise/i.test(type);
 }
 
 const CITY_FIX: Record<string, string> = { montreal: "Montréal", quebec: "Québec", "quebec city": "Québec", "trois-rivieres": "Trois-Rivières", "trois rivieres": "Trois-Rivières", "trois-rivières": "Trois-Rivières", levis: "Lévis" };
