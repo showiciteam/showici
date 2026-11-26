@@ -43,7 +43,6 @@ export const terms: Record<"en" | "fr", LegalDoc> = {
       { h: "6. Messages and contacts", p: [
         "- Use messages for real booking conversations. No spam, advertising, mass messages or harassment.",
         "- To keep contact details private until both sides are ready, phone numbers and email addresses typed into messages may be hidden automatically.",
-        "- Accounts may be limited in how many new conversations they can start per day. Replies in existing conversations are not limited.",
         "- We can email you when you get a new message. You can turn these emails off in your inbox.",
       ] },
       { h: "7. Reviews", p: ["Reviews must be honest, based on a real experience and only written after talking with that member on ShowIci. Don't review yourself, someone you're close to or a competitor, and don't offer or accept anything in exchange for a review. We may remove reviews that break these rules."] },
@@ -104,7 +103,6 @@ export const terms: Record<"en" | "fr", LegalDoc> = {
       { h: "6. Messages et contacts", p: [
         "- Utilisez les messages pour de vraies discussions de réservation. Pas de pourriel, de publicité, d'envois massifs ni de harcèlement.",
         "- Pour garder les coordonnées privées jusqu'à ce que les deux parties soient prêtes, les numéros de téléphone et adresses courriel écrits dans les messages peuvent être masqués automatiquement.",
-        "- Les comptes peuvent être limités dans le nombre de nouvelles conversations par jour. Les réponses dans les conversations existantes ne sont pas limitées.",
         "- Nous pouvons vous écrire par courriel quand vous recevez un nouveau message. Vous pouvez désactiver ces courriels dans votre boîte de réception.",
       ] },
       { h: "7. Avis", p: ["Les avis doivent être honnêtes, fondés sur une expérience réelle et rédigés seulement après avoir échangé avec ce membre sur ShowIci. N'évaluez pas votre propre compte, un proche ou un concurrent, et n'offrez ni n'acceptez rien en échange d'un avis. Nous pouvons retirer les avis qui ne respectent pas ces règles."] },
