@@ -98,3 +98,12 @@ export function PillLink({ href, children, tone = "red", external = false }: { h
   if (external) return <a href={href} target="_blank" rel="noopener noreferrer sponsored" className={className}>{children}</a>;
   return <Link href={href} className={className}>{children}</Link>;
 }
+
+/** Shown where a list has nothing to display yet, instead of sample cards. */
+export function ComingSoon({ text, dark = false }: { text: string; dark?: boolean }) {
+  return (
+    <p className={`rounded-xl border-[1.5px] border-dashed px-6 py-8 text-center font-display font-bold ${dark ? "border-ink-line text-on-dark" : "border-line-strong text-muted"}`}>
+      {text}
+    </p>
+  );
+}

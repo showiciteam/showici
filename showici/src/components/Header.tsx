@@ -10,15 +10,72 @@ import { switchLang } from "@/lib/lang";
 import { ContactButton } from "./ContactDialog";
 import { Logo } from "./Logo";
 
-const links: { href: string; key: DictKey }[] = [
-  { href: "/shows", key: "nav.shows" },
+// "Spectacles" opens a small menu with local shows and big events, so the whole menu fits on one line.
+const showLinks: { href: string; key: DictKey }[] = [
+  { href: "/shows", key: "nav.localShows" },
   { href: "/events", key: "nav.bigEvents" },
+];
+
+const links: { href: string; key: DictKey }[] = [
   { href: "/performers", key: "nav.performers" },
   { href: "/venues", key: "nav.venues" },
   { href: "/request", key: "nav.private" },
   { href: "/spotlight", key: "nav.spotlight" },
   { href: "/news", key: "nav.news" },
 ];
+
+const isActive = (path: string, href: string) => path === href || path.startsWith(`${href}/`);
+
+/** Spectacles ▾ : local shows and big events. A list on phones, a small menu on wider screens. */
+function ShowsMenu({ path }: { path: string }) {
+  const { t } = useLang();
+  const [open, setOpen] = useState(false);
+  const active = showLinks.some((l) => isActive(path, l.href));
+  useEffect(() => setOpen(false), [path]);
+  useEffect(() => {
+    if (!open) return;
+    const close = (e: MouseEvent | KeyboardEvent) => {
+      if (e instanceof KeyboardEvent ? e.key === "Escape" : !(e.target as HTMLElement).closest("[data-shows-menu]")) setOpen(false);
+    };
+    document.addEventListener("click", close);
+    document.addEventListener("keydown", close);
+    return () => {
+      document.removeEventListener("click", close);
+      document.removeEventListener("keydown", close);
+    };
+  }, [open]);
+
+  return (
+    <div data-shows-menu className="relative">
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls="shows-menu"
+        onClick={() => setOpen(!open)}
+        className={`hidden items-center gap-1 border-b-[3px] pb-1 font-bold text-white lg:flex ${active ? "border-accent" : "border-transparent hover:border-ink-line"}`}
+      >
+        {t("nav.shows")}
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" aria-hidden="true" className={open ? "rotate-180" : ""}><path d="m6 9 6 6 6-6" /></svg>
+      </button>
+      <span className="text-sm font-bold uppercase tracking-wider text-on-dark lg:hidden">{t("nav.shows")}</span>
+      <div
+        id="shows-menu"
+        className={`${open ? "lg:flex" : "lg:hidden"} mt-2 flex flex-col gap-3 pl-3 lg:absolute lg:left-1/2 lg:top-full lg:z-30 lg:mt-3 lg:w-56 lg:-translate-x-1/2 lg:gap-0 lg:overflow-hidden lg:rounded-xl lg:bg-white lg:p-1.5 lg:shadow-xl`}
+      >
+        {showLinks.map((l) => (
+          <Link
+            key={l.href}
+            href={l.href}
+            aria-current={isActive(path, l.href) ? "page" : undefined}
+            className={`w-fit text-white no-underline hover:text-white lg:w-full lg:rounded-lg lg:px-3.5 lg:py-2.5 lg:text-ink lg:hover:bg-sand lg:hover:text-ink ${isActive(path, l.href) ? "lg:text-accent" : ""}`}
+          >
+            {t(l.key)}
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 /** The current path without the /en prefix, so "is this link active?" works in both languages. */
 function useBarePath() {
@@ -86,9 +143,10 @@ export function Header({ user }: { user?: { name: string; home: string } | null 
           id="site-menu"
           className={`${open ? "flex" : "hidden"} w-full flex-col gap-5 border-t border-ink-line pb-4 pt-4 lg:flex lg:w-auto lg:flex-1 lg:flex-row lg:items-center lg:border-0 lg:p-0`}
         >
-          <div className="flex flex-col gap-4 font-display text-[17px] font-bold lg:flex-1 lg:flex-row lg:flex-wrap lg:justify-center lg:gap-x-4 lg:gap-y-2 lg:text-[14px] xl:gap-x-5 xl:text-[15px]">
+          <div className="flex flex-col gap-4 font-display text-[17px] font-bold lg:flex-1 lg:flex-row lg:flex-nowrap lg:items-center lg:justify-center lg:gap-x-4 lg:text-[14px] xl:gap-x-6 xl:text-[15px]">
+            <ShowsMenu path={path} />
             {links.map((l) => {
-              const active = path === l.href || path.startsWith(`${l.href}/`);
+              const active = isActive(path, l.href);
               return (
                 <Link
                   key={l.href}
@@ -100,6 +158,7 @@ export function Header({ user }: { user?: { name: string; home: string } | null 
                 </Link>
               );
             })}
+            <ContactButton label={t("nav.contact")} className="w-fit border-b-[3px] border-transparent pb-1 text-left font-bold text-white hover:border-ink-line" />
           </div>
           <div className="flex flex-wrap items-center gap-4">
             <LangToggle />

@@ -91,8 +91,8 @@ export default async function ShowsPage({ params }: { params: Promise<{ lang: st
         {bigEvents.length > 0 && (
           <div className="mt-14">
             <SectionHead title={c.big} sub={c.bigSub} more={{ href: "/events", label: c.bigMore }} />
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4">
-              {bigEvents.slice(0, 3).map((e) => <BigEventCard key={e.id} e={e} />)}
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {bigEvents.slice(0, 4).map((e) => <BigEventCard key={e.id} e={e} />)}
             </div>
           </div>
         )}

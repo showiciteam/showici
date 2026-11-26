@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { HomeSearch } from "@/components/HomeSearch";
 import { HomeMap } from "@/components/HomeMap";
 import { EventRow, ShowRow, TileCard } from "@/components/cards";
-import { PageHero, PillLink, RedBand, SectionHead } from "@/components/sections";
+import { ComingSoon, PageHero, PillLink, RedBand, SectionHead } from "@/components/sections";
 import { FollowButtons } from "@/components/Social";
 import Link from "@/components/Link";
 import { getBigEvents, getPerformers, getShows, getStories, getVenues } from "@/lib/data";
@@ -28,6 +28,7 @@ const copy = {
     read: "Lire l’entrevue",
     bandTitle: "Explorez la scène québécoise",
     bandText: "Des artistes, des salles et une communauté passionnée, partout au Québec.",
+    soon: "Information à venir",
   },
   en: {
     title: "The local scene.",
@@ -44,6 +45,7 @@ const copy = {
     read: "Read the interview",
     bandTitle: "Explore Québec’s live scene",
     bandText: "Artists, venues and a passionate community, all across Québec.",
+    soon: "Information coming soon",
   },
 } satisfies Record<Lang, unknown>;
 
@@ -63,6 +65,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
 
   // Until enough artists have joined, the "discover" row shows the acts playing big events this week.
   const discoverArtists = performers.length >= 4;
+  const thisWeek = shows.length > 0 ? "shows" : bigEvents.length > 0 ? "events" : "none";
 
   const siteLd = {
     "@context": "https://schema.org",
@@ -98,6 +101,9 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
 
       <section className="wrap py-14">
         <SectionHead title={c.discover} sub={c.discoverSub} more={{ href: discoverArtists ? "/performers" : "/events", label: c.allArtists }} />
+        {!discoverArtists && bigEvents.length === 0 ? (
+          <ComingSoon text={c.soon} />
+        ) : (
         <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-5">
           {discoverArtists
             ? performers.slice(0, 5).map((p) => (
@@ -107,6 +113,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
                 <TileCard key={e.id} href={e.url} external image={e.image} title={e.name} meta={[label(e.category, lang), e.venue].filter(Boolean).join(" · ")} />
               ))}
         </div>
+        )}
       </section>
 
       <HomeMap venues={venues} performers={performers} />
@@ -116,9 +123,9 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
           <div className="min-w-0 flex-[1_1_520px] rounded-2xl border border-white/10 bg-ink-soft p-6">
             <SectionHead title={c.thisWeek} more={{ href: "/shows", label: c.allShows }} dark />
             <div className="flex flex-col">
-              {shows.length > 0
-                ? shows.slice(0, 3).map((s) => <ShowRow key={s.id} show={s} venue={venueById[s.venueId]} />)
-                : bigEvents.slice(0, 3).map((e) => <EventRow key={e.id} e={e} />)}
+              {thisWeek === "shows" && shows.slice(0, 3).map((s) => <ShowRow key={s.id} show={s} venue={venueById[s.venueId]} />)}
+              {thisWeek === "events" && bigEvents.slice(0, 3).map((e) => <EventRow key={e.id} e={e} />)}
+              {thisWeek === "none" && <ComingSoon text={c.soon} dark />}
             </div>
           </div>
           {featured?.article && (

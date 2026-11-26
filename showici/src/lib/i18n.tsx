@@ -9,9 +9,10 @@ export type { Lang } from "./lang";
 const dict = {
   fr: {
     "nav.shows": "Spectacles",
+    "nav.localShows": "Spectacles locaux",
     "nav.bigEvents": "Grands événements",
     "nav.performers": "Artistes",
-    "nav.venues": "Salles",
+    "nav.venues": "Venues",
     "nav.private": "Événements privés",
     "nav.spotlight": "ShowIci Spotlight",
     "nav.news": "Nouvelles",
@@ -34,6 +35,7 @@ const dict = {
   },
   en: {
     "nav.shows": "Shows",
+    "nav.localShows": "Local shows",
     "nav.bigEvents": "Big events",
     "nav.performers": "Artists",
     "nav.venues": "Venues",

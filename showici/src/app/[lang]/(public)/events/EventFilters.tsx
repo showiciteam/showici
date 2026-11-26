@@ -3,12 +3,13 @@
 import { useMemo, useState } from "react";
 import { BigEventCard } from "@/components/cards";
 import { useLang } from "@/lib/i18n";
-import { label, monthLabel } from "@/lib/labels";
 import { ALL_QUEBEC, REGIONS, distanceKm } from "@/lib/regions";
 import type { BigEvent } from "@/lib/types";
 
 const CATEGORIES = ["All", "Concert", "Festival", "Comedy", "Theatre", "Family"];
 const WHEN = ["all", "weekend", "30", "90"] as const;
+// Three rows of four on wide screens, then "show more" adds three more rows.
+const PAGE_SIZE = 12;
 
 const copy = {
   fr: {
@@ -17,7 +18,7 @@ const copy = {
     whenLabel: "Quand", where: "Où", type: "Type d’événement",
     soon: "Les grands événements arrivent bientôt. Revenez nous voir.",
     none: "Aucun événement pour ces filtres. Essayez une autre date ou région.",
-    next: "Prochainement", more: (n: number) => ` · +${n} dates`, tickets: "Billets", sold: "Billets vendus sur Ticketmaster",
+    more: (n: number) => ` · +${n} dates`, tickets: "Billets", sold: "Billets vendus sur Ticketmaster", showMore: "Voir plus d’événements",
   },
   en: {
     cats: { All: "All", Concert: "Concerts", Festival: "Festivals", Comedy: "Comedy", Theatre: "Theatre", Family: "Family" } as Record<string, string>,
@@ -25,7 +26,7 @@ const copy = {
     whenLabel: "When", where: "Where", type: "Type of event",
     soon: "Big events are on their way. Check back soon.",
     none: "No events match these filters. Try another date or region.",
-    next: "Next up", more: (n: number) => ` · +${n} more dates`, tickets: "Get tickets", sold: "Tickets sold on Ticketmaster",
+    more: (n: number) => ` · +${n} more dates`, tickets: "Get tickets", sold: "Tickets sold on Ticketmaster", showMore: "Show more events",
   },
 };
 
@@ -69,7 +70,7 @@ export function EventsBrowser({ events }: { events: BigEvent[] }) {
     });
   }, [events, cat, when, region]);
 
-  const [featured, ...rest] = shown;
+  const [visible, setVisible] = useState(PAGE_SIZE);
 
   return (
     <>
@@ -104,29 +105,16 @@ export function EventsBrowser({ events }: { events: BigEvent[] }) {
         <p className="rounded-2xl border border-line bg-sand p-8 text-center text-slate">{events.length === 0 ? c.soon : c.none}</p>
       )}
 
-      {featured && (
-        <a href={featured.url} target="_blank" rel="noopener noreferrer sponsored" className="flex flex-wrap overflow-hidden rounded-2xl bg-ink text-white no-underline hover:text-white">
-          {featured.image ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={featured.image} alt="" className="min-h-72 flex-[1_1_520px] bg-ink-soft object-cover" />
-          ) : (
-            <div className="min-h-72 flex-[1_1_520px] bg-ink-soft" />
-          )}
-          <div className="flex flex-[1_1_360px] flex-col justify-center gap-3 p-8">
-            <span className="eyebrow text-accent-bright">{label(featured.category, lang)} · {c.next}</span>
-            <span className="font-display text-[30px] font-extrabold leading-tight sm:text-[34px]">{featured.name}</span>
-            <span className="text-on-dark">{[featured.venue, featured.city].filter(Boolean).join(", ")}</span>
-            <span className="text-on-dark">{[featured.month ? `${featured.date} ${monthLabel(featured.month, lang).toLowerCase()}` : "", featured.time].filter(Boolean).join(" · ")}{featured.moreDates ? c.more(featured.moreDates) : ""}</span>
-            {featured.price && <span className="text-on-dark">{featured.price}</span>}
-            <span className="mt-2 w-fit rounded-full bg-accent px-5 py-3 font-display font-bold text-white">{c.tickets} ↗</span>
-            <span className="text-xs text-on-dark">{c.sold}</span>
-          </div>
-        </a>
-      )}
-
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4">
-        {rest.map((e) => <BigEventCard key={e.id} e={e} />)}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {shown.slice(0, visible).map((e) => <BigEventCard key={e.id} e={e} />)}
       </div>
+      {shown.length > visible && (
+        <div className="text-center">
+          <button type="button" onClick={() => setVisible((n) => n + PAGE_SIZE)} className="min-h-11 rounded-full border-[1.5px] border-ink px-6 font-display font-bold hover:bg-sand">
+            {c.showMore}
+          </button>
+        </div>
+      )}
     </>
   );
 }
