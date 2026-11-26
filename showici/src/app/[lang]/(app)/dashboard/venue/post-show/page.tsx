@@ -151,15 +151,15 @@ export default function PostShow() {
               <label className="label">{tr("Genre")}<select value={genre} onChange={(e) => setGenre(e.target.value)} className="input"><option value="Rock covers">{tr("Rock covers")}</option><option value="Pop">{tr("Pop")}</option><option value="Blues">{tr("Blues")}</option><option value="Jazz">{tr("Jazz")}</option><option value="Folk / trad">{tr("Folk / trad")}</option><option value="Latin">{tr("Latin")}</option><option value="Comedy">{tr("Comedy")}</option><option value="DJ night">{tr("DJ night")}</option><option value="Magic">{tr("Magic")}</option><option value="Other">{tr("Other")}</option></select></label>
               <div className="flex flex-col gap-2">
                 <ChipGroup legend={tr("Description")} hint={tr("Write it in both languages")} single options={["Français", "English"]} value={lang} onChange={setLang} />
-                <textarea rows={3} value={descFr} onChange={(e) => setDescFr(e.target.value)} className={`input ${lang[0] === "Français" ? "" : tr("hidden")}`} placeholder={tr("Description du spectacle en français.")} />
-                <textarea rows={3} value={descEn} onChange={(e) => setDescEn(e.target.value)} className={`input ${lang[0] === "English" ? "" : tr("hidden")}`} placeholder={tr("Show description in English.")} />
+                <textarea rows={3} value={descFr} onChange={(e) => setDescFr(e.target.value)} className={`input ${lang[0] === "Français" ? "" : "hidden"}`} placeholder={tr("Description du spectacle en français.")} />
+                <textarea rows={3} value={descEn} onChange={(e) => setDescEn(e.target.value)} className={`input ${lang[0] === "English" ? "" : "hidden"}`} placeholder={tr("Show description in English.")} />
               </div>
               {status && <Notice kind={status.kind}>{status.msg}</Notice>}
               <TagUsTip />
               <div className="flex flex-wrap items-center justify-end gap-2.5">
                 {showId && currentStatus !== "cancelled" && <button type="button" disabled={busy} onClick={cancelShow} className="mr-auto text-sm font-bold text-red-700 underline">{tr("Cancel this show")}</button>}
                 <Button variant="secondary" disabled={busy} onClick={() => save("draft")}>{tr("Save draft")}</Button>
-                <Button type="submit" disabled={busy} className="px-7">{busy ? "Saving…" : showId ? tr("Save and publish") : tr("Publish show")}</Button>
+                <Button type="submit" disabled={busy} className="px-7">{busy ? tr("Saving…") : showId ? tr("Save and publish") : tr("Publish show")}</Button>
               </div>
             </form>
             <aside className="flex max-w-[360px] flex-[1_1_280px] flex-col gap-3">

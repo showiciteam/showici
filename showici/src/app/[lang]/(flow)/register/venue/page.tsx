@@ -214,7 +214,7 @@ export default function RegisterVenue() {
             {status && <Notice kind={status.kind}>{status.msg}</Notice>}
             <div className="flex flex-wrap justify-end gap-2.5">
               <Button variant="secondary" disabled={busy || !f.name} onClick={() => save(false)}>{tr("Save as draft")}</Button>
-              <Button type="submit" disabled={busy} className="px-7 text-base">{busy ? "Saving…" : existingId ? tr("Save and publish") : tr("Publish my venue")}</Button>
+              <Button type="submit" disabled={busy} className="px-7 text-base">{busy ? tr("Saving…") : existingId ? tr("Save and publish") : tr("Publish my venue")}</Button>
             </div>
           </FormCard>
         </form>
