@@ -4,7 +4,7 @@ import { AppHeader } from "@/components/Header";
 import Link from "@/components/Link";
 import { Button, DateBadge, toneClass } from "@/components/ui";
 import { getEventRequests } from "@/lib/data";
-import { countConversations, getBookingRequests, getContactAllowance, getMyPerformer } from "@/lib/dashboard";
+import { countConversations, getBookingRequests, getMyPerformer } from "@/lib/dashboard";
 import { requireUser } from "@/lib/session";
 import { AvailabilityToggle } from "./AvailabilityToggle";
 import { BookingRequests } from "./BookingRequests";
@@ -20,9 +20,9 @@ export default async function PerformerDashboard() {
   const requests = allRequests.slice(0, 3);
 
   // Demo mode keeps the sample layout. Live mode reads the signed-in performer's own data.
-  const [me, conversations, contactsLeft, bookings] = user
-    ? await Promise.all([getMyPerformer(user.id), countConversations(user.id), getContactAllowance(user.id), getBookingRequests()])
-    : [null, 3, 2, []];
+  const [me, conversations, bookings] = user
+    ? await Promise.all([getMyPerformer(user.id), countConversations(user.id), getBookingRequests()])
+    : [null, 3, []];
 
   const name = me?.name ?? user?.name ?? "[Band name]";
   const strength = me?.strength ?? (user ? 0 : 85);
@@ -34,7 +34,7 @@ export default async function PerformerDashboard() {
   const stats: [string, string][] = [
     ["Conversations", String(conversations)],
     ["Open event requests", String(allRequests.length)],
-    ["Contacts left today", contactsLeft == null ? tr("Unlimited") : `${contactsLeft} / 2`],
+    ["Booking requests", String(bookings.length)],
     ["Profile", me ? (me.published ? tr("Published") : tr("Draft")) : user ? tr("Not created") : tr("Published")],
   ];
 

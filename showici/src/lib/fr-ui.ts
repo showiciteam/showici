@@ -320,7 +320,7 @@ export const FR_UI: Record<string, string> = {
   "PREVIEW: how your videos appear on your venue page": "APERÇU : vos vidéos telles qu'elles paraissent sur la page de votre salle",
   "Previous photo": "Photo précédente",
   "Price": "Prix",
-  "Private events looking for acts like yours, within your 50 km travel area. Responding uses one of your daily contacts.": "Des événements privés qui cherchent des artistes comme vous, dans votre rayon de 50 km. Répondre utilise un de vos contacts quotidiens.",
+  "Private events looking for acts like yours, within your 50 km travel area.": "Des événements privés qui cherchent des artistes comme vous, dans votre rayon de 50 km.",
   "Private parties": "Fêtes privées",
   "Private. Never shown on your page.": "Privé. Jamais affiché sur votre page.",
   "Private. Never shown on your profile.": "Privé. Jamais affiché sur votre profil.",

@@ -139,9 +139,12 @@ export function Inbox({ live, meId, threads, activeId, messages: initial, starte
       <aside className="flex max-w-[340px] flex-[1_1_280px] flex-col border-r border-line">
         <div className="flex flex-col gap-2.5 border-b border-line p-[18px]">
           <h1 className="h-display text-[26px]">{tr("Messages")}</h1>
-          <span className="rounded-[10px] bg-accent-tint px-3 py-2 text-[13px] font-bold text-ink-deep">
-            {contactsLeft == null ? tr("Unlimited new contacts") : fill(tr("{count} of 2 new contacts left today"), { count: contactsLeft })}
-          </span>
+          {/* Only shown if the admin turns plan limits back on. */}
+          {contactsLeft != null && (
+            <span className="rounded-[10px] bg-accent-tint px-3 py-2 text-[13px] font-bold text-ink-deep">
+              {fill(tr("{count} of 2 new contacts left today"), { count: contactsLeft })}
+            </span>
+          )}
           {live && (
             <label className="flex items-center gap-2 text-[13px] text-slate">
               <input

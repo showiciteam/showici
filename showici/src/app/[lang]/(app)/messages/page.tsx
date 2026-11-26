@@ -19,7 +19,7 @@ export default async function MessagesPage({ searchParams }: { searchParams: Pro
       <>
         <AppHeader role="venue" name="[Your pub]" />
         <main className="wrap pb-12 pt-6">
-          <Inbox live={false} meId="" threads={threads} activeId={threads[0]?.id ?? null} messages={[]} contactsLeft={1} startedAt={null} newTo={null} />
+          <Inbox live={false} meId="" threads={threads} activeId={threads[0]?.id ?? null} messages={[]} contactsLeft={null} startedAt={null} newTo={null} />
         </main>
       </>
     );
