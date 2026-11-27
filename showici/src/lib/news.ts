@@ -14,6 +14,8 @@ export interface NewsArticleText {
   /** Byline, e.g. "The ShowIci team". */
   author: string;
   keywords: string[];
+  /** Description of the article picture, for screen readers. */
+  imageAlt?: string;
   sections: { heading?: string; paragraphs: string[] }[];
   tagline: string;
 }
@@ -23,6 +25,8 @@ export interface NewsArticle extends Record<Lang, NewsArticleText> {
   /** ISO date, for search engines and the sitemap. */
   published: string;
   tone: Tone;
+  /** Article picture in /public, also used for link previews. */
+  image?: string;
 }
 
 /** Published News articles, newest first. Each one lives at /news/<slug> (French) and /en/news/<slug> (English). */
@@ -31,6 +35,7 @@ export const NEWS_ARTICLES: NewsArticle[] = [
     slug: "the-story-behind-showici",
     published: "2026-11-27",
     tone: "ph-1",
+    image: "/images/the-story-behind-showici.jpg",
     fr: {
       category: "Communauté",
       title: "ShowIci : parce que le talent d’ici mérite d’être vu",
@@ -40,6 +45,7 @@ export const NEWS_ARTICLES: NewsArticle[] = [
       date: "27 novembre 2026",
       read: "4 min de lecture",
       author: "L’équipe ShowIci",
+      imageAlt: "Le logo ShowIci devant la page d’accueil du site",
       keywords: [
         "artistes locaux Québec",
         "spectacles",
@@ -142,6 +148,7 @@ export const NEWS_ARTICLES: NewsArticle[] = [
       date: "November 27, 2026",
       read: "4 min read",
       author: "The ShowIci team",
+      imageAlt: "The ShowIci logo over the ShowIci homepage",
       keywords: [
         "Québec local artists",
         "live entertainment",
