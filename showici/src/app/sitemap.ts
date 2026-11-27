@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { createClient } from "@supabase/supabase-js";
 import { stories } from "@/lib/mock";
+import { NEWS_ARTICLES } from "@/lib/news";
 import { LANGS, localize } from "@/lib/lang";
 import { SITE_URL } from "@/lib/site";
 
@@ -52,5 +53,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   const fixed = PUBLIC_PAGES.map((p) => entry(p.path, now, p.changeFrequency, p.priority));
   const articles = stories.filter((s) => s.article && !s.draft).map((s) => entry(`/spotlight/${s.slug}`, now, "monthly", 0.7));
-  return [...fixed, ...articles, ...(await dynamicPages())];
+  const news = NEWS_ARTICLES.map((a) => entry(`/news/${a.slug}`, new Date(a.published), "monthly", 0.6));
+  return [...fixed, ...articles, ...news, ...(await dynamicPages())];
 }
