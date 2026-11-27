@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const article = getNewsArticle(slug);
   if (!article || !isLang(lang)) return {};
   const a = article[lang];
-  const meta = pageMetadata({ lang, path: `/news/${slug}`, title: a.seoTitle, description: a.description });
+  const meta = pageMetadata({ lang, path: `/news/${slug}`, title: a.seoTitle, description: a.description, image: article.image });
   return {
     ...meta,
     keywords: a.keywords,
@@ -42,6 +42,7 @@ export default async function NewsArticlePage({ params }: { params: Params }) {
     description: a.description,
     inLanguage: fr ? "fr-CA" : "en-CA",
     datePublished: article.published,
+    image: article.image ? absoluteUrl(article.image) : undefined,
     keywords: a.keywords.join(", "),
     author: { "@type": "Organization", name: "ShowIci", url: SITE_URL },
     publisher: { "@id": `${SITE_URL}/#organization` },
@@ -61,6 +62,10 @@ export default async function NewsArticlePage({ params }: { params: Params }) {
           <span className="flex-1 text-[15px]"><strong>{a.author}</strong><br /><span className="text-muted">{a.date} · {a.read}</span></span>
           <ShareMenu title={a.title} />
         </div>
+        {article.image && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={article.image} alt={a.imageAlt ?? ""} width={1600} height={900} className="mb-4 aspect-[16/9] w-full rounded-[18px] object-cover" />
+        )}
         <div className="text-lg leading-[1.7] text-graphite">
           {a.sections.map((section, i) => (
             <section key={section.heading ?? i}>
