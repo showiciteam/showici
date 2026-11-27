@@ -57,7 +57,7 @@ export default async function NewsArticlePage({ params }: { params: Params }) {
         <h1 className="h-display text-[clamp(36px,5vw,54px)] leading-[1.05]">{a.title}</h1>
         <p className="mt-4 font-display text-[22px] font-normal leading-normal text-slate">{a.dek}</p>
         <div className="my-6 flex flex-wrap items-center gap-3.5 border-y border-line py-4">
-          <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-ink font-display text-sm font-extrabold text-accent">ES</span>
+          <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-ink font-display text-sm font-extrabold text-accent">JF</span>
           <span className="flex-1 text-[15px]"><strong>{article.author}</strong>, {a.authorRole}<br /><span className="text-muted">{a.date} · {a.read}</span></span>
           <ShareMenu title={a.title} />
         </div>
