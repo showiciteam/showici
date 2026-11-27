@@ -30,7 +30,7 @@ export const NEWS_ARTICLES: NewsArticle[] = [
   {
     slug: "the-story-behind-showici",
     published: "2026-11-27",
-    author: "Edgar da Silva",
+    author: "Jessica F.",
     tone: "ph-1",
     fr: {
       category: "Communauté",
@@ -40,7 +40,7 @@ export const NEWS_ARTICLES: NewsArticle[] = [
       dek: "ShowIci est né d’un amour de la musique et de l’envie de rendre le talent d’ici plus facile à découvrir. Voici l’histoire du projet, pourquoi il existe et ce que nous espérons bâtir avec la communauté artistique du Québec.",
       date: "27 novembre 2026",
       read: "4 min de lecture",
-      authorRole: "Fondateur de ShowIci",
+      authorRole: "Rédactrice",
       keywords: [
         "artistes locaux Québec",
         "spectacles",
@@ -142,7 +142,7 @@ export const NEWS_ARTICLES: NewsArticle[] = [
       dek: "ShowIci started with a love of music and a desire to make local talent easier to discover. Here’s the story behind the project, why it exists and what we hope to build together with Québec’s artistic community.",
       date: "November 27, 2026",
       read: "4 min read",
-      authorRole: "Founder of ShowIci",
+      authorRole: "Editor",
       keywords: [
         "Québec local artists",
         "live entertainment",
