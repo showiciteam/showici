@@ -34,7 +34,12 @@ export default async function NewsPage({ params }: { params: Promise<{ lang: str
 
       {featured && (
         <Link href={`/news/${featured.slug}`} className="card flex flex-wrap items-center gap-7 overflow-hidden text-ink no-underline hover:text-ink">
-          <Placeholder tone={featured.tone} className="min-h-[340px] flex-[1_1_480px] self-stretch" />
+          {featured.image ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={featured.image} alt={featured[lang].imageAlt ?? ""} className="min-h-[340px] w-0 min-w-0 flex-[1_1_480px] self-stretch object-cover" />
+          ) : (
+            <Placeholder tone={featured.tone} className="min-h-[340px] flex-[1_1_480px] self-stretch" />
+          )}
           <div className="flex flex-[1_1_380px] flex-col gap-3 py-7 pl-1 pr-8">
             <span className="eyebrow">{featured[lang].category}</span>
             <span className="h-display text-4xl leading-tight">{featured[lang].title}</span>
