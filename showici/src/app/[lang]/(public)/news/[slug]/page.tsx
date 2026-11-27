@@ -18,8 +18,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   return {
     ...meta,
     keywords: a.keywords,
-    authors: [{ name: article.author }],
-    openGraph: { ...meta.openGraph, type: "article", publishedTime: article.published, authors: [article.author] },
+    authors: [{ name: a.author }],
+    openGraph: { ...meta.openGraph, type: "article", publishedTime: article.published, authors: [a.author] },
   };
 }
 
@@ -43,7 +43,7 @@ export default async function NewsArticlePage({ params }: { params: Params }) {
     inLanguage: fr ? "fr-CA" : "en-CA",
     datePublished: article.published,
     keywords: a.keywords.join(", "),
-    author: { "@type": "Person", name: article.author, jobTitle: a.authorRole },
+    author: { "@type": "Organization", name: "ShowIci", url: SITE_URL },
     publisher: { "@id": `${SITE_URL}/#organization` },
     mainEntityOfPage: absoluteUrl(localize(`/news/${slug}`, lang)),
   };
@@ -57,8 +57,8 @@ export default async function NewsArticlePage({ params }: { params: Params }) {
         <h1 className="h-display text-[clamp(36px,5vw,54px)] leading-[1.05]">{a.title}</h1>
         <p className="mt-4 font-display text-[22px] font-normal leading-normal text-slate">{a.dek}</p>
         <div className="my-6 flex flex-wrap items-center gap-3.5 border-y border-line py-4">
-          <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-ink font-display text-sm font-extrabold text-accent">JF</span>
-          <span className="flex-1 text-[15px]"><strong>{article.author}</strong>, {a.authorRole}<br /><span className="text-muted">{a.date} · {a.read}</span></span>
+          <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-ink font-display text-sm font-extrabold text-accent">SI</span>
+          <span className="flex-1 text-[15px]"><strong>{a.author}</strong><br /><span className="text-muted">{a.date} · {a.read}</span></span>
           <ShareMenu title={a.title} />
         </div>
         <div className="text-lg leading-[1.7] text-graphite">
@@ -69,7 +69,7 @@ export default async function NewsArticlePage({ params }: { params: Params }) {
             </section>
           ))}
           <p className="mt-10 font-display text-[26px] font-semibold leading-snug text-ink">{a.tagline}</p>
-          <p className="mt-8"><strong className="text-ink">{article.author}</strong><br /><span className="text-muted">{a.authorRole}</span></p>
+          <p className="mt-8 font-bold text-ink">{a.author}</p>
         </div>
       </article>
       <section className="border-t border-line bg-sand">
